@@ -37,12 +37,12 @@ const DashboardLayout: React.FC<LayoutProps> = ({ children }) => {
       {/* Adjusted layout for Sidebar and Main Content */}
       <div className="flex pt-[6.5rem]"> {/* This padding accounts for TopNav + SecondaryMenuBar */}
         {/* Fixed Sidebar (now sits below SecondaryMenuBar) */}
-        <div className="fixed left-0 top-[3rem] h-[calc(100vh-3rem)] w-64 border-r border-border bg-sidebar">
+        <div className="fixed left-0 top-[3rem] h-[calc(100vh-3rem)] w-48 border-r border-border bg-sidebar">
           <SidebarNav />
         </div>
 
         {/* Main Content (starts after Sidebar, with padding for TopNav & SecondaryMenuBar already handled by parent div) */}
-        <main className="flex-1 ml-64 pl-0 pr-6 py-6">
+        <main className="flex-1 ml-36 pl-0 pr-6 py-6">
           
           <div className="max-w-[1400px]">{children}</div>
         </main>
