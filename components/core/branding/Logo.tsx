@@ -7,7 +7,7 @@ export function Logo() {
         <div className="bg-gradient-to-r from-primary to-accent rounded-md w-8 h-8 flex items-center justify-center text-white font-bold text-lg">
           S
         </div>
-        <span className="ml-2 font-semibold text-lg">Sikso</span>
+        <span className="ml-2 font-semibold text-lg">SIKSO</span>
       </div>
     </Link>
   )

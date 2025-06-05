@@ -234,6 +234,7 @@ export function SidebarNav() {
           {/* Section Navigation with Dropdowns */}
           {sectionNavItems.map((section) => (
             <div key={section.section}>
+              
               <button
                 onClick={() => toggleSection(section.section)}
                 className={cn(

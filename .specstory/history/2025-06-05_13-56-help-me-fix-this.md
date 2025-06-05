@@ -437,7 +437,84 @@ One probleme as long as I toggle betwen light and dark I do not have an issue. B
 
 _**Assistant**_
 
+Ah, I see the issue. The problem is likely because we need to ensure the proper theme attributes are cleared when switching between themes. Let's check your theme provider: 
 
+Let's modify your theme provider to handle this properly. We need to make it clear the brand class when switching to other themes: 
+```
+
+```
+
+
+I've updated the ThemeProvider to:
+
+1. Add explicit theme values mapping to ensure proper class handling
+2. Added an `onValueChange` callback that removes the 'brand' class when switching to any other theme
+3. Added a helper function to clean up theme-specific classes
+
+This should now:
+- Properly apply the brand theme when selected
+- Correctly remove the brand theme when switching to light/dark
+- Maintain proper theme switching between light/dark
+
+Now when you:
+1. Switch from brand → light: The brand class will be removed, and light theme will apply correctly
+2. Switch from brand → dark: The brand class will be removed, and dark theme will apply correctly
+3. Switch between light ↔ dark: Will work as before with no issues
+
+Try switching between themes now - you should see proper theme changes without any sticking issues.
+
+---
+
+_**User**_
+
+I searched how wto make the notification bell in my topnav have this colour (hover:bg-[#2A3050]) when we hover on it but I could not find it. This is basically the same hover colour of my sidebar when the them is .brand
+
+---
+
+_**Assistant**_
+
+I'll help you add the hover effect to the notification bell button in the TopNav that matches the sidebar hover color when using the brand theme. Let's update the button's styling in TopNav.tsx: 
+```
+
+```
+
+
+I've updated the notification bell button to use `hover:bg-[var(--topnav-hover)]`. Since we've already defined `--topnav-hover` in your `globals.css` for the brand theme (which matches your sidebar hover color), this will:
+
+1. Use the same hover color as your sidebar when in brand theme
+2. Properly adapt to other themes since we're using the CSS variable
+3. Maintain consistency with your design system
+
+This means:
+- In brand theme: hover will show the `#2A3050` color (matches sidebar)
+- In light/dark themes: hover will use their respective theme-appropriate colors
+
+Let's also apply this same hover effect to the other buttons in the TopNav for consistency: 
+```
+
+```
+
+```
+
+```
+Now all the buttons in your TopNav will have consistent hover effects that match your theme:
+- Brand theme: `#2A3050` hover color (matching sidebar)
+- Light theme: Light gray hover effect
+- Dark theme: Dark gray hover effect
+
+The hover effects will automatically adapt when you switch themes, maintaining visual consistency throughout your application.
+
+---
+
+_**User**_
+
+one lats thin. I install react-flag but the language button does still not show real flag. How to do that?
+
+---
+
+_**Assistant**_
+
+Let me help you implement the language selector with real flags using react-flags. First, let me check your current LanguageSelector component: 
 
 ---
 

@@ -81,7 +81,11 @@ export function TopNav() {
   return (
     <header className="sticky top-0 left-0 right-0 h-14 bg-[var(--topnav-bg)] text-[var(--topnav-foreground)] z-50 px-3 flex items-center justify-between shadow-md">
       <div className="flex items-center lg:hidden">
-        <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(!showMobileMenu)} className="text-[var(--topnav-foreground)]">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setShowMobileMenu(!showMobileMenu)} 
+          className="text-[var(--topnav-foreground)] hover:bg-[var(--topnav-hover)]">
           <Menu className="h-4 w-5" />
         </Button>
       </div>
@@ -93,7 +97,7 @@ export function TopNav() {
           <input
             type="text"
             placeholder={t("search.placeholder")}
-            className="w-full bg-[var(--topnav-hover)] border border-[var(--topnav-border)] rounded-full py-1.5 pl-10 pr-4 text-sm text-[var(--topnav-foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--topnav-active)]"
+            className="w-full bg-gray-700/50 border border-gray-600 rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
       </div>
@@ -105,7 +109,10 @@ export function TopNav() {
         {/* Notification Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-[var(--topnav-foreground)] relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-[var(--topnav-foreground)] relative hover:bg-[var(--topnav-hover)]">
               <Bell className="h-5 w-5 text-[var(--topnav-foreground)]" />
               {/* Notification badge (dynamic) */}
               {/* This will show only if there are unread notifications */}
@@ -159,7 +166,10 @@ export function TopNav() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="ghost" size="icon" className="text-[var(--topnav-foreground)]">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="text-[var(--topnav-foreground)] hover:bg-[var(--topnav-hover)]">
           <HelpCircle className="h-5 w-5 text-[var(--topnav-foreground)]" />
         </Button>
 
