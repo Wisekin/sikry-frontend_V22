@@ -3,10 +3,10 @@
 import type React from "react"
 
 import { createContext, useContext, useEffect, useState } from "react"
+import { createClient } from "@supabase/supabase-js"
 import type { User, Session } from "@supabase/supabase-js"
-import { createClient } from "@/utils/supabase/client"
 
-const supabase = createClient()
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 interface AuthContextType {
   user: User | null

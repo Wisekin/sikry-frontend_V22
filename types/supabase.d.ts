@@ -55,3 +55,24 @@ export interface Database {
           phones: string[] | null
           technologies: string[] | null
           social_links: Json | null
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          emails?: string[] | null
+          phones?: string[] | null
+          technologies?: string[] | null
+          social_links?: Json | null
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          emails?: string[] | null
+          phones?: string[] | null
+          technologies?: string[] | null
+          social_links?: Json | null
+        }
+      }
+    }
+  }
+}

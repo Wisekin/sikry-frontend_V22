@@ -3,6 +3,7 @@ import { TranslationProvider } from "@/providers/TranslationProvider"
 import { SidebarNav } from "@/components/core/navigation/SidebarNav"
 import { TopNav } from "@/components/core/navigation/TopNav"
 import { ThemeProvider } from "@/providers/ThemeProvider"
+import { AuthProvider } from "@/providers/AuthProvider"
 
 export default function DashboardLayout({
   children,
@@ -14,12 +15,12 @@ export default function DashboardLayout({
       <div className="min-h-screen bg-background">
         <div className="flex h-screen overflow-hidden">
           {/* Sidebar */}
-      {/*     <div className="hidden md:flex md:w-64 md:flex-col">
+          <div className="hidden md:flex md:w-64 md:flex-col">
             <div className="flex flex-col flex-grow border-r bg-sidebar overflow-y-auto">
               <SidebarNav />
             </div>
-          </div> */}
-
+          </div>
+    <AuthProvider>
           {/* Main content */}
           <div className="flex flex-col flex-1 overflow-hidden">
             <TopNav />
@@ -29,6 +30,7 @@ export default function DashboardLayout({
             </ThemeProvider>
             </main>
           </div>
+</AuthProvider>
         </div>
       </div>
     </TranslationProvider>

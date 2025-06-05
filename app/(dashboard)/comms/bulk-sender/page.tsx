@@ -173,4 +173,24 @@ export default function BulkSenderPage() {
                         Physical address included
                       </li>
                       <li className="flex items-center">
-                        <span className="h-1.\
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2"></span>
+                        CAN-SPAM requirements met
+                      </li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="linkedin">
+          <div>LinkedIn bulk sending coming soon.</div>
+        </TabsContent>
+        <TabsContent value="phone">
+          <div>Phone bulk sending coming soon.</div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
