@@ -410,5 +410,34 @@ Let me check how the theme is being applied. Since you mentioned having to reloa
 
 Let me check your theme provider and implementation: 
 
+I found two theme providers in your codebase (`theme-provider.tsx` and `ThemeProvider.tsx`). Let me check how they're being used: 
+
+Now I understand the issue. You have to reload because the ThemeProvider in your root layout (`layout.tsx`) has `disableTransitionOnChange` set to `true`. This prop prevents theme transitions from happening smoothly and requires a reload.
+
+Let's modify the ThemeProvider to fix this. We'll enable transitions: 
+```
+
+```
+This change will allow the theme to change instantly without requiring a page reload. The `disableTransitionOnChange` prop was preventing smooth transitions between themes.
+
+Now when you click on any theme option (brand, light, dark, or system), it should change immediately without needing to reload the page. The TopNav and Sidebar will instantly update to match the selected theme's colors.
+
+You should see:
+1. Instant theme changes without page reload
+2. Proper theme colors applied to TopNav and Sidebar
+3. Smooth transitions between themes
+
+---
+
+_**User**_
+
+One probleme as long as I toggle betwen light and dark I do not have an issue. But when I toggle to brand and come back to either light or dark I still stay on brand 
+
+---
+
+_**Assistant**_
+
+
+
 ---
 

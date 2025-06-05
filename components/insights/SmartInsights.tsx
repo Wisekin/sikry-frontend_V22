@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   ExclamationTriangleIcon,
   LightBulbIcon,
   ArrowRightIcon,
@@ -20,7 +20,7 @@ export function SmartInsights() {
       description: "Found 23 companies with recent funding rounds in your target market",
       impact: "High",
       action: "Review prospects",
-      icon: TrendingUpIcon,
+      icon: ArrowTrendingUpIcon,
       color: "bg-green-500",
     },
     {
