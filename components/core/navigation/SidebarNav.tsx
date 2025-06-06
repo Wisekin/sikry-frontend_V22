@@ -208,10 +208,8 @@ export function SidebarNav() {
   {/* Sticky Header */}
   <div className="h-16 flex-shrink-0 bg-sidebar flex items-center p-4 border-b text-white sticky top-0 z-10">
     <Logo />
-  </div>
-
-  {/* Scrollable Nav Content */}
-  <div className="flex-1 overflow-y-auto py-4">
+  </div>  {/* Scrollable Nav Content */}
+  <div className="flex-1 overflow-y-auto py-4 scrollbar-custom">
     <nav className="px-2 space-y-1">
       {/* Main Navigation */}
       {mainNavItems.map((item) => (

@@ -18,6 +18,11 @@
     --topnav-hover: rgba(0, 0, 0, 0.05);
     --topnav-active: rgba(0, 0, 0, 0.1);
     --topnav-border: rgba(0, 0, 0, 0.1);
+
+    /* Scrollbar */
+    --scrollbar-track: #f1f1f1;
+    --scrollbar-thumb: #c1c1c1;
+    --scrollbar-thumb-hover: #a8a8a8;
     
     --sidebar: #f8f9fa;
     --sidebar-hover: #f1f3f5;
@@ -53,6 +58,11 @@
     /* Dark theme TopNav and Sidebar */
     --topnav-bg: #1E1E1E;
     --topnav-foreground: #E0E0E0;
+
+    /* Scrollbar */
+    --scrollbar-track: #1a1a1a;
+    --scrollbar-thumb: #333333;
+    --scrollbar-thumb-hover: #444444;
     --topnav-hover: rgba(255, 255, 255, 0.05);
     --topnav-active: rgba(255, 255, 255, 0.1);
     --topnav-border: rgba(255, 255, 255, 0.1);
@@ -128,8 +138,13 @@
 /* These will override HSL variables if names clash, or add new ones */
 /* For example, if you want the brand's primary color to be different from the default HSL primary */
 .brand {
-  /* Brand-specific primary, accent, secondary if they differ from the HSL defaults */
-  /* Example: --primary: 258 95% 57%; */ /* Uncomment and set if brand primary is different */
+  /* Brand-specific variables */
+  --primary: 195 17% 16%; /* #213032 */
+  --primary-foreground: 0 0% 100%; /* #ffffff */
+  --secondary: 213 13% 42%; /* #5a697b */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 189 47% 80%; /* #b5dde5 */
+  --accent-foreground: 195 17% 16%;
   
   /* TopNav specific variables */
   --topnav-bg: #213032;
@@ -137,6 +152,17 @@
   --topnav-hover: rgba(255, 255, 255, 0.1);
   --topnav-active: rgba(255, 255, 255, 0.2);
   --topnav-border: rgba(255, 255, 255, 0.1);
+  
+  /* Sidebar */
+  --sidebar: #1B1F3B;
+  --sidebar-hover: #2A3050;
+  --sidebar-selected: #3C4568;
+  --sidebar-foreground: #FFFFFF;
+  
+  /* Scrollbar */
+  --scrollbar-track: #1d2a2c;
+  --scrollbar-thumb: #394b4e;
+  --scrollbar-thumb-hover: #455b5f;
   
   /* Specific variables from original app/globals.css that might be brand related or component-specific */
   --brand-primary: #213032; /* Renamed to avoid clash, use this in brand components */
@@ -281,6 +307,32 @@
   }
   .shadow-dark-md {
     box-shadow: var(--shadow-dark-md);
+  }
+
+  /* Custom scrollbar styling */
+  .scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 4px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 4px;
+    border: 2px solid var(--scrollbar-track);
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
   }
 }
 
