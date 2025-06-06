@@ -47,44 +47,28 @@ export async function middleware(request: NextRequest) {
   
   try {
     // Only check auth for protected routes
-    if (pathname.startsWith('/dashboard')) {
+    if (pathname.startsWith('/dashboard') || pathname.startsWith('/(dashboard)')) {
       console.log('Middleware: Checking auth for protected route:', pathname);
       
       const supabase = createMiddlewareClient({ req: request, res: response });
-      console.log('Middleware: Supabase client created');
-
-      // Get session first to check if it exists
-      const sessionResponse = await supabase.auth.getSession();
-      const session = sessionResponse.data?.session;
-      console.log('Middleware: Session check:', { 
-        hasSession: !!session,
-        userId: session?.user?.id,
-        expiresAt: session?.expires_at
-      });
-
-      // Then get user
-      const { data: { user }, error } = await supabase.auth.getUser();
-      console.log('Middleware: User session check', { 
-        hasUser: !!user, 
-        userId: user?.id,
-        email: user?.email,
-        error: error?.message,
-        hasSession: !!session
-      });
-
-      if (!user || error) {
-        console.log('Middleware: No valid user session, redirecting to login');
-        const loginUrl = new URL('/login', request.url);
-        loginUrl.searchParams.set('redirectedFrom', pathname);
-        
-        // Clear any invalid auth cookies
-        response.cookies.delete('sb-access-token');
-        response.cookies.delete('sb-refresh-token');
-        
-        return NextResponse.redirect(loginUrl);
-      }
       
-      console.log('Middleware: User authenticated, allowing access:', user.id);
+      // Refresh session if expired
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (sessionError) {
+        console.error('Middleware: Session error:', sessionError);
+        return NextResponse.redirect(new URL('/login', request.url))
+      }
+
+      if (!session) {
+        console.log('Middleware: No session found, redirecting to login');
+        return NextResponse.redirect(new URL('/login', request.url))
+      }
+
+      console.log('Middleware: Valid session found for user:', session.user.id);
+      
+      // Update response headers if session was refreshed
+      return response
     }
 
     // Default: allow access

@@ -167,7 +167,7 @@ export function SidebarNav() {
       ],
     },
     {
-      section: "admin",
+      section: "admin",   
       titleKey: "nav.admin",
       icon: Shield,
       basePath: "/admin",
