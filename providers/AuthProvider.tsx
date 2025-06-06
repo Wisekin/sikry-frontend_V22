@@ -12,10 +12,10 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string) => Promise<void>
+  signIn: (email: string, password: string) => Promise<{ user: User; session: Session } | null>
+  signUp: (email: string, password: string) => Promise<{ user: User | null; session: Session | null } | null>
   signOut: () => Promise<void>
-  resetPassword: (email: string) => Promise<void>
+  resetPassword: (email: string) => Promise<{ data: any; error: any } | null>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -27,72 +27,155 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Inactivity auto-logout (15 minutes)
   useEffect(() => {
+    console.log('[Auth] Setting up inactivity timer');
     let timeout: NodeJS.Timeout | null = null;
     const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutes
 
     const resetTimer = () => {
+      console.log('[Auth] Resetting inactivity timer');
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {
+        console.log('[Auth] Inactivity limit reached, signing out');
         signOut();
       }, INACTIVITY_LIMIT);
     };
 
     // Listen for user activity
     const activityEvents = ["mousemove", "keydown", "mousedown", "touchstart"];
-    activityEvents.forEach((event) => window.addEventListener(event, resetTimer));
+    activityEvents.forEach((event) => {
+      console.log(`[Auth] Adding ${event} listener`);
+      window.addEventListener(event, resetTimer);
+    });
     resetTimer(); // Start timer on mount
 
     // Clean up
     return () => {
+      console.log('[Auth] Cleaning up inactivity timer');
       if (timeout) clearTimeout(timeout);
-      activityEvents.forEach((event) => window.removeEventListener(event, resetTimer));
+      activityEvents.forEach((event) => {
+        console.log(`[Auth] Removing ${event} listener`);
+        window.removeEventListener(event, resetTimer);
+      });
     };
   }, [user]);
 
   useEffect(() => {
+    console.log('[Auth] Initializing auth state');
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+      console.log('[Auth] Initial session:', session ? 'Found session' : 'No session found');
+      console.log('[Auth] Session user:', session?.user?.email);
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    }).catch(error => {
+      console.error('[Auth] Error getting initial session:', error);
+      setLoading(false);
+    });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log(`[Auth] Auth state changed - Event: ${event}`);
+      console.log('[Auth] New session:', session);
+      console.log('[Auth] User:', session?.user?.email);
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-    return () => subscription.unsubscribe()
+    return () => {
+      console.log('[Auth] Cleaning up auth state listener');
+      subscription.unsubscribe();
+    };
   }, [])
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    if (error) throw error
+    console.log('[Auth] Signing in with email:', email);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error('[Auth] Sign in error:', error);
+        throw error;
+      }
+      
+      if (!data || !data.user || !data.session) {
+        const error = new Error('No user or session returned from sign in');
+        console.error('[Auth] Sign in error:', error);
+        throw error;
+      }
+      
+      console.log('[Auth] Sign in successful');
+      return { user: data.user, session: data.session };
+    } catch (error) {
+      console.error('[Auth] Sign in exception:', error);
+      throw error;
+    }
   }
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-    if (error) throw error
+    console.log('[Auth] Signing up with email:', email);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error('[Auth] Sign up error:', error);
+        throw error;
+      }
+      
+      console.log('[Auth] Sign up successful');
+      return { 
+        user: data.user || null, 
+        session: data.session || null 
+      };
+    } catch (error) {
+      console.error('[Auth] Sign up exception:', error);
+      throw error;
+    }
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+    console.log('[Auth] Signing out');
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('[Auth] Sign out error:', error);
+        throw error;
+      }
+      console.log('[Auth] Sign out successful');
+      // Clear any local state if needed
+      setSession(null);
+      setUser(null);
+    } catch (error) {
+      console.error('[Auth] Sign out exception:', error);
+      throw error;
+    }
   }
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email)
-    if (error) throw error
+    console.log('[Auth] Resetting password for email:', email);
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+      
+      if (error) {
+        console.error('[Auth] Reset password error:', error);
+        throw error;
+      }
+      
+      console.log('[Auth] Reset password email sent');
+      return { data, error: null };
+    } catch (error) {
+      console.error('[Auth] Reset password exception:', error);
+      return { data: null, error };
+    }
   }
 
   const value = {

@@ -285,10 +285,10 @@ function SearchContent() {
                     onClick={() => toggleSource("google")}
                   >
                     <div className="flex items-center">
-                      <Globe className="w-4 h-4 mr-2" style={{ color: 'var(--brand-action)' }} />
-                      <span className={`text-sm font-medium ${selectedSources.includes("google") ? "text-primary" : ""}`}>Google</span>
+                        <Globe className="w-4 h-4 mr-2" style={{ color: '#023670' }} />
+                        <span className={`text-sm font-medium ${selectedSources.includes("google") ? "text-primary" : ""}`}>Google</span>
                     </div>
-                    {selectedSources.includes("google") && <Check className="w-4 h-4" style={{ color: 'var(--brand-action)' }} />}
+                    {selectedSources.includes("google") && <Check className="w-4 h-4" style={{ color: '#023670' }} />}
                   </div>
 
                   <div
@@ -298,7 +298,7 @@ function SearchContent() {
                     onClick={() => toggleSource("linkedin")}
                   >
                     <div className="flex items-center">
-                      <Linkedin className="w-4 h-4 mr-2" style={{ color: 'var(--brand-action)' }} />
+                      <Linkedin className="w-4 h-4 mr-2" style={{ color: '#023670' }} />
                       <span className={`text-sm font-medium ${selectedSources.includes("linkedin") ? "text-primary" : ""}`}>LinkedIn</span>
                     </div>
                     {selectedSources.includes("linkedin") && <Check className="w-4 h-4 text-primary animate-pulse" />}
@@ -311,7 +311,7 @@ function SearchContent() {
                     onClick={() => toggleSource("crunchbase")}
                   >
                     <div className="flex items-center">
-                      <Database className="w-4 h-4 mr-2" style={{ color: 'var(--brand-action)' }} />
+                      <Database className="w-4 h-4 mr-2" style={{ color: '#023670' }} />
                       <span className={`text-sm font-medium ${selectedSources.includes("crunchbase") ? "text-primary" : ""}`}>Crunchbase</span>
                     </div>
                     {selectedSources.includes("crunchbase") && <Check className="w-4 h-4 text-primary animate-pulse" />}
@@ -321,7 +321,7 @@ function SearchContent() {
 
               <div className="border-t border-primary/20 pt-4">
                 <h3 className="text-sm font-medium mb-3 flex items-center text-card-foreground">
-                  <Building2 className="w-4 h-4 mr-2 text-primary" />
+                  <Building2 className="w-4 h-4 mr-2 text-primary" style={{ color: '#023670' }}/>
                   {t("search.filters.industry")}
                 </h3>
                 <Select
@@ -342,7 +342,7 @@ function SearchContent() {
 
               <div>
                 <h3 className="text-sm font-medium mb-3 flex items-center text-card-foreground">
-                  <MapPin className="w-4 h-4 mr-2 text-primary" />
+                  <MapPin className="w-4 h-4 mr-2 text-primary" style={{ color: '#023670' }}/>
                   {t("search.filters.location")}
                 </h3>
                 <Input
@@ -355,7 +355,7 @@ function SearchContent() {
 
               <div>
                 <h3 className="text-sm font-medium mb-3 flex items-center text-card-foreground">
-                  <Users className="w-4 h-4 mr-2 text-primary" />
+                  <Users className="w-4 h-4 mr-2 text-primary" style={{ color: '#023670' }}/>
                   {t("search.filters.companySize")}
                 </h3>
                 <Select
@@ -380,7 +380,7 @@ function SearchContent() {
                   <BarChart3 className="w-4 h-4 mr-2 text-primary" />
                   {t("search.filters.minConfidence")}
                 </h3>
-                <div className="px-3 py-4 relative z-20 bg-muted/30 rounded-lg border border-primary/20 shadow-sm">
+                <div className="px-3 py-4 relative z-20 bg-[#b8e7ed] rounded-lg border border-primary/20 shadow-sm">
                   <div className="mb-8 mt-2">
                     <Slider
                       value={[filters.confidenceScore]}
@@ -390,8 +390,8 @@ function SearchContent() {
                       onValueChange={(value) => setFilters((prev) => ({ ...prev, confidenceScore: value[0] }))}
                       className=""
                       style={{
-                        '--slider-track': 'var(--brand-action)',
-                        '--slider-thumb': 'var(--brand-action)',
+                        '--slider-track': '#eeeeee',
+                        '--slider-thumb': '#eeeeee',
                       } as React.CSSProperties}
                     />
                   </div>
@@ -410,15 +410,15 @@ function SearchContent() {
 
                 <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
   <label className="text-sm flex items-center cursor-pointer">
-    <Mail className="w-4 h-4 mr-2" style={{ color: 'var(--brand-action)' }} />
+    <Mail className="w-4 h-4 mr-2" style={{ color: '#023670' }} />
     {t("search.filters.hasEmail")}
   </label>
   <Switch
     checked={filters.hasEmail}
     onCheckedChange={(checked) => setFilters((prev) => ({ ...prev, hasEmail: checked }))}
     style={{
-      backgroundColor: filters.hasEmail ? 'var(--brand-action)' : '#62c7db',
-      borderColor: filters.hasEmail ? 'var(--brand-action)' : '#62c7db',
+      backgroundColor: filters.hasEmail ? '#2972b6' : '#21130d',
+      borderColor: filters.hasEmail ? '#2972b6' : '#21130d',
     }}
     className="switch-thumb-white"
   />
@@ -426,15 +426,15 @@ function SearchContent() {
 
                 <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
   <label className="text-sm flex items-center cursor-pointer">
-    <Phone className="w-4 h-4 mr-2" style={{ color: 'var(--brand-action)' }} />
+    <Phone className="w-4 h-4 mr-2" style={{ color: '#023670' }} />
     {t("search.filters.hasPhone")}
   </label>
   <Switch
     checked={filters.hasPhone}
     onCheckedChange={(checked) => setFilters((prev) => ({ ...prev, hasPhone: checked }))}
     style={{
-      backgroundColor: filters.hasPhone ? 'var(--brand-action)' : '#62c7db',
-      borderColor: filters.hasPhone ? 'var(--brand-action)' : '#62c7db',
+      backgroundColor: filters.hasPhone ? '#2972b6' : '#21130d',
+      borderColor: filters.hasPhone ? '#2972b6' : '#21130d',
     }}
     className="switch-thumb-white"
   />
@@ -442,7 +442,7 @@ function SearchContent() {
 
                 <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
                   <label className="text-sm flex items-center cursor-pointer">
-                    <Clock className="w-4 h-4 mr-2 text-primary/70" />
+                    <Clock className="w-4 h-4 mr-2" style={{ color: '#023670' }} />
                     Recently Updated
                   </label>
                   <Switch
@@ -450,8 +450,8 @@ function SearchContent() {
                     onCheckedChange={(checked) => setFilters((prev) => ({ ...prev, recentlyUpdated: checked }))}
                     className=""
                     style={{
-                      backgroundColor: filters.recentlyUpdated ? 'var(--brand-action)' : '#62c7db',
-                      borderColor: filters.recentlyUpdated ? 'var(--brand-action)' : '#62c7db',
+                      backgroundColor: filters.recentlyUpdated ? '#2972b6' : '#21130d',
+                      borderColor: filters.recentlyUpdated ? '#2972b6' : '#21130d',
                     }}
                 
                   />

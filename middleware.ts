@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
+// Debug function to log request details
+function logRequestDetails(request: NextRequest) {
+  console.log('Middleware: Request URL:', request.url);
+  console.log('Middleware: Request method:', request.method);
+  console.log('Middleware: Request headers:', Object.fromEntries(request.headers.entries()));
+  console.log('Middleware: Request cookies:', request.cookies.getAll().map(c => c.name));
+}
+
 // Define public routes that don't require authentication
 const publicRoutes = [
   '/',
@@ -19,7 +27,9 @@ const publicRoutes = [
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  console.log('\n--- New Request ---');
   console.log('Middleware: Processing request for:', pathname);
+  logRequestDetails(request);
   
   // Skip middleware for public routes
   if (publicRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
@@ -43,17 +53,34 @@ export async function middleware(request: NextRequest) {
       const supabase = createMiddlewareClient({ req: request, res: response });
       console.log('Middleware: Supabase client created');
 
+      // Get session first to check if it exists
+      const sessionResponse = await supabase.auth.getSession();
+      const session = sessionResponse.data?.session;
+      console.log('Middleware: Session check:', { 
+        hasSession: !!session,
+        userId: session?.user?.id,
+        expiresAt: session?.expires_at
+      });
+
+      // Then get user
       const { data: { user }, error } = await supabase.auth.getUser();
       console.log('Middleware: User session check', { 
         hasUser: !!user, 
         userId: user?.id,
-        error: error?.message 
+        email: user?.email,
+        error: error?.message,
+        hasSession: !!session
       });
 
-      if (!user) {
-        console.log('Middleware: No user session, redirecting to login');
+      if (!user || error) {
+        console.log('Middleware: No valid user session, redirecting to login');
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('redirectedFrom', pathname);
+        
+        // Clear any invalid auth cookies
+        response.cookies.delete('sb-access-token');
+        response.cookies.delete('sb-refresh-token');
+        
         return NextResponse.redirect(loginUrl);
       }
       
@@ -65,8 +92,20 @@ export async function middleware(request: NextRequest) {
     return response;
   } catch (error) {
     console.error('Middleware error:', error);
-    // In case of error, allow the request to continue but log the error
-    return NextResponse.next();
+    
+    // If there's an auth error, clear any invalid auth cookies
+    if (error instanceof Error && error.message.includes('Auth')) {
+      response.cookies.delete('sb-access-token');
+      response.cookies.delete('sb-refresh-token');
+      
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('error', 'session_expired');
+      return NextResponse.redirect(loginUrl);
+    }
+    
+    // In case of other errors, allow the request to continue but log the error
+    console.error('Middleware non-auth error, allowing request to continue:', error);
+    return response;
   }
 }
 

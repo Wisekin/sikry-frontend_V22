@@ -46,7 +46,7 @@ export interface Database {
           updated_at?: string
           last_scraped?: string | null
         }
-      }
+      } // closes companies
       extracted_data: {
         Row: {
           id: string
@@ -55,7 +55,7 @@ export interface Database {
           phones: string[] | null
           technologies: string[] | null
           social_links: Json | null
-        }
+        } // closes Row for extracted_data
         Insert: {
           id?: string
           company_id: string
@@ -63,7 +63,7 @@ export interface Database {
           phones?: string[] | null
           technologies?: string[] | null
           social_links?: Json | null
-        }
+        } // closes Insert for extracted_data
         Update: {
           id?: string
           company_id?: string
@@ -71,8 +71,8 @@ export interface Database {
           phones?: string[] | null
           technologies?: string[] | null
           social_links?: Json | null
-        }
-      }
-    }
-  }
-}
+        } // closes Update for extracted_data
+      } // closes extracted_data
+    } // closes Tables
+  } // closes public
+} // closes Database
