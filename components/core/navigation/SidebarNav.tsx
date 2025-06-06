@@ -204,104 +204,106 @@ export function SidebarNav() {
   }
 
   return (
-    <div className="h-full flex flex-col overflow-y-auto bg-sidebar text-sidebar-foreground">
-      <div className="flex items-center h-[3.5rem] px-4 border-b border-border">
-        <Logo />
-      </div>
+   <div className="h-full flex flex-col bg-sidebar text-sidebar-foreground">
+  {/* Sticky Header */}
+  <div className="h-16 flex-shrink-0 bg-sidebar flex items-center p-4 border-b text-white sticky top-0 z-10">
+    <Logo />
+  </div>
 
-      <div className="flex-1 py-4">
-        <nav className="px-2 space-y-1">
-          {/* Main Navigation */}
-          {mainNavItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center px-3 py-2 text-sm font-medium rounded-md mb-1 transition-colors",
-                isActiveLink(item.href)
-                  ? "bg-sidebar-selected text-sidebar-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground",
-              )}
-            >
-              <item.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
-              {t(item.titleKey)}
-            </Link>
-          ))}
+  {/* Scrollable Nav Content */}
+  <div className="flex-1 overflow-y-auto py-4">
+    <nav className="px-2 space-y-1">
+      {/* Main Navigation */}
+      {mainNavItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            "flex items-center px-3 py-2 text-sm font-medium rounded-md mb-1 transition-colors",
+            isActiveLink(item.href)
+              ? "bg-sidebar-selected text-sidebar-foreground"
+              : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground"
+          )}
+        >
+          <item.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
+          {t(item.titleKey)}
+        </Link>
+      ))}
 
-          {/* Section Divider */}
-          {mainNavItems.length > 0 && sectionNavItems.length > 0 && <div className="border-t border-border my-4"></div>}
-
-          {/* Section Navigation with Dropdowns */}
-          {sectionNavItems.map((section) => (
-            <div key={section.section}>
-              
-              <button
-                onClick={() => toggleSection(section.section)}
-                className={cn(
-                  "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActiveSectionHeader(section.basePath)
-                    ? "bg-sidebar-selected text-sidebar-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground",
-                )}
-              >
-                <div className="flex items-center">
-                  <section.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
-                  {t(section.titleKey)}
-                </div>
-                <ChevronDown
-                  className={cn(
-                    "h-4 w-4 transition-transform",
-                    expandedSection === section.section ? "rotate-180" : "",
-                  )}
-                />
-              </button>
-
-              {/* Dropdown Items */}
-              {expandedSection === section.section && (
-                <div className="pl-10 pr-2 py-1 space-y-1">
-                  {section.items.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        "block px-3 py-2 text-sm rounded-md transition-colors",
-                        isActiveLink(item.href)
-                          ? "bg-sidebar-selected text-sidebar-foreground"
-                          : "text-sidebar-foreground/80 hover:bg-sidebar-hover hover:text-sidebar-foreground",
-                      )}
-                    >
-                      {t(item.titleKey)}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-      </div>
-
-      {/* Bottom Navigation */}
-      {bottomNavItems.length > 0 && (
-        <div className="p-4 border-t border-border mt-auto">
-          <nav className="space-y-1">
-            {bottomNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActiveLink(item.href)
-                    ? "bg-sidebar-selected text-sidebar-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground",
-                )}
-              >
-                <item.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
-                {t(item.titleKey)}
-              </Link>
-            ))}
-          </nav>
-        </div>
+      {mainNavItems.length > 0 && sectionNavItems.length > 0 && (
+        <div className="border-t border-border my-4"></div>
       )}
+
+      {/* Section Navigation */}
+      {sectionNavItems.map((section) => (
+        <div key={section.section}>
+          <button
+            onClick={() => toggleSection(section.section)}
+            className={cn(
+              "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors",
+              isActiveSectionHeader(section.basePath)
+                ? "bg-sidebar-selected text-sidebar-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground"
+            )}
+          >
+            <div className="flex items-center">
+              <section.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
+              {t(section.titleKey)}
+            </div>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform",
+                expandedSection === section.section ? "rotate-180" : ""
+              )}
+            />
+          </button>
+
+          {expandedSection === section.section && (
+            <div className="pl-10 pr-2 py-1 space-y-1">
+              {section.items.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "block px-3 py-2 text-sm rounded-md transition-colors",
+                    isActiveLink(item.href)
+                      ? "bg-sidebar-selected text-sidebar-foreground"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-hover hover:text-sidebar-foreground"
+                  )}
+                >
+                  {t(item.titleKey)}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </nav>
+  </div>
+
+  {/* Bottom Navigation */}
+  {bottomNavItems.length > 0 && (
+    <div className="p-4 border-t border-border mt-auto">
+      <nav className="space-y-1">
+        {bottomNavItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+              isActiveLink(item.href)
+                ? "bg-sidebar-selected text-sidebar-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground"
+            )}
+          >
+            <item.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
+            {t(item.titleKey)}
+          </Link>
+        ))}
+      </nav>
     </div>
+  )}
+</div>
+
   )
 }
