@@ -14,7 +14,7 @@ interface AuthContextType {
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ user: User; session: Session } | null>
   signUp: (email: string, password: string) => Promise<{ user: User | null; session: Session | null } | null>
-  signOut: () => Promise<void>
+  signOut: () => Promise<{ success: boolean }>
   resetPassword: (email: string) => Promise<{ data: any; error: any } | null>
 }
 
@@ -151,9 +151,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw error;
       }
       console.log('[Auth] Sign out successful');
-      // Clear any local state if needed
+      // Clear any local state
       setSession(null);
       setUser(null);
+      
+      // Force a page reload to clear any cached data
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
+      
+      return { success: true };
     } catch (error) {
       console.error('[Auth] Sign out exception:', error);
       throw error;

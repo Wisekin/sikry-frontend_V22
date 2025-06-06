@@ -27,11 +27,16 @@ export default function LoginPage() {
     setError("")
 
     try {
-      await signIn(email, password)
-      router.push("/dashboard")
+      const result = await signIn(email, password)
+      if (result?.user && result?.session) {
+        // Force a full page reload to ensure all auth state is properly set
+        window.location.href = "/dashboard"
+      } else {
+        throw new Error('No user or session returned from sign in')
+      }
     } catch (err) {
+      console.error('Login error:', err)
       setError("Invalid email or password")
-    } finally {
       setLoading(false)
     }
   }
