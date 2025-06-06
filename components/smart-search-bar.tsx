@@ -1,13 +1,12 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Search, Globe, Linkedin, Database, Sparkles } from "lucide-react"
+import { Search, Globe, Linkedin, Database, Mic, History } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils" // Assumed to be available from shadcn/ui
 
 interface SmartSearchBarProps {
   placeholder?: string
@@ -16,16 +15,19 @@ interface SmartSearchBarProps {
 }
 
 export function SmartSearchBar({
-  placeholder = "Search for companies...",
-  showSuggestions = false,
+  placeholder = "Search for companies or topics...",
+  showSuggestions = true, // Defaulting to true for better UX
   className = "",
 }: SmartSearchBarProps) {
   const [query, setQuery] = useState("")
   const [suggestions, setSuggestions] = useState<string[]>([])
-  const [showSuggestionsList, setShowSuggestionsList] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
   const [selectedSources, setSelectedSources] = useState<string[]>(["google", "linkedin", "crunchbase"])
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+
+  const showSuggestionsList = isFocused && query.length > 2 && suggestions.length > 0 && showSuggestions
 
   const searchSuggestions = [
     "Marketing agencies in Geneva",
@@ -39,30 +41,30 @@ export function SmartSearchBar({
   ]
 
   const sources = [
-    { id: "google", label: "Google", icon: Globe, color: "bg-blue-500" },
-    { id: "linkedin", label: "LinkedIn", icon: Linkedin, color: "bg-blue-600" },
-    { id: "crunchbase", label: "Crunchbase", icon: Database, color: "bg-orange-500" },
+    { id: "google", label: "Google", icon: Globe },
+    { id: "linkedin", label: "LinkedIn", icon: Linkedin },
+    { id: "crunchbase", label: "Crunchbase", icon: Database },
   ]
 
   useEffect(() => {
     if (query.length > 2 && showSuggestions) {
       const filtered = searchSuggestions.filter((suggestion) => suggestion.toLowerCase().includes(query.toLowerCase()))
       setSuggestions(filtered.slice(0, 5))
-      setShowSuggestionsList(true)
     } else {
-      setShowSuggestionsList(false)
+      setSuggestions([])
     }
   }, [query, showSuggestions])
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     if (query.trim()) {
       const searchParams = new URLSearchParams({
         q: query,
         sources: selectedSources.join(","),
       })
       router.push(`/search/results?${searchParams.toString()}`)
+      inputRef.current?.blur()
     }
-  }
+  }, [query, selectedSources, router])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -74,74 +76,98 @@ export function SmartSearchBar({
     setSelectedSources((prev) => (prev.includes(sourceId) ? prev.filter((id) => id !== sourceId) : [...prev, sourceId]))
   }
 
+  // Handle clicks outside to close suggestions
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsFocused(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
   return (
-    <div className={`relative w-full ${className}`}>
-      {/* Search Input */}
-      <div className="relative">
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-          <Sparkles className="w-5 h-5 text-green-700" />
-        </div>
-        <Input
-          ref={inputRef}
-          type="text"
-          placeholder={placeholder}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="pl-12 pr-24 h-14 text-lg border-2 border-slate-200 focus:border-green-700 rounded-xl shadow-lg"
-        />
-        <Button
-          onClick={handleSearch}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 px-6 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700"
+    <div className={cn("w-full max-w-2xl mx-auto", className)}>
+      <div ref={wrapperRef} className="relative">
+        {/* Main Search Bar Wrapper for Styling */}
+        <div
+          className={cn(
+            "relative flex items-center w-full h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-200 hover:shadow-md",
+            isFocused && "shadow-md ring-2 ring-blue-500/20",
+            showSuggestionsList ? "rounded-t-3xl" : "rounded-full",
+          )}
         >
-          <Search className="w-4 h-4 mr-2" />
-          Search
-        </Button>
+          <div className="pl-4 pr-2">
+            <Search className="w-5 h-5 text-slate-400" />
+          </div>
+          <Input
+            ref={inputRef}
+            type="text"
+            placeholder={placeholder}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyPress={handleKeyPress}
+            onFocus={() => setIsFocused(true)}
+            className="w-full h-full text-base bg-transparent border-none focus:ring-0 focus-visible:ring-0 dark:text-white"
+          />
+          <div className="px-4">
+            <Mic className="w-5 h-5 text-slate-400 cursor-pointer hover:text-slate-600" />
+          </div>
+        </div>
+
+        {/* Suggestions Dropdown */}
+        {showSuggestionsList && (
+          <div className="absolute top-full left-0 right-0 bg-white dark:bg-slate-800 border border-t-0 border-slate-200 dark:border-slate-700 shadow-md rounded-b-3xl z-50 overflow-hidden">
+            <ul>
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  className="px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer"
+                  onClick={() => {
+                    setQuery(suggestion)
+                    setIsFocused(false)
+                    inputRef.current?.focus()
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <History className="w-4 h-4 text-slate-400" />
+                    <span className="text-sm dark:text-slate-200">{suggestion}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
-      {/* Source Selectors */}
-      <div className="flex items-center gap-2 mt-3">
-        <span className="text-sm text-muted-foreground">Search in:</span>
+      {/* Buttons and Source Selectors Below the Bar */}
+      <div className="flex flex-wrap justify-center items-center gap-3 mt-6">
+        <Button onClick={handleSearch} className="bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+          Search
+        </Button>
         {sources.map((source) => {
           const Icon = source.icon
           const isSelected = selectedSources.includes(source.id)
           return (
-            <Badge
+            <Button
               key={source.id}
-              variant={isSelected ? "default" : "outline"}
-              className={`cursor-pointer transition-all ${
-                isSelected ? `${source.color} text-white hover:opacity-80` : "hover:bg-slate-100"
-              }`}
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "flex items-center gap-1.5 text-slate-500",
+                isSelected && "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300",
+              )}
               onClick={() => toggleSource(source.id)}
             >
-              <Icon className="w-3 h-3 mr-1" />
+              <Icon className="w-4 h-4" />
               {source.label}
-            </Badge>
+            </Button>
           )
         })}
       </div>
-
-      {/* Suggestions Dropdown */}
-      {showSuggestionsList && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50">
-          {suggestions.map((suggestion, index) => (
-            <div
-              key={index}
-              className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-600 last:border-b-0"
-              onClick={() => {
-                setQuery(suggestion)
-                setShowSuggestionsList(false)
-                inputRef.current?.focus()
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{suggestion}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

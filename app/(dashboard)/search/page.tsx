@@ -390,8 +390,8 @@ function SearchContent() {
                       onValueChange={(value) => setFilters((prev) => ({ ...prev, confidenceScore: value[0] }))}
                       className=""
                       style={{
-                        '--slider-track': '#eeeeee',
-                        '--slider-thumb': '#eeeeee',
+                        '--slider-track': '#dae9ec',
+                        '--slider-thumb': '#dae9ec',
                       } as React.CSSProperties}
                     />
                   </div>
