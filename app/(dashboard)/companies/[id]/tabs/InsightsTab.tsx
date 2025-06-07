@@ -7,7 +7,7 @@ interface CompanyData {
   id: string
   name: string
   domain: string
-  location: string
+  location_text: string
   industry: string
   employees: string
   description: string

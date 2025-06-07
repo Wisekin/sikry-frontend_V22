@@ -82,7 +82,7 @@ export async function getCompanies(filters?: {
 
     if (filters?.location) {
       console.log('[Companies] Applying location filter:', filters.location);
-      query = query.ilike("location", `%${filters.location}%`);
+      query = query.ilike("location_text", `%${filters.location}%`);
     }
 
     if (filters?.size) {

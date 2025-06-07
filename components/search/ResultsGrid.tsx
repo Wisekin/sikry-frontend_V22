@@ -8,7 +8,7 @@ interface Company {
   id: string
   name: string
   domain: string
-  location: string
+  location_text: string
   industry: string
   employees: string
   description: string
@@ -57,7 +57,7 @@ export function ResultsGrid({ companies, layout = "grid" }: ResultsGridProps) {
                       </Badge>
                     </div>
                     <p className="text-sm text-secondary truncate">
-                      {company.industry} • {company.location}
+                      {company.industry} • {company.location_text}
                     </p>
                     <p className="text-sm truncate mt-1">{company.description}</p>
                   </div>
@@ -102,7 +102,7 @@ export function ResultsGrid({ companies, layout = "grid" }: ResultsGridProps) {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center text-secondary">
                   <Globe className="w-4 h-4 mr-2" />
-                  <span className="truncate">{company.location}</span>
+                  <span className="truncate">{company.location_text}</span>
                 </div>
                 {company.extractedData.emails.length > 0 && (
                   <div className="flex items-center text-secondary">

@@ -4,12 +4,7 @@ export interface Company {
   domain: string
   industry: string
   size: "startup" | "small" | "medium" | "large" | "enterprise"
-  location: {
-    country: string
-    city: string
-    address?: string
-    coordinates?: [number, number]
-  }
+  location_text: string
   contacts: Contact[]
   financials: {
     revenue?: number

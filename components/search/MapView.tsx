@@ -11,7 +11,7 @@ interface Company {
   id: string
   name: string
   domain: string
-  location: string
+  location_text: string
   industry: string
   employees: string
   description: string
@@ -70,7 +70,7 @@ export function MapView({ companies }: MapViewProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-sm truncate">{company.name}</h3>
-                    <p className="text-xs text-secondary truncate">{company.location}</p>
+                    <p className="text-xs text-secondary truncate">{company.location_text}</p>
                   </div>
                   <Badge variant={company.confidenceScore > 90 ? "success" : "default"} className="ml-auto text-xs">
                     {company.confidenceScore}%

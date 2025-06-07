@@ -16,7 +16,7 @@ interface Company {
   id: string
   name: string
   domain: string
-  location: string
+  location_text: string
   industry: string
   employees: string
   description: string
@@ -40,7 +40,7 @@ function SearchResultsContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid")
   const [filters, setFilters] = useState({
     industry: "All Industries",
-    location: "",
+    location_text: "",
     employeeCount: "All Sizes",
     confidenceScore: 0,
   })
@@ -51,7 +51,7 @@ function SearchResultsContent() {
       id: "1",
       name: "TechFlow Solutions",
       domain: "techflow.ch",
-      location: "Geneva, Switzerland",
+      location_text: "Geneva, Switzerland",
       industry: "Software Development",
       employees: "25-50",
       description: "Leading digital transformation consultancy specializing in React and TypeScript solutions.",
@@ -67,7 +67,7 @@ function SearchResultsContent() {
       id: "2",
       name: "Alpine Marketing Group",
       domain: "alpinemarketing.com",
-      location: "Zurich, Switzerland",
+      location_text: "Zurich, Switzerland",
       industry: "Marketing & Advertising",
       employees: "10-25",
       description: "Full-service marketing agency helping B2B companies scale their digital presence.",
@@ -83,7 +83,7 @@ function SearchResultsContent() {
       id: "3",
       name: "SwissFintech Innovations",
       domain: "swissfintech.io",
-      location: "Basel, Switzerland",
+      location_text: "Basel, Switzerland",
       industry: "Financial Technology",
       employees: "50-100",
       description: "Pioneering blockchain and AI solutions for the financial services industry.",
@@ -108,7 +108,7 @@ function SearchResultsContent() {
 
   const filteredCompanies = companies.filter((company) => {
     if (filters.industry !== "All Industries" && company.industry !== filters.industry) return false
-    if (filters.location && !company.location.toLowerCase().includes(filters.location.toLowerCase())) return false
+    if (filters.location_text && !company.location_text.toLowerCase().includes(filters.location_text.toLowerCase())) return false
     if (filters.employeeCount !== "All Sizes" && company.employees !== filters.employeeCount) return false
     if (filters.confidenceScore && company.confidenceScore < filters.confidenceScore) return false
     return true
@@ -116,11 +116,11 @@ function SearchResultsContent() {
 
   const handleExport = () => {
     const csvContent = [
-      ["Name", "Domain", "Location", "Industry", "Employees", "Confidence Score"],
+      ["Name", "Domain", "Location Text", "Industry", "Employees", "Confidence Score"],
       ...filteredCompanies.map((company) => [
         company.name,
         company.domain,
-        company.location,
+        company.location_text,
         company.industry,
         company.employees,
         company.confidenceScore.toString(),
@@ -178,7 +178,7 @@ function SearchResultsContent() {
                     onValueChange={(value) => setFilters((prev) => ({ ...prev, industry: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All Industries" />
+                      <SelectValue>{filters.industry}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="All Industries">All Industries</SelectItem>
@@ -193,8 +193,8 @@ function SearchResultsContent() {
                   <label className="text-sm font-medium mb-2 block">Location</label>
                   <Input
                     placeholder="Enter location..."
-                    value={filters.location}
-                    onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
+                    value={filters.location_text}
+                    onChange={(e) => setFilters((prev) => ({ ...prev, location_text: e.target.value }))}
                   />
                 </div>
 
@@ -205,7 +205,7 @@ function SearchResultsContent() {
                     onValueChange={(value) => setFilters((prev) => ({ ...prev, employeeCount: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All Sizes" />
+                      <SelectValue>{filters.employeeCount}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="All Sizes">All Sizes</SelectItem>
@@ -226,7 +226,7 @@ function SearchResultsContent() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Score" />
+                      <SelectValue>{filters.confidenceScore === 0 ? "Any Score" : `${filters.confidenceScore}%+`}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="0">Any Score</SelectItem>

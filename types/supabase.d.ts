@@ -8,7 +8,7 @@ export interface Database {
           id: string
           name: string
           domain: string
-          location: string
+          location_text: string
           industry: string
           employees: string
           description: string
@@ -22,7 +22,7 @@ export interface Database {
           id?: string
           name: string
           domain: string
-          location?: string
+          location_text?: string
           industry?: string
           employees?: string
           description?: string
@@ -36,7 +36,7 @@ export interface Database {
           id?: string
           name?: string
           domain?: string
-          location?: string
+          location_text?: string
           industry?: string
           employees?: string
           description?: string

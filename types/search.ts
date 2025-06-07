@@ -4,7 +4,7 @@ export interface SearchResult {
   domain?: string
   description?: string
   industry?: string
-  location?: string
+  location_text?: string
   technologies?: string[]
   highlights?: Array<{
     field: string
