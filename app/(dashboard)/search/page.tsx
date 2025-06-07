@@ -353,7 +353,7 @@ function SearchContent() {
           }
         >
           <SelectTrigger className="w-full bg-white border-gray-300 focus:ring-2 focus:ring-[#1B1F3B] rounded-md">
-            <SelectValue placeholder={t("search.filters.allIndustries")} />
+            <SelectValue>{filters.industry === "All Industries" ? t("search.filters.allIndustries") : filters.industry}</SelectValue>
           </SelectTrigger>
           <SelectContent className="border border-gray-200 shadow-lg">
             <SelectItem value="All Industries">
@@ -401,7 +401,7 @@ function SearchContent() {
           }
         >
           <SelectTrigger className="w-full bg-white border-gray-300 rounded-md focus:ring-2 focus:ring-[#1B1F3B]">
-            <SelectValue placeholder={t("search.filters.allSizes")} />
+            <SelectValue>{filters.employeeCount === "All Sizes" ? t("search.filters.allSizes") : filters.employeeCount}</SelectValue>
           </SelectTrigger>
           <SelectContent className="border border-gray-200 shadow-lg">
             <SelectItem value="All Sizes">

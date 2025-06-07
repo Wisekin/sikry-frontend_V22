@@ -178,7 +178,7 @@ function SearchResultsContent() {
                     onValueChange={(value) => setFilters((prev) => ({ ...prev, industry: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All Industries" />
+                      <SelectValue>{filters.industry}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="All Industries">All Industries</SelectItem>
@@ -205,7 +205,7 @@ function SearchResultsContent() {
                     onValueChange={(value) => setFilters((prev) => ({ ...prev, employeeCount: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All Sizes" />
+                      <SelectValue>{filters.employeeCount}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="All Sizes">All Sizes</SelectItem>
@@ -226,7 +226,7 @@ function SearchResultsContent() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Any Score" />
+                      <SelectValue>{filters.confidenceScore === 0 ? "Any Score" : `${filters.confidenceScore}%+`}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="0">Any Score</SelectItem>
