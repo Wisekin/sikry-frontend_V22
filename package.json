@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:search": "playwright test tests/search/"
   },
   "dependencies": {
     "@heroicons/react": "latest",
@@ -55,6 +59,7 @@
     "next": "^15.3.3",
     "next-themes": "latest",
     "openai": "^4.104.0",
+    "playright": "^0.0.22",
     "playwright": "latest",
     "react": "^19",
     "react-country-flag": "^3.1.0",

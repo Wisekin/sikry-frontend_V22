@@ -1500,3 +1500,113 @@ This document outlines the test cases for Phase 1 of the application testing, fo
         2.  When a list is empty (e.g., no campaigns created yet), does the UI provide helpful "empty state" text guiding the user on what to do next (e.g., "You haven't created any campaigns yet. Click here to start!")?
         3.  Is there any onboarding guidance or contextual help for new users or complex features?
     *   **Expected Result:** Users are provided with appropriate guidance when they might need it, making the application easier to learn and use.
+
+# Test Cases for Natural Language Search Feature
+
+## 1. Cache System
+*   **Test Case ID:** NLS_CACHE_001
+    *   **Description:** Verify search results are correctly cached in the api_cache table.
+    *   **Steps:**
+        1. Perform a search query
+        2. Verify the result is stored in api_cache table
+        3. Perform the same query again
+        4. Verify the cached result is returned
+    *   **Expected Result:** Second query returns cached result faster than first query.
+
+*   **Test Case ID:** NLS_CACHE_002
+    *   **Description:** Verify cache expiration works correctly.
+    *   **Steps:**
+        1. Perform a search query
+        2. Wait for cache to expire (1 hour)
+        3. Perform the same query again
+    *   **Expected Result:** Second query fetches fresh results after cache expiration.
+
+*   **Test Case ID:** NLS_CACHE_003
+    *   **Description:** Verify metadata is correctly stored with cached results.
+    *   **Steps:**
+        1. Perform a search query
+        2. Check api_cache table for metadata column
+    *   **Expected Result:** Metadata contains source information and query details.
+
+## 2. Rate Limiting
+*   **Test Case ID:** NLS_RATE_001
+    *   **Description:** Verify rate limiting works for different organization plans.
+    *   **Steps:**
+        1. Set up test organizations with different plans
+        2. Perform multiple searches within time window
+    *   **Expected Result:** Rate limits are enforced according to plan limits.
+
+*   **Test Case ID:** NLS_RATE_002
+    *   **Description:** Verify rate limit reset works correctly.
+    *   **Steps:**
+        1. Hit rate limit
+        2. Wait for reset period
+        3. Try searching again
+    *   **Expected Result:** Searches work again after reset period.
+
+## 3. Search History
+*   **Test Case ID:** NLS_HIST_001
+    *   **Description:** Verify search history is recorded correctly.
+    *   **Steps:**
+        1. Perform multiple searches
+        2. Check search_history table
+    *   **Expected Result:** Each search is recorded with correct metadata and execution time.
+
+*   **Test Case ID:** NLS_HIST_002
+    *   **Description:** Verify search history includes source information.
+    *   **Steps:**
+        1. Perform searches with different sources
+        2. Check search_history.sources array
+    *   **Expected Result:** Sources array correctly reflects which data sources were used.
+
+## 4. Query Parsing
+*   **Test Case ID:** NLS_QUERY_001
+    *   **Description:** Verify OpenAI query parsing works correctly.
+    *   **Steps:**
+        1. Enter natural language query
+        2. Check parsed parameters
+    *   **Expected Result:** Query is correctly parsed into structured parameters.
+
+*   **Test Case ID:** NLS_QUERY_002
+    *   **Description:** Verify handling of complex queries.
+    *   **Steps:**
+        1. Enter complex query with multiple conditions
+        2. Check parsed parameters
+    *   **Expected Result:** Complex query is correctly parsed into structured parameters.
+
+## 5. Data Sources
+*   **Test Case ID:** NLS_DATA_001
+    *   **Description:** Verify integration with public business registries.
+    *   **Steps:**
+        1. Search for company information
+        2. Verify results from business registries
+    *   **Expected Result:** Results include data from public registries.
+
+*   **Test Case ID:** NLS_DATA_002
+    *   **Description:** Verify integration with Wikidata.
+    *   **Steps:**
+        1. Search for entity information
+        2. Verify results from Wikidata
+    *   **Expected Result:** Results include data from Wikidata.
+
+*   **Test Case ID:** NLS_DATA_003
+    *   **Description:** Verify fallback to Google search when no results found.
+    *   **Steps:**
+        1. Search for obscure term
+        2. Check response for Google fallback
+    *   **Expected Result:** System suggests Google search when no results found.
+
+## 6. Error Handling
+*   **Test Case ID:** NLS_ERR_001
+    *   **Description:** Verify handling of API failures.
+    *   **Steps:**
+        1. Simulate API failure
+        2. Check error response
+    *   **Expected Result:** User receives clear error message.
+
+*   **Test Case ID:** NLS_ERR_002
+    *   **Description:** Verify handling of rate limit exceeded.
+    *   **Steps:**
+        1. Exceed rate limit
+        2. Check error response
+    *   **Expected Result:** User receives clear rate limit message.
