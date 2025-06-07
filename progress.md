@@ -20,92 +20,78 @@ Implementing a natural language search system with:
 - Free public data sources
 - Rate limiting
 
-## Current Status: Getting Started
-
-### Completed ✅
-- Initial project planning and architecture design
-- Documentation review
+## Completed ✅
+- Initial project planning and architecture design.
+- Documentation review.
 - Database setup:
-  - Cache table structure and validation
-  - RLS policies for security
-  - Cleanup functions for maintenance
+  - Created migration script (`013-search-rate-limit.sql`) for API cache table, rate limiting table, enhanced search history table, and helper functions.
+  - Created migration script (`014-add-metadata-to-api-cache.sql`) to add `metadata` column to `api_cache` table.
+  - Verified missing tables from main schema.
+  - Added proper database indexes and RLS policies.
+  - Initial cache table structure and validation.
+  - Cleanup functions for maintenance.
 - Core utilities:
-  - OpenAI configuration (`lib/config/openai.ts`)
-  - Query parser implementation (`lib/utils/query-parser.ts`)
-  - Cache utility functions (`lib/utils/cache.ts`)
-- Search API implementation:
-  - Natural language parsing
-  - Cache integration
-  - Supabase database querying
-  - Error handling and response formatting
+  - OpenAI configuration (`lib/config/openai.ts`).
+  - Query parser implementation (`lib/utils/query-parser.ts`).
+  - Cache utility functions (`lib/utils/cache.ts` and `lib/utils/cache/searchCache.ts`).
+- Search API implementation (`app/api/search/natural/route.ts`):
+  - Initial natural language parsing, cache integration, Supabase querying, error handling, and response formatting.
+  - Corrected `searchExternalSources` function call to use only the `query` argument.
+  - Fixed `highlights` array generation to conform to `Array<{ field: string; text: string; }>` type and restored overall function structure.
+- Rate Limiter (`lib/utils/cache/rateLimiter.ts`):
+  - Corrected `createClient` import to use server-side Supabase client.
+  - Fixed `organizations.plan` access to correctly retrieve plan information.
+- Search Suggestions API (`app/api/search/suggestions/route.ts` & `utils/supabase/server.ts`):
+  - Made `createClient` in `utils/supabase/server.ts` synchronous to resolve `supabase.from is not a function` error.
+- Integrated external data sources: Business registries, Wikidata, OpenCorporates API.
+- Implemented (initial) rate limiting middleware.
+- Updated frontend search component with data source selection.
+- Added (initial) API response caching system.
+- Enhanced error handling and loading states in UI.
 
-### In Progress 🚧
-- Testing integrated data sources functionality
-- Fine-tuning cache performance
-- Implementing database schema updates
-- Enhancing the search API:
-  - Implementing rate limiting based on organization plans.
-  - Adding caching functionality using the `api_cache` table.
-  - Logging search metrics in the `search_history` table.
-- Testing and debugging the `performSearch` function:
-  - Ensure proper handling of different search scopes (`companies`, `contacts`, etc.).
-  - Verify error handling and response formatting.
-- Finalizing the integration of `CacheManager` and `RateLimiter` in the search API.
+## In Progress 🚧
+- **Testing & Validation**:
+  - Devising and executing a comprehensive test plan for the caching system:
+    - Verifying search results are correctly cached (including `metadata`).
+    - Ensuring cache entries are invalidated based on TTL.
+    - Confirming cache hits and misses are logged/handled as expected by `searchCache.ts`.
+  - Testing rate limiting functionality under different scenarios (e.g., different organization plans).
+- **Refinement & Enhancement**:
+  - Fine-tuning cache performance (e.g., TTL values, cache eviction strategies) based on testing.
+  - Improving search metrics logging in the `search_history` table (e.g., filters, more metadata, accurate execution time and result counts).
+  - Finalizing the integration and interaction of `searchCache.ts` utilities and `DbRateLimiter` within the search API and potentially other relevant endpoints.
 
-### Just Completed ✅
-- Created new migration script (013-search-rate-limit.sql) for:
-  - API cache table
-  - Rate limiting table
-  - Enhanced search history table
-  - Helper functions for cache and rate limit management
-- Verified missing tables from main schema
-- Added proper database indexes and RLS policies
+## Next Steps 📝
+1.  **CRITICAL: Run database migration scripts `013-search-rate-limit.sql` (for initial tables) AND `014-add-metadata-to-api-cache.sql` (for `metadata` column)** to set up `api_cache`, `rate_limits`, and `search_history` tables correctly.
+2.  Execute the test plan for the caching system (see "In Progress").
+3.  Execute tests for the rate limiting system.
+4.  Write unit and integration tests for:
+    - `performSearch` function (if applicable, or core search logic within API route).
+    - Caching utilities (`searchCache.ts`).
+    - Rate limiting utilities (`rateLimiter.ts`).
+    - Key API endpoints.
+    - Cover edge cases and error scenarios.
+5.  Update project documentation:
+    - Add details about the refined caching and rate limiting systems.
+    - Provide examples of API usage and expected responses.
+    - Document environment variables needed for external APIs and other configurations.
 
-### Previously Completed ✅
-1. Implemented rate limiting middleware
-2. Updated frontend search component with data source selection
-3. Added API response caching system
-4. Integrated external data sources:
-   - Business registries
-   - Wikidata
-   - OpenCorporates API
-5. Enhanced error handling and loading states
+## Current Focus
+1. Ensuring the database schema is up-to-date for caching (`metadata` column).
+2. Systematically testing the end-to-end caching and rate limiting functionality.
+3. Monitoring and optimizing cache hit rates and search performance metrics post-fixes.
 
-### Next Steps 📝
-1. Test the caching system:
-   - Verify that search results are correctly cached and invalidated based on TTL.
-   - Ensure cache hits are logged properly.
-2. Optimize the rate limiter:
-   - Add support for dynamic rate limits based on organization plans.
-   - Test rate limiting functionality under different scenarios.
-3. Improve search metrics logging:
-   - Add filters and metadata to the `search_history` table.
-   - Ensure accurate logging of execution time and result counts.
-4. Write unit tests for the `performSearch` function and middleware:
-   - Cover edge cases and error scenarios.
-   - Validate integration with Supabase and caching utilities.
-5. Update documentation:
-   - Add details about the caching and rate limiting systems.
-   - Provide examples of API usage and expected responses.
+## Technical Debt/Improvements (Future Considerations)
+- Implement more sophisticated query result scoring/ranking.
+- Add backup data sources for reliability.
+- Implement a more granular rate limiting quota system (e.g., per feature within a plan).
+- Add automated testing for external data source integrations.
+- Add analytics for search patterns and user behavior.
+- Consider implementing query suggestions based on popular/past searches.
 
-### Current Focus
-1. Monitoring and optimizing cache hit rates
-2. Testing external data source reliability
-3. Analyzing search performance metrics
+## Technical Stack
+- Next.js
+- Supabase
+- OpenAI API
+- Various Public APIs (Wikidata, OpenCorporates, Business Registries)
 
-### Technical Debt/Improvements
-1. Implement more sophisticated query result scoring/ranking
-2. Add backup data sources for reliability
-3. Implement rate limiting quota system based on user tiers
-4. Add automated testing for external data source integrations
-3. Add analytics for search patterns
-4. Consider implementing query suggestions
-
-### Technical Stack
-- Next.js (existing)
-- Supabase (existing)
-- OpenAI API (to be integrated)
-- Public APIs (to be selected and integrated)
-
-### Immediate Next Action
-Review and implement the cache table structure in `scripts/012-api-cache.sql` to start building our foundation.

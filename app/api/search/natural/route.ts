@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
-import { searchExternalSources } from "@/lib/utils/data-sources"
+import { searchExternalSources } from "@/lib/utils/data-sources/index"
 import { getCachedSearchResults, cacheSearchResults } from "@/lib/utils/cache/searchCache"
 import type { SearchResponse, SearchResult, ExternalSource } from "@/types/search"
 import { QueryParser } from "@/features/search-engine/utils/queryParser"
-import { ExternalAPIs } from "@/lib/utils/external-apis"
 
 export const runtime = "edge"
 
@@ -63,10 +62,9 @@ export async function POST(request: Request) {
     }
 
     // Check cache first
-    const cacheKey = `search:${query}:${sources.sort().join(",")}:${limit}`
-    const cached = await getCachedSearchResults(cacheKey)
+    const { data: cachedData, metrics: cacheMetrics } = await getCachedSearchResults(query, sources, { limit, organization: teamMember?.organization_id });
     
-    if (cached) {
+    if (cachedData) {
       // Log cache hit in search history
       await supabase.from("search_history").insert({
         organization_id: teamMember.organization_id,
@@ -74,15 +72,19 @@ export async function POST(request: Request) {
         query,
         search_type: "natural",
         search_scope: "companies",
-        execution_time_ms: 0, // Cache hit
-        results_count: cached.results.length,
+        execution_time_ms: 0, // Cache hit // Consider using cacheMetrics.avgResponseTime or a specific retrieval time if available
+        results_count: cachedData.results.length,
         search_filters: sources,
         created_at: new Date().toISOString(),
       })
 
       return NextResponse.json({
-        ...cached,
+        ...cachedData,
         source: "cache",
+        meta: {
+          ...cachedData.meta,
+          cacheMetrics,
+        },
       })
     }
 
@@ -176,7 +178,7 @@ export async function POST(request: Request) {
     }
 
     // Search external sources in parallel with database query
-    const externalResults = sources.length > 0 ? await searchExternalSources(query, sources) : []
+    const externalResults = sources.length > 0 ? await searchExternalSources(query) : []
 
     // Combine and enhance all results
     const combinedResults = [...(dbResults || []), ...externalResults] as SearchResult[]
@@ -212,11 +214,11 @@ export async function POST(request: Request) {
         (tech) => company.technologies?.some(t => t.toLowerCase().includes(tech.name.toLowerCase()))
       )
       if (matchesTech) {
-        confidence += 0.15
+        confidence += 0.15;
       }
 
       // Normalize confidence score
-      confidence = Math.min(confidence, 1)
+      confidence = Math.min(confidence, 1);
 
       // Generate highlights
       const highlights = [
@@ -224,14 +226,19 @@ export async function POST(request: Request) {
         company.description && { field: "description", text: company.description.substring(0, 200) + "..." },
         company.industry && { field: "industry", text: company.industry },
         company.location && { field: "location", text: company.location }
-      ].filter(Boolean)
+      ].reduce<Array<{ field: string; text: string; }>>((acc, highlightItem) => {
+        if (highlightItem) {
+          acc.push(highlightItem as { field: string; text: string; });
+        }
+        return acc;
+      }, []);
 
       return {
         ...company,
         confidence,
         highlights
-      }
-    })
+      };
+    });
 
     // Get search suggestions for future queries
     const { data: suggestions } = await supabase
@@ -239,10 +246,10 @@ export async function POST(request: Request) {
       .select("query")
       .eq("organization_id", teamMember.organization_id)
       .order("created_at", { ascending: false })
-      .limit(5)
+      .limit(5);
 
     // Calculate execution time and update search history
-    const executionTime = Date.now() - startTime
+    const executionTime = Date.now() - startTime;
     if (searchHistoryEntry?.data) {
       await supabase
         .from("search_history")
@@ -250,10 +257,10 @@ export async function POST(request: Request) {
           execution_time_ms: executionTime,
           results_count: enhancedResults.length,
         })
-        .eq("id", searchHistoryEntry.data.id)
+        .eq("id", searchHistoryEntry.data.id);
     }
 
-    // Cache the results
+    // Construct the response object
     const response: SearchResponse = {
       success: true,
       results: enhancedResults,
@@ -269,21 +276,19 @@ export async function POST(request: Request) {
       },
       meta: {
         total: count || 0,
-        page: 1,
+        page: 1, // Defaulting page to 1, consider making this dynamic if pagination is added
         limit,
-        hasMore: false,
+        hasMore: (count || 0) > limit, // Simplified hasMore, assumes page 1
         executionTime,
         sources: [
-          ...sources,
-          "wikidata",
-          "opencorporates",
-          "business_registries"
+          ...sources, // These are the sources requested by the client
+          // Add actual sources used if different, e.g. from searchExternalSources logic
         ]
       },
-    }
+    };
 
     // Cache for future use
-    await cacheSearchResults(cacheKey, response)
+    await cacheSearchResults(query, sources, response, { limit, organization: teamMember?.organization_id });
 
     return NextResponse.json(response)
   } catch (error) {

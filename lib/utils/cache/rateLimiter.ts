@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/utils/supabase/server"
 import type { NextRequest } from "next/server"
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -90,7 +90,7 @@ export class DbRateLimiter {
     return {
       userId: user.id,
       organizationId: member.organization_id,
-      plan: member.organizations?.plan || 'starter'
+      plan: member.organizations?.[0]?.plan || 'starter'
     }
   }
 
@@ -233,4 +233,3 @@ export class DbRateLimiter {
   }
 }
 
-export const dbRateLimiter = new DbRateLimiter()

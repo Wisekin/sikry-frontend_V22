@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { dbRateLimiter } from "@/lib/utils/cache/rateLimiter"
+import { DbRateLimiter } from "@/lib/utils/cache/rateLimiter"
 
 export async function searchRateLimitMiddleware(req: NextRequest) {
+  const rateLimiter = new DbRateLimiter()
   if (req.nextUrl.pathname.startsWith("/api/search")) {
-    const result = await dbRateLimiter.isAllowed(req)
+    const result = await rateLimiter.isAllowed(req)
     
     if (!result.allowed || result.status !== 200) {
       // For 401 Unauthorized, redirect to login
@@ -64,7 +65,7 @@ export async function searchRateLimitMiddleware(req: NextRequest) {
 
   // Clean up expired rate limits periodically (1% chance)
   if (Math.random() < 0.01) {
-    await dbRateLimiter.cleanup()
+    await rateLimiter.cleanup()
   }
 
   return NextResponse.next()
