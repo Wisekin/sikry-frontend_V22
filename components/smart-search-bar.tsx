@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, Mic, History, Globe, Database } from "lucide-react"
+import { Search, Mic, History, Globe, Database, ChevronDown, Settings, Filter, Linkedin } from "lucide-react"
 import { DataSourcesMenu } from "./data-sources-menu"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils" // Assumed to be available from shadcn/ui
@@ -17,7 +17,7 @@ interface SmartSearchBarProps {
 
 import { useNaturalLanguage, EnhancedSearchResult } from '@/features/search-engine/hooks/useNaturalLanguage'
 import { useDebounce } from '@/lib/hooks/useDebounce'
-import { ChevronDown, Settings } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
 import {
   Tooltip,
