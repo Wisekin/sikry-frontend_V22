@@ -116,7 +116,11 @@ export default function CompaniesPage() {
             </div>
             <Select value={industryFilter} onValueChange={setIndustryFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue>{industryFilter === "all" ? t("search.filters.allIndustries") : industryFilter}</SelectValue>
+                <SelectValue>
+                  {industryFilter === "all" 
+                    ? t("search.filters.allIndustries") 
+                    : t(`search.filters.${industryFilter.toLowerCase()}`)}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("search.filters.allIndustries")}</SelectItem>
