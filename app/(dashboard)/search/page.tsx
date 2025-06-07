@@ -15,7 +15,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
-import { SmartSearchBar } from "@/components/search/SmartSearchBar"
+import { EnhancedSearchBar } from "@/components/search/EnhancedSearchBar"
 import { ResultsGrid } from "@/components/search/ResultsGrid"
 import { MapView } from "@/components/search/MapView"
 import { ScopeBadges } from "./components/ScopeBadges"
@@ -182,8 +182,8 @@ function SearchContent() {
     setSelectedSources(prev => prev.filter(s => s !== source))
   }
 
-  const handleRemoveFilter = (filterKey: keyof typeof filters) => {
-    const defaultValues = {
+  const handleRemoveFilter = (filter: string) => {
+    const defaultValues: { [key: string]: any } = {
       industry: "All Industries",
       location: "",
       employeeCount: "All Sizes",
@@ -192,7 +192,9 @@ function SearchContent() {
       hasPhone: false,
       recentlyUpdated: false,
     }
-    setFilters(prev => ({ ...prev, [filterKey]: defaultValues[filterKey] }))
+    if (filter in defaultValues) {
+      setFilters(prev => ({ ...prev, [filter]: defaultValues[filter] }))
+    }
   }
 
   const toggleSource = (source: string) => {
@@ -233,9 +235,16 @@ function SearchContent() {
 
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="lg:w-2/3">
-          <SmartSearchBar
+          <EnhancedSearchBar
             placeholder={t("search.refine")}
             showSuggestions={true}
+            onSearch={(query, settings) => {
+              // Update filters based on settings
+              setFilters(prev => ({
+                ...prev,
+                confidenceScore: settings.minimumConfidence * 100,
+              }))
+            }}
           />
         </div>
         <div className="lg:w-1/3">

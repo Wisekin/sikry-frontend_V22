@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
+import { cookies } from 'next/headers'
 
 export async function getCompanies(filters?: {
   industry?: string
@@ -11,85 +12,113 @@ export async function getCompanies(filters?: {
   confidence_min?: number
 }) {
   console.log('[Companies] Getting companies with filters:', filters);
-  const supabase = await createClient()
   
-  // Log cookies for debugging
-  if (typeof document !== 'undefined') {
-    console.log('[Companies] Cookies:', document.cookie);
+  try {
+    console.log('[Companies] Creating Supabase client...');
+    const supabase = await createClient()
+    
+    // Check cookies for debugging
+    const cookieStore = await cookies();
+    const allCookies = cookieStore.getAll();
+    console.log('[Companies] Cookies present:', allCookies.map(c => c.name));
+    
+    // Get the current session with detailed logging
+    console.log('[Companies] Fetching auth session...');
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+    
+    console.log('[Companies] Auth response:', {
+      hasSessionData: !!sessionData,
+      hasSession: !!sessionData?.session,
+      error: sessionError?.message
+    });
+    
+    if (sessionError) {
+      console.error('[Companies] Session error:', sessionError);
+      throw new Error("Authentication error: " + sessionError.message)
+    }
+
+    if (!sessionData?.session) {
+      console.error('[Companies] No session found');
+      throw new Error("No active session found")
+    }
+
+    const { session } = sessionData;
+    console.log('[Companies] Valid session found for user:', {
+      userId: session.user.id,
+      email: session.user.email
+    });
+
+    // Get team member info with detailed logging
+    console.log('[Companies] Looking up team member for user:', session.user.id);
+    const { data: teamMember, error: teamError } = await supabase
+      .from("team_members")
+      .select("organization_id")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (teamError) {
+      console.error('[Companies] Team member lookup error:', teamError);
+      throw new Error("Failed to verify organization membership: " + teamError.message);
+    }
+
+    if (!teamMember) {
+      console.error('[Companies] No team member found for user:', session.user.id);
+      throw new Error("User is not associated with any organization");
+    }
+
+    console.log('[Companies] Found team member in organization:', teamMember.organization_id);
+
+    // Build the query with all filters
+    let query = supabase
+      .from("discovered_companies")
+      .select("*")
+      .eq("organization_id", teamMember.organization_id);
+
+    // Apply filters
+    if (filters?.industry) {
+      console.log('[Companies] Applying industry filter:', filters.industry);
+      query = query.eq("industry", filters.industry);
+    }
+
+    if (filters?.location) {
+      console.log('[Companies] Applying location filter:', filters.location);
+      query = query.ilike("location", `%${filters.location}%`);
+    }
+
+    if (filters?.size) {
+      console.log('[Companies] Applying size filter:', filters.size);
+      query = query.eq("company_size", filters.size);
+    }
+
+    if (filters?.confidence_min) {
+      console.log('[Companies] Applying confidence score filter:', filters.confidence_min);
+      query = query.gte("confidence_score", filters.confidence_min);
+    }
+
+    if (filters?.search) {
+      console.log('[Companies] Applying search filter:', filters.search);
+      query = query.or(`name.ilike.%${filters.search}%,domain.ilike.%${filters.search}%`);
+    }
+
+    // Execute query
+    console.log('[Companies] Executing query...');
+    const { data: companies, error: queryError } = await query.order("created_at", { ascending: false });
+
+    if (queryError) {
+      console.error('[Companies] Query error:', queryError);
+      throw new Error("Failed to fetch companies: " + queryError.message);
+    }
+
+    console.log('[Companies] Successfully fetched companies:', {
+      count: companies?.length || 0,
+      organizationId: teamMember.organization_id
+    });
+
+    return companies || [];
+  } catch (error) {
+    console.error('[Companies] Error in getCompanies:', error);
+    throw error;
   }
-
-  // Get current user's organization
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  console.log('[Companies] User auth check:', { 
-    hasUser: !!user, 
-    userId: user?.id,
-    error: userError 
-  });
-
-  if (userError || !user) {
-    console.error('[Companies] Unauthorized access attempt:', userError?.message || 'No user found');
-    throw new Error("Unauthorized: Please sign in to continue")
-  }
-
-  console.log('[Companies] Fetching team member for user:', user.id);
-  const { data: teamMember, error: teamError } = await supabase
-    .from("team_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .single()
-
-  console.log('[Companies] Team member data:', { 
-    teamMember, 
-    error: teamError 
-  });
-
-  if (teamError || !teamMember) {
-    console.error('[Companies] User not part of any organization:', teamError?.message || 'No team member found');
-    throw new Error("You are not part of any organization. Please contact your administrator.")
-  }
-
-  console.log('[Companies] Building query for organization:', teamMember.organization_id);
-  let query = supabase
-    .from("discovered_companies")
-    .select("*")
-    .eq("organization_id", teamMember.organization_id)
-    .order("created_at", { ascending: false })
-
-  if (filters?.industry) {
-    console.log('[Companies] Filtering by industry:', filters.industry);
-    query = query.eq("industry", filters.industry)
-  }
-
-  if (filters?.size) {
-    console.log('[Companies] Filtering by size:', filters.size);
-    query = query.eq("company_size", filters.size)
-  }
-
-  if (filters?.confidence_min) {
-    console.log('[Companies] Filtering by confidence min:', filters.confidence_min);
-    query = query.gte("confidence_score", filters.confidence_min)
-  }
-
-  if (filters?.search) {
-    query = query.or(
-      `name.ilike.%${filters.search}%,domain.ilike.%${filters.search}%,description.ilike.%${filters.search}%`,
-    )
-  }
-
-  console.log('[Companies] Executing database query');
-  const { data, error } = await query;
-
-  if (error) {
-    console.error('[Companies] Database error:', error);
-    throw new Error(`Failed to fetch companies: ${error.message}`);
-  }
-
-  console.log(`[Companies] Successfully fetched ${data?.length || 0} companies`);
-  return data || []
 }
 
 export async function getCompany(id: string) {

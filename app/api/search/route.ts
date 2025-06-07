@@ -1,161 +1,147 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
-import type { SearchParams } from "@/types/api"
+import { NextResponse } from 'next/server'
+import { createClient } from '@/utils/supabase/server'
+import type { ApiResponse, SearchResult } from '@/types'
+import type { SearchScope } from '@/types/types'
+import { CacheManager } from '@/lib/utils/cache/cacheManager'
+import { DbRateLimiter } from '@/lib/utils/cache/rateLimiter'
+
+const supabase = createClient()
+
+// Cache TTL per search scope
+const CACHE_TTL: Record<SearchScope, number> = {
+  companies: 3600,      // 1 hour for company searches
+  contacts: 1800,       // 30 minutes for contact searches
+  insights: 900,        // 15 minutes for insights
+  default: 600         // 10 minutes default
+}
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const query = searchParams.get("query") || ""
-    const page = Number.parseInt(searchParams.get("page") || "1", 10)
-    const limit = Number.parseInt(searchParams.get("limit") || "10", 10)
-    const filters = searchParams.get("filters") ? JSON.parse(searchParams.get("filters") || "{}") : {}
-    const scope = searchParams.get("scope") || "companies"
+    const url = new URL(request.url)
+    const query = url.searchParams.get('q') || ''
+    const scope = url.searchParams.get('scope') || 'companies'
+    const user = url.searchParams.get('user')
 
-    const supabase = createClient()
+    // Get organization context
+    const supabase = getSupabaseServerClient()
+    const { data: teamMember } = await supabase
+      .from('team_members')
+      .select('organization_id, organizations(plan)')
+      .eq('user_id', user)
+      .single()
 
-    // Log search query for analytics
-    await supabase.from("search_history").insert({
-      query,
-      filters: filters,
-      scope,
-      created_at: new Date().toISOString(),
+    if (!teamMember) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Organization not found',
+          errors: [{ code: 'NOT_FOUND', message: 'Organization not found' }]
+        } as ApiResponse,
+        { status: 404 }
+      )
+    }
+
+    // Initialize rate limiter and check limits
+    const rateLimiter = new RateLimiter(teamMember.organization_id, teamMember.organizations.plan)
+    const canProceed = await rateLimiter.checkRateLimit()
+
+    if (!canProceed) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Rate limit exceeded',
+          errors: [{ code: 'RATE_LIMIT', message: 'Too many requests. Please try again later.' }]
+        } as ApiResponse,
+        { status: 429 }
+      )
+    }
+
+    // Initialize cache manager
+    const cacheManager = new CacheManager(teamMember.organization_id, teamMember.organizations.plan)
+    const cacheKey = `search:${scope}:${query}`
+
+    // Try to get from cache first
+    const cachedResult = await cacheManager.get(cacheKey, scope)
+    if (cachedResult) {
+      return NextResponse.json(cachedResult)
+    }
+
+    // Perform the search if not in cache
+    const searchStartTime = Date.now()
+    const response = await performSearch(query, scope, teamMember.organization_id)
+    const searchTime = Date.now() - searchStartTime
+
+    // Store search metrics
+    await supabase.from('search_history').insert({
+      organization_id: teamMember.organization_id,
+      user_id: user,
+      search_query: query,
+      search_filters: {}, // Add any filters used
+      search_scope: scope,
+      search_type: 'standard',
+      results_count: response.data?.length || 0,
+      execution_time_ms: searchTime
     })
 
-    // Start with a base query
-    let dbQuery = supabase.from(scope).select("*", { count: "exact" })
-
-    // Apply text search if query is provided
-    if (query) {
-      dbQuery = dbQuery.textSearch("searchable", query, {
-        type: "websearch",
-        config: "english",
-      })
-    }
-
-    // Apply filters
-    if (filters.industry) {
-      dbQuery = dbQuery.in("industry", Array.isArray(filters.industry) ? filters.industry : [filters.industry])
-    }
-
-    if (filters.size) {
-      dbQuery = dbQuery.in("size", Array.isArray(filters.size) ? filters.size : [filters.size])
-    }
-
-    if (filters.location?.country) {
-      dbQuery = dbQuery.ilike("location->country", `%${filters.location.country}%`)
-    }
-
-    // Apply pagination
-    const from = (page - 1) * limit
-    const to = from + limit - 1
-    dbQuery = dbQuery.range(from, to)
-
-    // Execute the query
-    const { data, error, count } = await dbQuery
-
-    if (error) {
-      throw error
-    }
-
-    return NextResponse.json({
-      data,
-      success: true,
-      meta: {
-        total: count || 0,
-        page,
-        limit,
-        hasMore: count ? from + data.length < count : false,
-      },
+    // Cache the successful response
+    await cacheManager.set({
+      cacheKey,
+      cacheValue: response,
+      cacheScope: scope,
+      ttlSeconds: CACHE_TTL[scope] || CACHE_TTL.default,
+      accessCount: 0,
+      metadata: {
+        query,
+        executionTime: searchTime,
+        resultsCount: response.data?.length || 0
+      }
     })
+
+    return NextResponse.json(response)
+
   } catch (error) {
-    console.error("Search API error:", error)
+    console.error('Search API error:', error)
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to perform search",
-        errors: [{ code: "search_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
+        message: 'Internal server error',
+        errors: [{ code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' }]
+      } as ApiResponse,
+      { status: 500 }
     )
   }
 }
 
-export async function POST(request: Request) {
-  try {
-    const body: SearchParams = await request.json()
-    const { query, filters, page = 1, limit = 10, scope = "companies" } = body
+async function performSearch(query: string, scope: string, organizationId: string) {
+  const supabase = getSupabaseServerClient()
 
-    const supabase = createClient()
+  // Base query
+  let searchQuery = supabase.from(scope === 'companies' ? 'discovered_companies' : scope)
+    .select('*')
+    .eq('organization_id', organizationId)
 
-    // Log search query for analytics
-    await supabase.from("search_history").insert({
+  // Add search conditions based on scope
+  if (scope === 'companies') {
+    searchQuery = searchQuery.or(`name.ilike.%${query}%, description.ilike.%${query}%`)
+  } else if (scope === 'contacts') {
+    searchQuery = searchQuery.or(`name.ilike.%${query}%, email.ilike.%${query}%`)
+  } else {
+    searchQuery = searchQuery.textSearch('searchable_tsvector', query)
+  }
+
+  const { data, error } = await searchQuery.limit(50)
+
+  if (error) {
+    throw error
+  }
+
+  return {
+    success: true,
+    data,
+    metadata: {
       query,
-      filters: filters,
       scope,
-      created_at: new Date().toISOString(),
-    })
-
-    // Start with a base query
-    let dbQuery = supabase.from(scope).select("*", { count: "exact" })
-
-    // Apply text search if query is provided
-    if (query) {
-      dbQuery = dbQuery.textSearch("searchable", query, {
-        type: "websearch",
-        config: "english",
-      })
+      timestamp: new Date().toISOString()
     }
-
-    // Apply filters
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          dbQuery = dbQuery.in(key, value)
-        } else if (typeof value === "object" && value !== null) {
-          // Handle range filters
-          if ("min" in value && value.min !== undefined) {
-            dbQuery = dbQuery.gte(key, value.min)
-          }
-          if ("max" in value && value.max !== undefined) {
-            dbQuery = dbQuery.lte(key, value.max)
-          }
-        } else {
-          dbQuery = dbQuery.eq(key, value)
-        }
-      })
-    }
-
-    // Apply pagination
-    const from = (page - 1) * limit
-    const to = from + limit - 1
-    dbQuery = dbQuery.range(from, to)
-
-    // Execute the query
-    const { data, error, count } = await dbQuery
-
-    if (error) {
-      throw error
-    }
-
-    return NextResponse.json({
-      data,
-      success: true,
-      meta: {
-        total: count || 0,
-        page,
-        limit,
-        hasMore: count ? from + data.length < count : false,
-      },
-    })
-  } catch (error) {
-    console.error("Search API error:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to perform search",
-        errors: [{ code: "search_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
-    )
   }
 }
