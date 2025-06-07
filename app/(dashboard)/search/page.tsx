@@ -48,7 +48,7 @@ interface Company {
   id: string
   name: string
   domain: string
-  location: string
+  location_text: string
   industry: string
   employees: string
   description: string
@@ -67,7 +67,7 @@ const mockCompanies: Company[] = [
     id: "1",
     name: "TechFlow Solutions",
     domain: "techflow.ch",
-    location: "Geneva, Switzerland",
+    location_text: "Geneva, Switzerland",
     industry: "Software Development",
     employees: "25-50",
     description: "Leading digital transformation consultancy specializing in React and TypeScript solutions.",
@@ -83,7 +83,7 @@ const mockCompanies: Company[] = [
     id: "2",
     name: "Alpine Marketing Group",
     domain: "alpinemarketing.com",
-    location: "Zurich, Switzerland",
+    location_text: "Zurich, Switzerland",
     industry: "Marketing & Advertising",
     employees: "10-25",
     description: "Full-service marketing agency helping B2B companies scale their digital presence.",
@@ -99,7 +99,7 @@ const mockCompanies: Company[] = [
     id: "3",
     name: "SwissFintech Innovations",
     domain: "swissfintech.io",
-    location: "Basel, Switzerland",
+    location_text: "Basel, Switzerland",
     industry: "Financial Technology",
     employees: "50-100",
     description: "Pioneering blockchain and AI solutions for the financial services industry.",
@@ -124,7 +124,7 @@ function SearchContent() {
   const [selectedSources, setSelectedSources] = useState<string[]>(["google", "linkedin"])
   const [filters, setFilters] = useState({
     industry: "All Industries",
-    location: "",
+    location_text: "",
     employeeCount: "All Sizes",
     confidenceScore: 0,
     hasEmail: false,
@@ -143,7 +143,7 @@ function SearchContent() {
 
   const filteredCompanies = companies.filter(company => {
     if (filters.industry !== "All Industries" && company.industry !== filters.industry) return false
-    if (filters.location && !company.location.toLowerCase().includes(filters.location.toLowerCase())) return false
+    if (filters.location_text && !company.location_text.toLowerCase().includes(filters.location_text.toLowerCase())) return false
     if (filters.employeeCount !== "All Sizes" && company.employees !== filters.employeeCount) return false
     if (filters.confidenceScore && company.confidenceScore < filters.confidenceScore) return false
     if (filters.hasEmail && company.extractedData.emails.length === 0) return false
@@ -153,8 +153,8 @@ function SearchContent() {
 
   const handleExport = () => {
     const csvContent = [
-      ["Name", "Domain", "Location", "Industry", "Employees", "Confidence Score"],
-      ...filteredCompanies.map(c => [c.name, c.domain, c.location, c.industry, c.employees, c.confidenceScore.toString()]),
+      ["Name", "Domain", "Location Text", "Industry", "Employees", "Confidence Score"],
+      ...filteredCompanies.map(c => [c.name, c.domain, c.location_text, c.industry, c.employees, c.confidenceScore.toString()]),
     ].map(row => row.join(",")).join("\n")
 
     const blob = new Blob([csvContent], { type: "text/csv" })
@@ -169,7 +169,7 @@ function SearchContent() {
   const handleClearFilters = () => {
     setFilters({
       industry: "All Industries",
-      location: "",
+      location_text: "",
       employeeCount: "All Sizes",
       confidenceScore: 0,
       hasEmail: false,
@@ -185,7 +185,7 @@ function SearchContent() {
   const handleRemoveFilter = (filter: string) => {
     const defaultValues: { [key: string]: any } = {
       industry: "All Industries",
-      location: "",
+      location_text: "",
       employeeCount: "All Sizes",
       confidenceScore: 0,
       hasEmail: false,
@@ -206,7 +206,7 @@ function SearchContent() {
   const hasActiveFilters =
     selectedSources.length > 0 ||
     filters.industry !== "All Industries" ||
-    filters.location ||
+    filters.location_text ||
     filters.employeeCount !== "All Sizes"
 
   return (
@@ -380,9 +380,9 @@ function SearchContent() {
         </h3>
         <Input
           placeholder={t("search.filters.enterLocation")}
-          value={filters.location}
+          value={filters.location_text}
           onChange={e =>
-            setFilters(prev => ({ ...prev, location: e.target.value }))
+            setFilters(prev => ({ ...prev, location_text: e.target.value }))
           }
           className="w-full border-gray-300 rounded-md focus:ring-2 focus:ring-[#1B1F3B]"
         />

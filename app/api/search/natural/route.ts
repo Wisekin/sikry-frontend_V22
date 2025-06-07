@@ -125,7 +125,7 @@ export async function POST(request: Request) {
         .map(loc => `%${loc.name}%`)
         .filter(term => term.length > 2) // Filter out very short location names
       if (locationTerms.length > 0) {
-        dbQuery = dbQuery.or(`location->country.ilike.(${locationTerms.join(",")})`)
+        dbQuery = dbQuery.or(`location_text.ilike.(${locationTerms.map(term => `%${term}%`).join(",")})`)
       }
     }
 

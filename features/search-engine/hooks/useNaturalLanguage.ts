@@ -2,15 +2,16 @@
 
 import { useState, useCallback } from "react"
 import { searchClient } from "@/lib/api/searchClient"
+import { QueryParser } from '../utils/queryParser'
+import type { SearchResult } from '@/types/search'
+import type { SearchResponse } from '@/features/search-engine/types'
 
-import { QueryParser, ParsedQuery } from '../utils/queryParser'
-
-export interface EnhancedSearchResult extends ParsedQuery {
+export interface EnhancedSearchResult {
   companies: Array<{
     id: string
     name: string
-    domain: string
-    description: string
+    domain?: string
+    description?: string
     matchConfidence: number
     highlights: Array<{
       field: string
@@ -39,16 +40,15 @@ export interface EnhancedSearchResult extends ParsedQuery {
     timestamp: string
     searchSources: string[]
   }
+  query: string
 }
-
-import type { SearchResponse } from '@/types/search'
 
 export function useNaturalLanguage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<SearchResponse | null>(null)
+  const [results, setResults] = useState<EnhancedSearchResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [activeSources, setActiveSources] = useState(new Set(['internal']))
-  const [sourceResults, setSourceResults] = useState<Record<string, SearchResponse['data']>>({})
+  const [sourceResults, setSourceResults] = useState<Record<string, SearchResult[]>>({})
   const [searchHistory, setSearchHistory] = useState<Array<{
     query: string
     timestamp: string
@@ -65,49 +65,75 @@ export function useNaturalLanguage() {
     setError(null)
 
     try {
-      // Parse the query using our enhanced QueryParser
       const parsedQuery = QueryParser.parse(query)
-
-      // Call the search API with parsed query
       const response = await searchClient.naturalLanguageSearch(query)
 
       // Add search to history
       setSearchHistory(prev => [{
         query,
         timestamp: new Date().toISOString(),
-        resultCount: response.companies.length
+        resultCount: response.results.length,
+        sources: options?.sources || ['internal']
       }, ...prev].slice(0, 10))
+
+      // Group results by source
+      const resultsBySource: Record<string, SearchResult[]> = {
+        internal: []
+      }
+      
+      response.results.forEach(result => {
+        resultsBySource.internal.push({
+          id: result.id,
+          name: result.title || '',
+          domain: result.url,
+          description: result.description,
+          location_text: '',
+          highlights: result.highlights.map(text => ({
+            field: 'description',
+            text
+          })),
+          confidence: result.confidence
+        })
+      })
+      
+      setSourceResults(resultsBySource)
 
       // Transform API response to EnhancedSearchResult
       const enhancedResult: EnhancedSearchResult = {
-        ...parsedQuery,
-        companies: response.companies.map(company => ({
-          ...company,
-          matchConfidence: company.confidence || 0,
-          highlights: company.highlights || []
+        companies: response.results.map(result => ({
+          id: result.id,
+          name: result.title || '',
+          domain: result.url,
+          description: result.description,
+          matchConfidence: result.confidence,
+          highlights: result.highlights.map(text => ({
+            field: 'description',
+            text
+          }))
         })),
         totalCount: response.totalCount,
         suggestions: response.suggestions.map(suggestion => ({
           text: suggestion,
-          type: 'company', // Default type, API should provide actual type
-          confidence: 0.8 // Default confidence, API should provide actual confidence
+          type: 'company',
+          confidence: 0.8
         })),
         analysis: {
-          topIndustries: [],
-          topTechnologies: [],
-          locationDistribution: [],
+          topIndustries: response.facets?.industry?.map(f => ({ name: f.value, count: f.count })) || [],
+          topTechnologies: response.facets?.technology?.map(f => ({ name: f.value, count: f.count })) || [],
+          locationDistribution: response.facets?.location?.map(f => ({ location: f.value, count: f.count })) || [],
           averageCompanySize: 0,
           confidenceStats: {
-            min: 0,
-            max: 0,
-            average: 0
+            min: Math.min(...response.results.map(r => r.confidence)),
+            max: Math.max(...response.results.map(r => r.confidence)),
+            average: response.results.reduce((acc, r) => acc + r.confidence, 0) / response.results.length
           }
         },
         metadata: {
-          executionTime: response.executionTime || 0,
+          executionTime: response.executionTime,
           timestamp: new Date().toISOString(),
-          searchSources: options?.sources || ['google', 'linkedin', 'crunchbase']
-        }
+          searchSources: options?.sources || ['internal']
+        },
+        query
       }
 
       setResults(enhancedResult)
@@ -133,7 +159,7 @@ export function useNaturalLanguage() {
 
   const refreshSearch = useCallback(() => {
     if (results) {
-      search(results.originalQuery)
+      search(results.query)
     }
   }, [results, search])
 
@@ -144,6 +170,7 @@ export function useNaturalLanguage() {
     isLoading,
     results,
     error,
+    sourceResults,
     searchHistory
   }
 }

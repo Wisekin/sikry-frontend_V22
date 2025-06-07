@@ -23,7 +23,7 @@ interface Company {
   id: string
   name: string
   domain: string
-  location: string
+  location_text: string
   industry: string
   employees: string
   description: string
@@ -116,7 +116,7 @@ export function CompanyCard({ company, layout = "grid" }: CompanyCardProps) {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex items-center gap-2 text-caption text-text-secondary">
                 <MapPin className="w-3 h-3 text-accent" />
-                <span>{company.location}</span>
+                <span>{company.location_text}</span>
               </div>
               <div className="flex items-center gap-2 text-caption text-text-secondary">
                 <Users className="w-3 h-3 text-accent" />
@@ -147,7 +147,7 @@ export function CompanyCard({ company, layout = "grid" }: CompanyCardProps) {
               <div className="flex items-center gap-4 text-caption text-text-secondary mb-2">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-3 h-3 text-accent" />
-                  <span>{company.location}</span>
+                  <span>{company.location_text}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="w-3 h-3 text-accent" />

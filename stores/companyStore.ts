@@ -9,7 +9,7 @@ interface Company {
   domain: string
   industry: string
   size: string
-  location: string
+  location_text: string
   revenue: string
   confidence: number
   lastUpdated: string

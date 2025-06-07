@@ -10,7 +10,7 @@ interface CompanyData {
   id: string
   name: string
   domain: string
-  location: string
+  location_text: string
   industry: string
   employees: string
   description: string
@@ -57,7 +57,7 @@ export function CompanyHeader({ company }: CompanyHeaderProps) {
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
-                  <span>{company.location}</span>
+                  <span>{company.location_text}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="w-4 h-4" />

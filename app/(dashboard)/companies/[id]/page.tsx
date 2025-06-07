@@ -19,7 +19,7 @@ interface CompanyData {
   id: string
   name: string
   domain: string
-  location: string
+  location_text: string
   industry: string
   employees: string
   description: string
@@ -50,7 +50,7 @@ export default function CompanyDetailPage() {
     id: companyId,
     name: "TechFlow Solutions",
     domain: "techflow.ch",
-    location: "Geneva, Switzerland",
+    location_text: "Geneva, Switzerland",
     industry: "Software Development",
     employees: "25-50",
     description: "Leading digital transformation consultancy specializing in React and TypeScript solutions.",

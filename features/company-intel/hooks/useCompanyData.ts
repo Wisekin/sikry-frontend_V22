@@ -9,11 +9,7 @@ export interface CompanyData {
   domain: string
   description: string
   industry: string
-  location: {
-    city: string
-    state: string
-    country: string
-  }
+  location_text: string
   size: {
     employees: number
     range: string

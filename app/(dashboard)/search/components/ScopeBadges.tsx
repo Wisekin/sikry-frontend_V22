@@ -7,7 +7,7 @@ interface ScopeBadgesProps {
   selectedSources: string[]
   filters: {
     industry?: string
-    location?: string
+    location_text?: string
     employeeCount?: string
   }
   onRemoveSource?: (source: string) => void
@@ -64,17 +64,17 @@ export function ScopeBadges({ selectedSources, filters, onRemoveSource, onRemove
         </Badge>
       )}
 
-      {filters.location && (
+      {filters.location_text && (
         <Badge
           variant="outline"
           className="flex items-center gap-1 bg-amber-50 border-amber-200 text-amber-700 px-3 py-1 rounded-full"
         >
           <MapPin className="w-3 h-3" />
-          {filters.location}
+          {filters.location_text}
           {onRemoveFilter && (
             <X
               className="w-3 h-3 ml-1 cursor-pointer hover:text-amber-600"
-              onClick={() => onRemoveFilter("location")}
+              onClick={() => onRemoveFilter("location_text")}
             />
           )}
         </Badge>
