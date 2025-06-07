@@ -3,85 +3,147 @@
 import { useState, useCallback } from "react"
 import { searchClient } from "@/lib/api/searchClient"
 
-export interface SearchQuery {
-  text: string
-  filters: Record<string, any>
-  scope: string[]
-  intent: "search" | "filter" | "compare" | "analyze"
-}
+import { QueryParser, ParsedQuery } from '../utils/queryParser'
 
-export interface SearchResult {
-  companies: any[]
+export interface EnhancedSearchResult extends ParsedQuery {
+  companies: Array<{
+    id: string
+    name: string
+    domain: string
+    description: string
+    matchConfidence: number
+    highlights: Array<{
+      field: string
+      text: string
+    }>
+  }>
   totalCount: number
-  suggestions: string[]
-  queryAnalysis: {
-    intent: string
-    entities: string[]
-    filters: Record<string, any>
+  suggestions: Array<{
+    text: string
+    type: 'company' | 'industry' | 'technology' | 'location'
+    confidence: number
+  }>
+  analysis: {
+    topIndustries: Array<{ name: string; count: number }>
+    topTechnologies: Array<{ name: string; count: number }>
+    locationDistribution: Array<{ location: string; count: number }>
+    averageCompanySize: number
+    confidenceStats: {
+      min: number
+      max: number
+      average: number
+    }
+  }
+  metadata: {
+    executionTime: number
+    timestamp: string
+    searchSources: string[]
   }
 }
 
+import type { SearchResponse } from '@/types/search'
+
 export function useNaturalLanguage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<SearchResult | null>(null)
+  const [results, setResults] = useState<SearchResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [activeSources, setActiveSources] = useState(new Set(['internal']))
+  const [sourceResults, setSourceResults] = useState<Record<string, SearchResponse['data']>>({})
+  const [searchHistory, setSearchHistory] = useState<Array<{
+    query: string
+    timestamp: string
+    resultCount: number
+    sources: string[]
+  }>>([])
 
-  const search = useCallback(async (query: string) => {
+  const search = useCallback(async (query: string, options?: {
+    sources?: string[]
+    limit?: number
+    includeAnalytics?: boolean
+  }) => {
     setIsLoading(true)
     setError(null)
 
     try {
+      // Parse the query using our enhanced QueryParser
+      const parsedQuery = QueryParser.parse(query)
+
+      // Call the search API with parsed query
       const response = await searchClient.naturalLanguageSearch(query)
-      setResults(response)
+
+      // Add search to history
+      setSearchHistory(prev => [{
+        query,
+        timestamp: new Date().toISOString(),
+        resultCount: response.companies.length
+      }, ...prev].slice(0, 10))
+
+      // Transform API response to EnhancedSearchResult
+      const enhancedResult: EnhancedSearchResult = {
+        ...parsedQuery,
+        companies: response.companies.map(company => ({
+          ...company,
+          matchConfidence: company.confidence || 0,
+          highlights: company.highlights || []
+        })),
+        totalCount: response.totalCount,
+        suggestions: response.suggestions.map(suggestion => ({
+          text: suggestion,
+          type: 'company', // Default type, API should provide actual type
+          confidence: 0.8 // Default confidence, API should provide actual confidence
+        })),
+        analysis: {
+          topIndustries: [],
+          topTechnologies: [],
+          locationDistribution: [],
+          averageCompanySize: 0,
+          confidenceStats: {
+            min: 0,
+            max: 0,
+            average: 0
+          }
+        },
+        metadata: {
+          executionTime: response.executionTime || 0,
+          timestamp: new Date().toISOString(),
+          searchSources: options?.sources || ['google', 'linkedin', 'crunchbase']
+        }
+      }
+
+      setResults(enhancedResult)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Search failed")
+      console.error('Search error:', err)
     } finally {
       setIsLoading(false)
     }
   }, [])
 
-  const parseQuery = useCallback((query: string): SearchQuery => {
-    // Basic query parsing logic
-    const filters: Record<string, any> = {}
-    const scope: string[] = []
-    let intent: SearchQuery["intent"] = "search"
-
-    // Extract location filters
-    const locationMatch = query.match(/in\s+([^,]+)/i)
-    if (locationMatch) {
-      filters.location = locationMatch[1].trim()
-    }
-
-    // Extract industry filters
-    const industryMatch = query.match(/(?:industry|sector):\s*([^,]+)/i)
-    if (industryMatch) {
-      filters.industry = industryMatch[1].trim()
-    }
-
-    // Extract size filters
-    const sizeMatch = query.match(/(?:size|employees):\s*([^,]+)/i)
-    if (sizeMatch) {
-      filters.size = sizeMatch[1].trim()
-    }
-
-    // Determine intent
-    if (query.includes("compare")) intent = "compare"
-    else if (query.includes("analyze")) intent = "analyze"
-    else if (query.includes("filter")) intent = "filter"
-
-    return {
-      text: query,
-      filters,
-      scope,
-      intent,
+  const getSuggestions = useCallback(async (query: string) => {
+    if (query.length < 2) return []
+    
+    try {
+      const suggestions = await searchClient.getSuggestions(query)
+      return suggestions
+    } catch (err) {
+      console.error('Suggestions error:', err)
+      return []
     }
   }, [])
 
+  const refreshSearch = useCallback(() => {
+    if (results) {
+      search(results.originalQuery)
+    }
+  }, [results, search])
+
   return {
     search,
-    parseQuery,
+    getSuggestions,
+    refreshSearch,
     isLoading,
     results,
     error,
+    searchHistory
   }
 }

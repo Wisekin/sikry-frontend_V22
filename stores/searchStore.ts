@@ -10,12 +10,15 @@ interface SearchState {
     location: string[]
     size: string[]
     revenue: string[]
+    sources: string[] // External data sources to include
   }
   results: any[]
   isLoading: boolean
   totalResults: number
   currentPage: number
   viewMode: "grid" | "list" | "map"
+  activeSources: Set<string> // Currently active external data sources
+  sourceResults: Record<string, any[]> // Results from each source
 }
 
 interface SearchActions {
@@ -37,12 +40,15 @@ const initialState: SearchState = {
     location: [],
     size: [],
     revenue: [],
+    sources: []
   },
   results: [],
   isLoading: false,
   totalResults: 0,
   currentPage: 1,
   viewMode: "grid",
+  activeSources: new Set(['internal']), // Start with internal search enabled
+  sourceResults: {}
 }
 
 export const useSearchStore = create<SearchState & SearchActions>()(

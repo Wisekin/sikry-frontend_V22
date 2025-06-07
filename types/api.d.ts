@@ -28,8 +28,30 @@ export interface PaginationParams {
 export interface SearchParams extends PaginationParams {
   query?: string
   filters?: Record<string, any>
-  facets?: string[]
-  highlight?: boolean
+  scope?: 'companies' | 'contacts' | 'all'
+}
+
+export interface ParsedSearchQuery {
+  industry?: string
+  location?: string
+  filters?: {
+    max_employees?: number
+    min_employees?: number
+    [key: string]: any
+  }
+  keywords?: string[]
+}
+
+export interface SearchResult {
+  id: string
+  name: string
+  description?: string
+  industry?: string
+  location?: string
+  employee_count?: number
+  website?: string
+  searchable?: string
+  [key: string]: any
 }
 
 export interface SearchResponse<T> {

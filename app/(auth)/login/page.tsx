@@ -1,9 +1,8 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,6 +19,8 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const { signIn } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo') || '/dashboard'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,13 +30,14 @@ export default function LoginPage() {
     try {
       const result = await signIn(email, password)
       if (result?.user && result?.session) {
-        // Force a full page reload to ensure all auth state is properly set
-        window.location.href = "/dashboard"
+        console.log('[Login] Successful login, redirecting to:', returnTo)
+        // Use router.push for client-side navigation
+        router.push(returnTo)
       } else {
         throw new Error('No user or session returned from sign in')
       }
     } catch (err) {
-      console.error('Login error:', err)
+      console.error('[Login] Error:', err)
       setError("Invalid email or password")
       setLoading(false)
     }

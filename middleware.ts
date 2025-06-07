@@ -1,107 +1,118 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
+import { searchRateLimitMiddleware } from "./middleware/searchRateLimit";
 
-// Debug function to log request details
-function logRequestDetails(request: NextRequest) {
-  console.log('Middleware: Request URL:', request.url);
-  console.log('Middleware: Request method:', request.method);
-  console.log('Middleware: Request headers:', Object.fromEntries(request.headers.entries()));
-  console.log('Middleware: Request cookies:', request.cookies.getAll().map(c => c.name));
-}
+// Define auth-related routes
+const authRoutes = [
+  '/login',
+  '/signup',
+  '/forgot-password'
+]
 
-// Define public routes that don't require authentication
+// Define marketing/public pages
 const publicRoutes = [
   '/',
   '/features',
   '/pricing',
-  '/login',
-  '/signup',
-  '/forgot-password',
+  '/about',
+  '/careers',
+  '/contact',
+  '/privacy',
+  '/terms',
+  '/security'
+]
+
+// Define static and system routes that should always be accessible
+const systemRoutes = [
   '/_next',
   '/favicon.ico',
   '/placeholder.svg',
   '/api/notifications',
-  '/.well-known'
-];
+  '/.well-known',
+  '/fonts',
+  '/images',
+  '/static'
+]
+
+// Define protected routes that require authentication
+const protectedRoutes = [
+  '/search',
+  '/dashboard',
+  '/admin',
+  '/settings',
+  '/profile',
+  '/my-account'
+]
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  console.log('\n--- New Request ---');
-  console.log('Middleware: Processing request for:', pathname);
-  logRequestDetails(request);
-  
-  // Skip middleware for public routes
-  if (publicRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
-    console.log('Middleware: Allowing access to public route:', pathname);
-    return NextResponse.next();
+  // Check rate limits for search API
+  const rateLimitResponse = await searchRateLimitMiddleware(request)
+  if (rateLimitResponse.status === 429) {
+    return rateLimitResponse
   }
+
+  const { pathname } = request.nextUrl
   
-  // Skip middleware for static files
-  if (pathname.includes('.')) {
-    console.log('Middleware: Allowing static file:', pathname);
-    return NextResponse.next();
+  // Check route types
+  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
+  const isSystemRoute = systemRoutes.some(route => pathname.startsWith(route))
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+  
+  // Allow access to public routes
+  if ((isAuthRoute || isPublicRoute || isSystemRoute || pathname.includes('.')) && !isProtectedRoute) {
+    console.log('Middleware: Allowing access to public route:', pathname)
+    return NextResponse.next()
   }
-  
-  const response = NextResponse.next();
-  
+
   try {
-    // Only check auth for protected routes
-    if (pathname.startsWith('/dashboard') || pathname.startsWith('/(dashboard)')) {
-      console.log('Middleware: Checking auth for protected route:', pathname);
+    // All other routes require authentication
+    if (isProtectedRoute || pathname.startsWith('/(dashboard)')) {
+      console.log('Middleware: Checking auth for protected route:', pathname)
       
-      const supabase = createMiddlewareClient({ req: request, res: response });
+      // Create a response and a supabase client
+      const res = NextResponse.next()
+      const supabase = createMiddlewareClient({ req: request, res })
       
-      // Refresh session if expired
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      // Get session
+      const { data: { session } } = await supabase.auth.getSession()
       
-      if (sessionError) {
-        console.error('Middleware: Session error:', sessionError);
-        return NextResponse.redirect(new URL('/login', request.url))
-      }
-
       if (!session) {
-        console.log('Middleware: No session found, redirecting to login');
-        return NextResponse.redirect(new URL('/login', request.url))
+        console.log('Middleware: No session found, redirecting to login')
+        
+        // Create the login URL with a return path
+        const loginUrl = new URL('/login', request.url)
+        loginUrl.searchParams.set('returnTo', pathname)
+        
+        // Create a redirect response
+        const redirectResponse = NextResponse.redirect(loginUrl)
+        
+        // Clear any existing auth cookies
+        redirectResponse.cookies.delete('sb-access-token')
+        redirectResponse.cookies.delete('sb-refresh-token')
+        
+        return redirectResponse
       }
 
-      console.log('Middleware: Valid session found for user:', session.user.id);
-      
-      // Update response headers if session was refreshed
-      return response
+      console.log('Middleware: Valid session found for user:', session.user.id)
+      return res
     }
 
-    // Default: allow access
-    console.log('Middleware: Default access allowed for:', pathname);
-    return response;
+    // Non-protected routes
+    return NextResponse.next()
   } catch (error) {
-    console.error('Middleware error:', error);
+    console.error('Middleware error:', error)
     
-    // If there's an auth error, clear any invalid auth cookies
-    if (error instanceof Error && error.message.includes('Auth')) {
-      response.cookies.delete('sb-access-token');
-      response.cookies.delete('sb-refresh-token');
-      
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('error', 'session_expired');
-      return NextResponse.redirect(loginUrl);
-    }
-    
-    // In case of other errors, allow the request to continue but log the error
-    console.error('Middleware non-auth error, allowing request to continue:', error);
-    return response;
+    // If there's an error, redirect to login
+    const loginUrl = new URL('/login', request.url)
+    return NextResponse.redirect(loginUrl)
   }
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - api routes (handled separately)
-     */
+    // Match all paths except static files and api routes
     "/((?!_next/static|_next/image|favicon.ico|api).*)",
   ],
 }

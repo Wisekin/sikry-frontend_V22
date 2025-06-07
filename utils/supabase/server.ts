@@ -1,52 +1,49 @@
-import {
-  createServerClient as createSupabaseServerClient,
-  type CookieOptions,
-} from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
-  const cookieStore = await cookies()
+  const cookieStore = cookies()
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-  if (!supabaseUrl) {
-    console.error('[Supabase] NEXT_PUBLIC_SUPABASE_URL is not defined.')
-    throw new Error('Server configured Supabase URL is required.')
-  }
-  if (!supabaseKey) {
-    console.error('[Supabase] NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined.')
-    throw new Error('Server configured Supabase Anon Key is required.')
-  }
-
-  return createSupabaseServerClient(supabaseUrl, supabaseKey, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: false,
-    },
+  return createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
-      get(name: string) {
-        const cookie = cookieStore.get(name)
-        console.log(`[Supabase Server] Getting cookie ${name}:`, cookie?.value ? 'found' : 'not found');
-        return cookie?.value
-      },
-      set(name: string, value: string, options: CookieOptions) {
+      async get(name: string) {
         try {
-          // In Server Components, cookies are read-only
-          console.log(`[Supabase Server] Cookie ${name} would be set (read-only context)`);
+          const cookie = await cookieStore.get(name)
+          return cookie?.value
         } catch (error) {
-          console.warn(`[Supabase Server] Could not set cookie ${name}:`, error);
+          console.error(`Cookie get error: ${name}`, error)
+          return undefined
         }
       },
-      remove(name: string, options: CookieOptions) {
+      async set(name: string, value: string, options: CookieOptions) {
         try {
-          // In Server Components, cookies are read-only
-          console.log(`[Supabase Server] Cookie ${name} would be removed (read-only context)`);
+          // Use the async cookies() API
+          await cookies().set(name, value, {
+            ...options,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/'
+          })
         } catch (error) {
-          console.warn(`[Supabase Server] Could not remove cookie ${name}:`, error);
+          console.error(`Cookie set error: ${name}`, error)
         }
       },
-    },
+      async remove(name: string, options: CookieOptions) {
+        try {
+          // Use the async cookies() API
+          await cookies().set(name, '', {
+            ...options,
+            maxAge: 0,
+            path: '/'
+          })
+        } catch (error) {
+          console.error(`Cookie remove error: ${name}`, error)
+        }
+      }
+    }
   })
 }
