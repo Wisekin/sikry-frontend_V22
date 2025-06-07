@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const startTime = Date.now()
   try {
     const body = await request.json()
-    const { query, sources = ["google", "linkedin", "crunchbase"] as ExternalSource[], limit = 20 } = body
+    const { query, sources = ["google", "linkedin", "crunchbase"] as ExternalSource[], limit = 20, language } = body
 
     if (!query) {
       return NextResponse.json(
@@ -107,12 +107,16 @@ export async function POST(request: Request) {
       .single()
 
     // Start with a base query
-    let dbQuery = supabase.from("companies").select("*", { count: "exact" })
+    let dbQuery = supabase.from("discovered_companies").select("*", { count: "exact" })
+
+    // Determine language for text search
+    const searchLanguage = typeof language === 'string' && language.toLowerCase() === 'fr' ? 'french' : 'english';
+    const tsVectorColumn = searchLanguage === 'french' ? 'searchable_tsvector_fr' : 'searchable_tsvector_en';
 
     // Apply primary text search with web search configuration
-    dbQuery = dbQuery.textSearch("searchable", query, {
+    dbQuery = dbQuery.textSearch(tsVectorColumn, query, {
       type: "websearch",
-      config: "english",
+      config: searchLanguage,
     })
 
     // Apply entity-based filters

@@ -1,9 +1,27 @@
---THIS IS THE FULL FILE SCHEMA FOR THE NEW SCHEMA THAT CONTAINS ALL THE TABLES AND RELATIONS
-
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto"; 
 CREATE EXTENSION IF NOT EXISTS "pg_trgm"; 
+
+-- Function to update searchable_tsvectors for discovered_companies
+CREATE OR REPLACE FUNCTION update_discovered_companies_tsvectors()
+RETURNS TRIGGER AS $$
+DECLARE
+  common_text TEXT;
+BEGIN
+  common_text :=
+    coalesce(NEW.name, '') || ' ' ||
+    coalesce(NEW.description, '') || ' ' ||
+    coalesce(NEW.industry, '') || ' ' ||
+    coalesce(NEW.location_text, '') || ' ' ||
+    array_to_string(NEW.tags_list, ' ') || ' ' ||
+    array_to_string(NEW.technologies_list, ' ');
+
+  NEW.searchable_tsvector_en := to_tsvector('english', common_text);
+  NEW.searchable_tsvector_fr := to_tsvector('french', common_text);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql; 
 
 -- Drop tables in dependency order (from original File Schema)
 DROP TABLE IF EXISTS communication_attachments CASCADE; 
@@ -23,6 +41,7 @@ DROP TABLE IF EXISTS company_relationships CASCADE;
 -- DROP TABLE IF EXISTS users CASCADE; -- Will be dropped after new tables that depend on it
 
 -- Drop new tables (reverse order of creation, approximately)
+DROP TABLE IF EXISTS profiles CASCADE;
 DROP TABLE IF EXISTS password_reset_tokens CASCADE;
 DROP TABLE IF EXISTS user_sessions CASCADE;
 DROP TABLE IF EXISTS oauth_providers CASCADE;
@@ -32,8 +51,6 @@ DROP TABLE IF EXISTS webhooks CASCADE;
 DROP TABLE IF EXISTS user_roles CASCADE;
 DROP TABLE IF EXISTS api_keys CASCADE;
 DROP TABLE IF EXISTS search_history CASCADE;
-DROP TABLE IF EXISTS api_cache CASCADE;
-DROP TABLE IF EXISTS rate_limits CASCADE;
 DROP TABLE IF EXISTS background_jobs CASCADE;
 DROP TABLE IF EXISTS metrics CASCADE;
 DROP TABLE IF EXISTS system_logs CASCADE;
@@ -170,7 +187,8 @@ CREATE TABLE discovered_companies (
   company_status VARCHAR(50) DEFAULT 'active',  -- New: status VARCHAR(50)
   tags_list TEXT[],                           -- New: tags TEXT[]
   internal_notes TEXT,                        -- New: notes TEXT
-  searchable_tsvector TSVECTOR,               -- New: searchable TSVECTOR
+  searchable_tsvector_en TSVECTOR,             -- New: tsvector for English
+  searchable_tsvector_fr TSVECTOR,             -- New: tsvector for French
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 ); 
@@ -628,7 +646,6 @@ CREATE INDEX IF NOT EXISTS idx_communications_campaign ON communications(campaig
 CREATE INDEX IF NOT EXISTS idx_company_relationships_org ON company_relationships(organization_id); 
 
 -- Indexes for augmented/new fields in existing tables
-CREATE INDEX IF NOT EXISTS idx_dsc_co_searchable_tsvector ON discovered_companies USING GIN(searchable_tsvector);
 CREATE INDEX IF NOT EXISTS idx_dsc_co_industry ON discovered_companies(industry);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
@@ -702,6 +719,15 @@ CREATE INDEX IF NOT EXISTS idx_user_sessions_refresh_token ON user_sessions(refr
 CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_token ON password_reset_tokens(token_value);
 CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user_id ON password_reset_tokens(user_id);
 
+-- GIN Indexes for full-text search on discovered_companies
+CREATE INDEX IF NOT EXISTS discovered_companies_tsvector_en_idx ON discovered_companies USING GIN (searchable_tsvector_en);
+CREATE INDEX IF NOT EXISTS discovered_companies_tsvector_fr_idx ON discovered_companies USING GIN (searchable_tsvector_fr);
+
+-- Trigger to update searchable_tsvectors on insert or update for discovered_companies
+DROP TRIGGER IF EXISTS tsvectorupdate_discovered_companies ON discovered_companies;
+CREATE TRIGGER tsvectorupdate_discovered_companies
+BEFORE INSERT OR UPDATE ON discovered_companies
+FOR EACH ROW EXECUTE FUNCTION update_discovered_companies_tsvectors();
 
 -- Enable RLS for all tables (Original + New)
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY; 
@@ -756,38 +782,128 @@ CREATE POLICY "Users can only access their own profile" ON users
   USING (id = auth.uid())
   WITH CHECK (id = auth.uid()); 
 
-CREATE POLICY "Team members can view their org's data" ON team_members
-  USING (organization_id IN (
-    SELECT organization_id FROM team_members
-    WHERE user_id = auth.uid()
-  ))
-  WITH CHECK (organization_id IN (
-    SELECT organization_id FROM team_members
-    WHERE user_id = auth.uid()
-  )); 
 
--- Add basic RLS policies for new tables (examples - these should be reviewed and customized)
--- Allow users to manage their own data in new tables if a user_id link exists
-CREATE POLICY "Users can manage their own contacts" ON contacts
-  USING (EXISTS (SELECT 1 FROM team_members tm WHERE tm.organization_id = contacts.organization_id AND tm.user_id = auth.uid()))
-  WITH CHECK (EXISTS (SELECT 1 FROM team_members tm WHERE tm.organization_id = contacts.organization_id AND tm.user_id = auth.uid()));
 
-CREATE POLICY "Users can manage their own notifications" ON notifications
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY "Users can manage their own API keys" ON api_keys
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
+-- Function to update searchable_tsvectors for discovered_companies
+CREATE OR REPLACE FUNCTION update_discovered_companies_tsvectors()
+RETURNS TRIGGER AS $$
+DECLARE
+  common_text TEXT;
+BEGIN
+  common_text :=
+    coalesce(NEW.name, '') || ' ' ||
+    coalesce(NEW.description, '') || ' ' ||
+    coalesce(NEW.industry, '') || ' ' ||
+    coalesce(NEW.location_text, '') || ' ' ||
+    array_to_string(NEW.tags_list, ' ') || ' ' ||
+    array_to_string(NEW.technologies_list, ' ');
 
-CREATE POLICY "Users can manage their own sessions" ON user_sessions
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
+  NEW.searchable_tsvector_en := to_tsvector('english', common_text);
+  NEW.searchable_tsvector_fr := to_tsvector('french', common_text);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql; 
 
--- Org-based policies for tables with organization_id
-CREATE POLICY "Org members can access org-specific data in discovered_companies" ON discovered_companies
-  USING (EXISTS (SELECT 1 FROM team_members tm WHERE tm.organization_id = discovered_companies.organization_id AND tm.user_id = auth.uid()))
-  WITH CHECK (EXISTS (SELECT 1 FROM team_members tm WHERE tm.organization_id = discovered_companies.organization_id AND tm.user_id = auth.uid()));
--- (Similar org-based policies should be created for other new tables with organization_id like
--- competitor_analysis, competitors, insights, system_logs (for org-specific logs), background_jobs (for org-specific jobs),
--- search_history, webhooks, file_uploads etc.)
+ --tep 1: Modify the SECURITY DEFINER function to return an array of UUIDs. 
+
+CREATE OR REPLACE FUNCTION public.get_user_organization_ids_array(p_user_id uuid)
+RETURNS uuid[] -- Changed to return an array
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT array_agg(organization_id) -- Aggregate into an array
+  FROM team_members
+  WHERE user_id = p_user_id;
+$$;
+
+-- Grant execute permission
+GRANT EXECUTE ON FUNCTION public.get_user_organization_ids_array(uuid) TO authenticated;
+
+
+-- Drop the old policies if they were created or if you're re-running
+DROP POLICY IF EXISTS "Team members can view their organization's members" ON public.team_members;
+DROP POLICY IF EXISTS "Users can see their own team_member entries" ON public.team_members;
+DROP POLICY IF EXISTS "Users can manage their own membership details" ON public.team_members;
+-- Drop the original recursive policy if it still exists
+DROP POLICY IF EXISTS "Team members can view their org's data" ON public.team_members;
+
+
+-- New Policy: Team members can view other members within their own organization(s).
+CREATE POLICY "Team members can view their organization's members"
+ON public.team_members
+FOR SELECT
+TO authenticated
+USING (
+  organization_id = ANY (public.get_user_organization_ids_array(auth.uid())) -- Use = ANY with the array
+);
+
+-- New Policy: Users can always view their own specific team_member entry.
+CREATE POLICY "Users can see their own team_member entries"
+ON public.team_members
+FOR SELECT
+TO authenticated
+USING (
+  user_id = auth.uid()
+);
+
+-- New Policy: Users can update their own team_member entry.
+CREATE POLICY "Users can manage their own membership details"
+ON public.team_members
+FOR UPDATE
+TO authenticated
+USING (
+    user_id = auth.uid()
+)
+WITH CHECK (
+    user_id = auth.uid()
+);
+
+-- (Keep notes about INSERT/DELETE policies as before)
+
+
+--TABLE ADDED MANUALLY:
+-- Create profiles table to link auth.users with application data
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT UNIQUE NOT NULL,
+  first_name TEXT,
+  last_name TEXT,
+  avatar_url TEXT,
+  platform_role VARCHAR(50) DEFAULT 'user',
+  preferences JSONB DEFAULT '{}',
+  last_login TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  organization_id UUID REFERENCES organizations(id) ON DELETE SET NULL,
+  UNIQUE(email)
+);
+
+-- Enable RLS if not already enabled
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Allow authenticated users to select their own profile
+CREATE POLICY "Users can select their own profile"
+  ON profiles
+  FOR SELECT
+  USING (auth.uid() = id);
+
+
+--WE FINALLY DECIDED TO USE THE USERS TABLE INSTEAD OF PROFILE
+-- Function to insert into public.users when a new auth.users is created
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.users (id, email)
+  values (new.id, new.email)
+  on conflict do nothing; -- Prevents duplicate insert if already exists
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- Trigger on auth.users
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+after insert on auth.users
+for each row execute procedure public.handle_new_user();
