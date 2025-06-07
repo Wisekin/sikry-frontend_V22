@@ -13,6 +13,65 @@ IMPORTANT: These rules must never be deleted and must be referenced before any a
    - What should be done next
 4. Never remove completed items - they serve as implementation history
 
+---
+
+### Date: 2025-06-07: Resolving Next.js 15 & Supabase SSR Cookie Issues & New RLS Challenge
+
+**Objective:** Stabilize Supabase integration in Next.js 15.x, primarily fixing cookie handling errors, and then address subsequent issues.
+
+**Previous State:**
+- Persistent `cookies() should be awaited` error in Next.js 15.2.4 (later updated to 15.3.3) when using Supabase SSR, affecting various parts of the application.
+- Suspected issues with deprecated Supabase helper libraries and incorrect asynchronous handling of Next.js `cookies()` API.
+
+**Work Performed & Key Changes:**
+1.  **Dependency Audit & Cleanup:**
+    *   Identified that Next.js 15 made the `cookies()` API from `next/headers` asynchronous, requiring `await`.
+    *   Removed the deprecated `@supabase/auth-helpers-nextjs` package from `package.json` and updated dependencies (`npm install`).
+2.  **Server-Side Supabase Client (`utils/supabase/server.ts`):**
+    *   Modified the `createClient` function to use `createServerClient` from `@supabase/ssr`.
+    *   Ensured the `get`, `set`, and `remove` methods within the `cookies` configuration are `async` and correctly `await cookies()`.
+3.  **Next.js Middleware (`middleware.ts`):**
+    *   Replaced `createMiddlewareClient` (from the deprecated package) with `createServerClient` from `@supabase/ssr`.
+    *   Updated cookie handlers (`get`, `set`, `remove`) to be `async` and correctly interact with `request.cookies` and `response.cookies` as per `@supabase/ssr` guidelines for middleware.
+4.  **Client-Side Supabase Client (`utils/supabase/client.ts`):**
+    *   Replaced `createClientComponentClient` (from deprecated package) with `createBrowserClient` from `@supabase/ssr`.
+5.  **Code Cleanup:**
+    *   Identified and removed an unused/outdated `utils/supabase/middleware.ts` file that contained incorrect synchronous cookie handling.
+
+**Current Status & Outcomes:**
+-   **SUCCESS:** The primary `cookies() should be awaited` error has been **resolved**. The application now starts, and initial navigation and API calls (e.g., search suggestions) seem to function without this specific cookie error.
+-   **New Issues Uncovered:**
+    1.  **RLS Infinite Recursion (Critical - Intermittent):**
+        *   Error: `infinite recursion detected in policy for relation "team_members"`
+        *   Previously occurred when fetching data for the dashboard. This error has **intermittently disappeared** during recent testing (2025-06-07).
+        *   The root cause (exact RLS policy definition on `team_members` and the function `get_teams_for_user` it calls) remains unverified. If the error returns, this is the **top priority blocker**.
+    2.  **Organization Membership Error:**
+        *   Error: `User not part of any organization` (e.g., in `lib/actions/communications.ts`).
+        *   Likely a cascading failure due to the `team_members` RLS issue preventing organization lookup.
+    3.  **API Unauthorized Error:**
+        *   `POST /api/search/natural` now returns a `401 Unauthorized` error (previously was 403, then RLS recursion).
+        *   The API route's authentication logic (`supabase.auth.getUser()`) appears correct. The `401` suggests an issue with the user's session or cookies not being sent/validated correctly with the API request.
+    4.  **React Hydration Mismatch (Browser):**
+        *   Persistent hydration warnings in the browser console. Potentially due to browser extensions (e.g., "monica-id" attributes seen in HTML) or client/server rendering discrepancies.
+    5.  **Webpack Warning (Terminal):**
+        *   `@supabase/realtime-js` shows a "Critical dependency: the request of a dependency is an expression" warning. Considered minor for now.
+
+**Next Steps:**
+1.  **Investigate `401 Unauthorized` on `/api/search/natural` (Current Top Priority):**
+    *   Verify user login status when the error occurs.
+    *   Inspect browser request headers/cookies for the `/api/search/natural` call to ensure session cookies are present and valid.
+    *   If necessary, add temporary debugging in `utils/supabase/server.ts` to trace cookie handling for API routes.
+2.  **Monitor & Prepare for `team_members` RLS Issue:**
+    *   If the "infinite recursion" error on `team_members` returns, this becomes the top priority.
+    *   **Crucial:** Obtain the exact current SQL definition of the RLS policy on `public.team_members` (especially the one named "Policy with security definer functions") directly from the Supabase Dashboard. Also, confirm the exact name and definition of the function it calls (e.g., `get_teams_for_user`).
+    *   Analyze the policy and function for recursive logic or incorrect column references (e.g., `team_id` vs. `organization_id`).
+3.  **Verify Dashboard Data Loading:** Once API authentication and any RLS issues are stable, confirm that dashboard data loads correctly and related errors (e.g., "User not part of any organization") are resolved.
+4.  **Address React Hydration Mismatch:** Attempt to isolate the cause (e.g., by disabling browser extensions, reviewing components that might render differently on server/client).
+5.  **Security Hardening (Later):** Review instances of `supabase.auth.getSession()` and consider replacing with `supabase.auth.getUser()` where appropriate for enhanced security, as per Supabase recommendations (e.g., in `lib/actions/companies.ts`).
+6.  **Monitor Webpack Warning:** Keep an eye on the `@supabase/realtime-js` warning, but do not prioritize fixing unless it causes functional issues with real-time features (if used).
+7.  **Revisit `npm audit`:** After core functionality is stable, address the vulnerabilities reported by `npm audit`.
+
+---
 ## Overview
 Implementing a natural language search system with:
 - OpenAI query parsing
