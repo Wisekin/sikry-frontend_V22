@@ -15,6 +15,53 @@ IMPORTANT: These rules must never be deleted and must be referenced before any a
 
 ---
 
+### Date: 2025-06-07 (Evening): RLS, Session, and User ID Mismatch Resolution
+
+**Objective:** Resolve critical Supabase session errors, RLS infinite recursion, and subsequent data access issues.
+
+**Previous State (from earlier today):**
+- Next.js 15.x & Supabase SSR cookie handling issues were largely resolved by updating Supabase client initialization and middleware.
+- A critical "infinite recursion detected in policy for relation 'team_members'" error was the primary blocker.
+- After initial RLS policy adjustments, a "PGRST116: JSON object requested, multiple (or no) rows returned" error appeared when fetching team member data, indicating the user wasn't found in `team_members`.
+
+**Work Performed & Key Changes (This Session):**
+1.  **Middleware Naming Correction (Recap & Confirmation):**
+    *   Ensured the Next.js middleware file was correctly named `middleware.ts` at the project root. This was a key step in resolving initial "No active session found" errors by allowing Next.js to correctly process Supabase session cookies.
+2.  **RLS Infinite Recursion Fix (`team_members`):
+    *   The RLS policy on `team_members` causing infinite recursion (likely `USING (organization_id IN (SELECT organization_id FROM team_members WHERE user_id = auth.uid()))`) was successfully replaced.
+    *   Implemented a `SECURITY DEFINER` SQL function `public.get_user_organization_ids_array(user_id_input uuid)` that returns an array of `organization_id`s for a given user, crucially *without* re-triggering RLS on `team_members` within the function itself.
+    *   Updated the `SELECT` RLS policy on `team_members` to use this function: `USING (organization_id = ANY (public.get_user_organization_ids_array(auth.uid())))`.
+    *   Added a policy to allow users to see their own `team_member` entries: `USING (user_id = auth.uid())`.
+    *   These changes were applied to `schema.sql` and confirmed in the Supabase project, resolving the recursion error.
+3.  **User ID Mismatch & "PGRST116" Error Resolution:
+    *   Diagnosed the "PGRST116" (0 rows returned for `.single()`) error on `team_members` lookup.
+    *   Discovered a mismatch between `auth.users.id` (e.g., `ec5ff86e-...` for `john.doe@acme.com`) and the `user_id` stored in `public.users` and subsequently in `team_members` for older/mock data (e.g., `c0eebc...`).
+    *   The `handle_new_user` trigger (copying `auth.users.id` to `public.users.id` on new user creation) was confirmed to be working correctly for new users.
+    *   Tested with a newer user (`salomon@sikso.ch`, auth ID `47504076-...`) whose `public.users.id` and `team_members.user_id` correctly matched their `auth.uid()`. This user successfully fetched their companies, confirming the RLS and data access logic now works when IDs are consistent.
+
+**Current Status & Outcomes:**
+-   **SUCCESS:** The "No active session" errors are resolved (due to correct middleware and Supabase SSR setup).
+-   **SUCCESS:** The "infinite recursion detected in policy for relation 'team_members'" error is **resolved** by the new RLS function and policies.
+-   **SUCCESS:** The "PGRST116" error (0 rows for team member) is understood and **resolved for users with consistent IDs**. The application functions correctly for these users (e.g., `salomon@sikso.ch`).
+-   **Known Issue:** Older users populated with mock data (e.g., `john.doe@acme.com`) still have mismatched IDs in `public.users` and `team_members` compared to their `auth.uid()`. This will cause issues for these specific users until their data is corrected or they are no longer used for testing.
+-   The `team_members` table is populated via application logic (e.g., user invites, organization creation), not automatically by a trigger upon user signup (beyond the `public.users` table population).
+
+**Next Steps (Revised Priority):**
+1.  **Data Cleanup (Mock Users - As Needed):**
+    *   For `john.doe@acme.com` and any other mock users with inconsistent IDs: Decide whether to manually correct their `public.users.id` and `team_members.user_id` to match their `auth.uid()`, or to exclusively use users like `salomon@sikso.ch` (who have correct ID alignment) for further testing and development. *User has indicated they will use `salomon@sikso.ch` and clean up mock data later.*
+2.  **Verify Organization/Team Membership Logic:**
+    *   Review and test the application flows responsible for adding users to `team_members` (e.g., creating an organization, inviting users). Ensure this process correctly uses the `auth.uid()` for the `user_id` field in `team_members`.
+3.  **Security Refinement (`getSession` vs. `getUser` - Optional but Recommended):**
+    *   In server-side actions (e.g., `lib/actions/companies.ts`), consider replacing `supabase.auth.getSession()` with `supabase.auth.getUser()` for more robust session validation, as per Supabase recommendations. This is a minor refinement, not a bug fix.
+4.  **Re-evaluate Previous "Next Steps":**
+    *   Re-check if the `401 Unauthorized` on `/api/search/natural` is still occurring with the `salomon@sikso.ch` user. If so, investigate.
+    *   Address React Hydration Mismatch if still present and impacting development.
+    *   Monitor Webpack Warning.
+    *   Revisit `npm audit` vulnerabilities later.
+5.  **Continue with Core Feature Development:** Proceed with the main objectives outlined in the "Overview" and previous "Next Steps" sections now that critical auth/RLS issues are stable.
+
+---
+
 ### Date: 2025-06-07: Resolving Next.js 15 & Supabase SSR Cookie Issues & New RLS Challenge
 
 **Objective:** Stabilize Supabase integration in Next.js 15.x, primarily fixing cookie handling errors, and then address subsequent issues.
