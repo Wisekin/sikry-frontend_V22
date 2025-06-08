@@ -8,7 +8,6 @@ import {
   UsersIcon,
   ArrowTrendingUpIcon,
   ChatBubbleLeftRightIcon,
-  ArrowRightIcon,
 } from "@heroicons/react/24/solid"
 import Link from "next/link"
 import { SmartSearchBar } from "@/components/search/SmartSearchBar"
@@ -152,7 +151,7 @@ export default function HomePage() {
             <Button size="lg" variant="secondary" asChild className="bg-white text-blue-800 hover:bg-gray-100">
               <Link href="/search">
                 Start Free Search
-                <ArrowRightIcon className="w-4 h-4 ml-2" />
+                {/* <ArrowRightIcon className="w-4 h-4 ml-2" /> */}
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-800">
