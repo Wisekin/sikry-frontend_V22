@@ -1,131 +1,89 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
+import { NextResponse } from 'next/server';
+
+interface ReEngagementTask {
+  task_id: string;
+  description: string;
+  lead_id?: string;
+  lead_name?: string;
+  assigned_to_user_id?: string;
+  assigned_to_name?: string;
+  due_date: string; // ISO date string
+  status: 'open' | 'in_progress' | 'completed' | 'cancelled' | 'overdue';
+  priority: 'high' | 'medium' | 'low';
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
+}
+
+// Mock data store
+let mockTasks: ReEngagementTask[] = [
+  { task_id: 'task_001', description: 'Draft personalized email for Cold Lead Segment A', lead_name: 'Segment A (Cold Leads)', assigned_to_name: 'Marketing Team', due_date: '2023-11-10T23:59:59Z', status: 'completed', priority: 'high', created_at: '2023-11-08T10:00:00Z', updated_at: '2023-11-10T14:00:00Z' },
+  { task_id: 'task_002', description: 'Follow-up call with Jane Doe (Warm Lead)', lead_id: 'lead_jane_doe', lead_name: 'Jane Doe', assigned_to_user_id: 'user_alice', assigned_to_name: 'Sales Rep Alice', due_date: '2023-11-12T17:00:00Z', status: 'open', priority: 'high', created_at: '2023-11-09T11:00:00Z', updated_at: '2023-11-09T11:00:00Z' },
+  { task_id: 'task_003', description: 'Review engagement metrics for Campaign X (Re-engagement)', lead_name: 'Campaign X Metrics', assigned_to_name: 'Analyst Bob', due_date: '2023-11-14T17:00:00Z', status: 'in_progress', priority: 'medium', created_at: '2023-11-10T09:30:00Z', updated_at: '2023-11-11T10:00:00Z' },
+  { task_id: 'task_004', description: 'Send special offer to recently re-engaged leads group', lead_name: 'Re-engaged Group 1', assigned_to_name: 'Marketing Automation', due_date: '2023-11-08T23:59:59Z', status: 'overdue', priority: 'medium', created_at: '2023-11-05T15:00:00Z', updated_at: '2023-11-05T15:00:00Z' },
+  { task_id: 'task_005', description: 'Prepare content for new re-engagement email sequence (Q1)', assigned_to_name: 'Content Team', due_date: '2023-11-20T17:00:00Z', status: 'open', priority: 'low', created_at: '2023-11-11T16:00:00Z', updated_at: '2023-11-11T16:00:00Z' },
+];
 
 export async function GET(request: Request) {
+  // In a real app, apply filters from query parameters (status, priority, assignee, due_date_range)
   try {
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get("status")
-    const contact_id = searchParams.get("contact_id")
-
-    const supabase = await createClient()
-
-    // Get current user's organization
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-    if (userError || !user) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
-    }
-
-    const { data: teamMember, error: teamError } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
-
-    if (teamError || !teamMember) {
-      return NextResponse.json({ success: false, message: "User not part of any organization" }, { status: 403 })
-    }
-
-    let query = supabase
-      .from("reengagement_tasks")
-      .select(`
-        *,
-        contacts(name, email),
-        campaigns(name, status)
-      `)
-      .eq("organization_id", teamMember.organization_id)
-      .order("created_at", { ascending: false })
-
-    if (status) {
-      query = query.eq("status", status)
-    }
-
-    if (contact_id) {
-      query = query.eq("contact_id", contact_id)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      throw error
-    }
-
-    return NextResponse.json({
-      data,
-      success: true,
-      message: "Re-engagement tasks retrieved successfully",
-    })
+    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+    // Simple overdue check for mock data
+    const now = new Date();
+    mockTasks.forEach(task => {
+        if (task.status === 'open' || task.status === 'in_progress') {
+            if (new Date(task.due_date) < now) {
+                task.status = 'overdue';
+            }
+        }
+    });
+    return NextResponse.json(mockTasks);
   } catch (error) {
-    console.error("Re-engagement tasks API error:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to retrieve re-engagement tasks",
-        errors: [{ code: "fetch_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
-    )
+    console.error("Error fetching re-engagement tasks:", error);
+    return NextResponse.json({ message: "Error fetching re-engagement tasks" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { contact_id, task_type, trigger_criteria, priority = 5, scheduled_for } = body
-
-    const supabase = await createClient()
-
-    // Get current user's organization
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-    if (userError || !user) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
-    }
-
-    const { data: teamMember, error: teamError } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
-
-    if (teamError || !teamMember) {
-      return NextResponse.json({ success: false, message: "User not part of any organization" }, { status: 403 })
-    }
-
-    const taskData = {
-      organization_id: teamMember.organization_id,
-      contact_id,
-      task_type,
-      trigger_criteria,
-      priority,
-      scheduled_for: scheduled_for || new Date().toISOString(),
-      status: "pending",
-    }
-
-    const { data, error } = await supabase.from("reengagement_tasks").insert(taskData).select().single()
-
-    if (error) {
-      throw error
-    }
-
-    return NextResponse.json({
-      data,
-      success: true,
-      message: "Re-engagement task created successfully",
-    })
+    const newTaskData = await request.json() as Omit<ReEngagementTask, 'task_id' | 'created_at' | 'updated_at'>;
+    const newTask: ReEngagementTask = {
+      ...newTaskData,
+      task_id: `task_${String(Date.now()).slice(-6)}`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    mockTasks.push(newTask);
+    return NextResponse.json(newTask, { status: 201 });
   } catch (error) {
-    console.error("Create re-engagement task API error:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to create re-engagement task",
-        errors: [{ code: "create_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
-    )
+    console.error("Error creating re-engagement task:", error);
+    return NextResponse.json({ message: "Error creating re-engagement task" }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const taskId = searchParams.get('taskId');
+    if (!taskId) {
+      return NextResponse.json({ message: "Task ID is required for update" }, { status: 400 });
+    }
+
+    const updates = await request.json() as Partial<Omit<ReEngagementTask, 'task_id' | 'created_at'>>;
+    const taskIndex = mockTasks.findIndex(t => t.task_id === taskId);
+
+    if (taskIndex === -1) {
+      return NextResponse.json({ message: "Task not found" }, { status: 404 });
+    }
+
+    mockTasks[taskIndex] = {
+      ...mockTasks[taskIndex],
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+
+    return NextResponse.json(mockTasks[taskIndex]);
+  } catch (error) {
+    console.error("Error updating re-engagement task:", error);
+    return NextResponse.json({ message: "Error updating re-engagement task" }, { status: 500 });
   }
 }

@@ -1,125 +1,102 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
-import type { FinancialFilters } from "@/types/financial"
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+// Define the structure of a financial record based on Building-Plan.md
+interface FinancialRecord {
+  id: string;
+  organization_id?: string; // Optional, assuming it might be contextually inferred or added later
+  source_type: 'campaign' | 'contact' | 'manual_entry' | 'other';
+  source_id?: string;
+  amount: number;
+  type: 'income' | 'expense';
+  description: string;
+  timestamp: string; // ISO date string
+  currency: string;
+}
+
+// Mock data for the API
+const mockFinancialRecords: FinancialRecord[] = [
+  {
+    id: 'rec_001',
+    source_type: 'manual_entry',
+    amount: 1500.00,
+    type: 'income',
+    description: 'Payment for Invoice #INV-2023-001',
+    timestamp: '2023-10-15T10:00:00Z',
+    currency: 'USD'
+  },
+  {
+    id: 'rec_002',
+    source_type: 'other',
+    amount: 99.50,
+    type: 'expense',
+    description: 'Monthly Software Subscription - CRM Pro',
+    timestamp: '2023-10-14T14:30:00Z',
+    currency: 'USD'
+  },
+  {
+    id: 'rec_003',
+    source_type: 'campaign',
+    source_id: 'camp_xyz_789',
+    amount: 5250.75,
+    type: 'income',
+    description: 'Revenue from Q4 Marketing Campaign',
+    timestamp: '2023-10-10T16:45:00Z',
+    currency: 'USD'
+  },
+  {
+    id: 'rec_004',
+    source_type: 'manual_entry',
+    amount: 250.00,
+    type: 'expense',
+    description: 'Office Supplies Purchase',
+    timestamp: '2023-10-05T11:20:00Z',
+    currency: 'USD'
+  },
+  {
+    id: 'rec_005',
+    source_type: 'contact',
+    source_id: 'cont_abc_123',
+    amount: 75.00,
+    type: 'expense',
+    description: 'Client Gift Basket',
+    timestamp: '2023-10-02T09:00:00Z',
+    currency: 'USD'
+  }
+];
+
+export async function GET(request: Request) {
+  // In a real application, you would fetch this data from a database
+  // and handle query parameters for filtering, pagination, etc.
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    // Get user's organization
-    const { data: teamMember } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
-
-    if (!teamMember) {
-      return NextResponse.json({ error: "Organization not found" }, { status: 404 })
-    }
-
-    const searchParams = request.nextUrl.searchParams
-    const filters: FinancialFilters = {
-      source_type: searchParams.get("source_type") || undefined,
-      type: searchParams.get("type") || undefined,
-      currency: searchParams.get("currency") || undefined,
-      category: searchParams.get("category") || undefined,
-      date_from: searchParams.get("date_from") || undefined,
-      date_to: searchParams.get("date_to") || undefined,
-      search: searchParams.get("search") || undefined,
-    }
-
-    let query = supabase
-      .from("financial_records")
-      .select("*")
-      .eq("organization_id", teamMember.organization_id)
-      .order("recorded_at", { ascending: false })
-
-    // Apply filters
-    if (filters.source_type) {
-      query = query.eq("source_type", filters.source_type)
-    }
-    if (filters.type) {
-      query = query.eq("type", filters.type)
-    }
-    if (filters.currency) {
-      query = query.eq("currency", filters.currency)
-    }
-    if (filters.category) {
-      query = query.eq("category", filters.category)
-    }
-    if (filters.date_from) {
-      query = query.gte("recorded_at", filters.date_from)
-    }
-    if (filters.date_to) {
-      query = query.lte("recorded_at", filters.date_to)
-    }
-    if (filters.search) {
-      query = query.or(`description.ilike.%${filters.search}%,category.ilike.%${filters.search}%`)
-    }
-
-    const { data: records, error } = await query
-
-    if (error) {
-      console.error("Error fetching financial records:", error)
-      return NextResponse.json({ error: "Failed to fetch records" }, { status: 500 })
-    }
-
-    return NextResponse.json({ records })
+    // Simulate a delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return NextResponse.json(mockFinancialRecords);
   } catch (error) {
-    console.error("Financial records API error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Error fetching financial records:", error);
+    return NextResponse.json({ message: "Error fetching financial records" }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
+  // In a real application, you would validate the input and save it to a database
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    // Get user's organization
-    const { data: teamMember } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
-
-    if (!teamMember) {
-      return NextResponse.json({ error: "Organization not found" }, { status: 404 })
-    }
-
-    const body = await request.json()
-    const recordData = {
-      ...body,
-      organization_id: teamMember.organization_id,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
-
-    const { data: record, error } = await supabase.from("financial_records").insert(recordData).select().single()
-
-    if (error) {
-      console.error("Error creating financial record:", error)
-      return NextResponse.json({ error: "Failed to create record" }, { status: 500 })
-    }
-
-    return NextResponse.json({ record }, { status: 201 })
+    const newRecord = await request.json() as Omit<FinancialRecord, 'id' | 'timestamp'>;
+    // Simulate adding a record
+    const createdRecord: FinancialRecord = {
+      ...newRecord,
+      id: `rec_${String(Date.now()).slice(-5)}`, // Generate a simple unique ID
+      timestamp: new Date().toISOString(),
+    };
+    mockFinancialRecords.push(createdRecord); // Add to our mock data store
+    return NextResponse.json(createdRecord, { status: 201 });
   } catch (error) {
-    console.error("Financial records POST error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Error creating financial record:", error);
+    if (error instanceof SyntaxError) {
+      return NextResponse.json({ message: "Invalid JSON payload" }, { status: 400 });
+    }
+    return NextResponse.json({ message: "Error creating financial record" }, { status: 500 });
   }
 }
+
+// You might also want PUT for updates and DELETE for removing records.
+// For now, GET and POST should suffice for initial setup.

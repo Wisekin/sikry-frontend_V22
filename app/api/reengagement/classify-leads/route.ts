@@ -1,140 +1,70 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
+import { NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+interface LeadClassificationStats {
+  hot_leads_count: number;
+  warm_leads_count: number;
+  cold_leads_count: number;
+  unclassified_leads_count: number;
+}
+
+interface ClassificationRule {
+  id: string;
+  name: string;
+  description: string;
+  classification_target: 'Hot' | 'Warm' | 'Cold';
+  criteria_summary: string; // A human-readable summary of the rule logic
+  // In a real system, this would also include structured criteria for processing
+}
+
+// Mock data store
+let mockClassificationStats: LeadClassificationStats = {
+  hot_leads_count: 78,
+  warm_leads_count: 230,
+  cold_leads_count: 1150,
+  unclassified_leads_count: 310,
+};
+
+let mockClassificationRules: ClassificationRule[] = [
+    { id: 'rule_cold_1', name: 'Inactive Users', classification_target: 'Cold', description: 'Users who have not logged in or opened an email in the last 90 days.', criteria_summary: 'Last active > 90 days' },
+    { id: 'rule_cold_2', name: 'Low Engagement', classification_target: 'Cold', description: 'Users with an engagement score below 10, indicating minimal interaction.', criteria_summary: 'Engagement score < 10' },
+    { id: 'rule_warm_1', name: 'Recent Product Interest', classification_target: 'Warm', description: 'Users who visited key product pages or the pricing page in the last 14 days.', criteria_summary: 'Visited key pages (product, pricing) recently' },
+    { id: 'rule_hot_1', name: 'High Intent Signals', classification_target: 'Hot', description: 'Users who requested a demo, started a trial, or had multiple high-value interactions in the last 30 days.', criteria_summary: 'Demo request, Trial started, or multiple high-value interactions' },
+];
+
+export async function GET(request: Request) {
+  // In a real application, stats would be queried from the database based on lead data and rules.
+  // Rules would also be fetched from a database.
   try {
-    const body = await request.json()
-    const { criteria = {} } = body
-
-    const supabase = await createClient()
-
-    // Get current user's organization
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-    if (userError || !user) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
-    }
-
-    const { data: teamMember, error: teamError } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
-
-    if (teamError || !teamMember) {
-      return NextResponse.json({ success: false, message: "User not part of any organization" }, { status: 403 })
-    }
-
-    // Get contacts that need classification
-    const { data: contacts, error: contactsError } = await supabase
-      .from("contacts")
-      .select("*")
-      .eq("organization_id", teamMember.organization_id)
-
-    if (contactsError) {
-      throw contactsError
-    }
-
-    const classifications = []
-    const coldLeads = []
-
-    for (const contact of contacts) {
-      // Calculate lead score using the database function
-      const { data: scoreResult, error: scoreError } = await supabase.rpc("calculate_lead_score", {
-        contact_uuid: contact.id,
-      })
-
-      if (scoreError) {
-        console.error(`Error calculating score for contact ${contact.id}:`, scoreError)
-        continue
-      }
-
-      const score = scoreResult || 50
-      let classification = "warm"
-
-      if (score >= 80) classification = "hot"
-      else if (score >= 60) classification = "warm"
-      else if (score >= 30) classification = "cold"
-      else if (score >= 10) classification = "dormant"
-      else classification = "unresponsive"
-
-      // Insert or update classification
-      const classificationData = {
-        organization_id: teamMember.organization_id,
-        contact_id: contact.id,
-        classification,
-        score,
-        factors: {
-          engagement_score: contact.engagement_score || 0,
-          days_since_contact: contact.last_contacted_at
-            ? Math.floor((Date.now() - new Date(contact.last_contacted_at).getTime()) / (1000 * 60 * 60 * 24))
-            : 999,
-          auto_classified: true,
-        },
-        last_activity_date: contact.last_contacted_at,
-        auto_classified: true,
-      }
-
-      const { data: classificationResult, error: classificationError } = await supabase
-        .from("lead_classifications")
-        .upsert(classificationData, {
-          onConflict: "contact_id,classification_date",
-          ignoreDuplicates: false,
-        })
-        .select()
-
-      if (!classificationError) {
-        classifications.push(classificationResult)
-
-        // Track cold leads for re-engagement
-        if (classification === "cold" || classification === "dormant") {
-          coldLeads.push({
-            contact_id: contact.id,
-            classification,
-            score,
-          })
-        }
-      }
-    }
-
-    // Auto-create re-engagement tasks for cold leads
-    if (coldLeads.length > 0) {
-      const reengagementTasks = coldLeads.map((lead) => ({
-        organization_id: teamMember.organization_id,
-        contact_id: lead.contact_id,
-        task_type: "auto_nurture",
-        trigger_criteria: {
-          classification: lead.classification,
-          score: lead.score,
-          auto_generated: true,
-        },
-        priority: lead.classification === "dormant" ? 8 : 6,
-        scheduled_for: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Schedule for tomorrow
-      }))
-
-      await supabase.from("reengagement_tasks").insert(reengagementTasks)
-    }
-
+    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
     return NextResponse.json({
-      data: {
-        classifications_updated: classifications.length,
-        cold_leads_found: coldLeads.length,
-        reengagement_tasks_created: coldLeads.length,
-      },
-      success: true,
-      message: "Lead classification completed successfully",
-    })
+      stats: mockClassificationStats,
+      rules: mockClassificationRules,
+    });
   } catch (error) {
-    console.error("Lead classification API error:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to classify leads",
-        errors: [{ code: "classification_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
-    )
+    console.error("Error fetching lead classification data:", error);
+    return NextResponse.json({ message: "Error fetching lead classification data" }, { status: 500 });
   }
 }
+
+export async function POST(request: Request) {
+  // This endpoint could be used to add a new classification rule.
+  // For now, it's a placeholder.
+  try {
+    const newRule = await request.json() as Omit<ClassificationRule, 'id'>;
+    const createdRule: ClassificationRule = {
+      ...newRule,
+      id: `rule_${String(Date.now()).slice(-5)}`,
+    };
+    mockClassificationRules.push(createdRule);
+    // In a real app, you might want to re-calculate stats after adding a rule, or trigger a background job.
+    return NextResponse.json(createdRule, { status: 201 });
+  } catch (error) {
+    console.error("Error creating classification rule:", error);
+    return NextResponse.json({ message: "Error creating classification rule" }, { status: 500 });
+  }
+}
+
+// Further development could include:
+// - PUT /api/reengagement/classify-leads/rules/{rule_id} to update a rule
+// - DELETE /api/reengagement/classify-leads/rules/{rule_id} to delete a rule
+// - POST /api/reengagement/classify-leads/run to trigger a re-classification job for all leads
