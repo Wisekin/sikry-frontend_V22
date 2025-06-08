@@ -3,12 +3,20 @@
 import { useEffect, useState } from "react"
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { getCompanies } from "@/lib/actions/companies"
 import type { DiscoveredCompany, Contact } from "@/types/database"
 import { format } from "date-fns"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 // Dummy getContacts, replace with real import if available
 async function getContacts() {
@@ -66,6 +74,12 @@ export function CommunicationFilters({ onChange }: CommunicationFiltersProps) {
       })
     }
   }, [status, channel, company, contact, subject, dateRange, onChange])
+
+  const formatDateRange = (range: { from: Date | undefined; to?: Date | undefined }) => {
+    if (!range.from) return "Select dates"
+    if (!range.to) return format(range.from, "LLL dd, y")
+    return `${format(range.from, "LLL dd, y")} - ${format(range.to, "LLL dd, y")}`
+  }
 
   return (
     <Card>
@@ -149,15 +163,57 @@ export function CommunicationFilters({ onChange }: CommunicationFiltersProps) {
           {/* Date Range */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Sent Date</label>
-            <div className="relative">
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={(range) => setDateRange(range ?? { from: undefined, to: undefined })}
-                numberOfMonths={1}
-                className="rounded-md border"
-              />
-            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dateRange.from && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formatDateRange(dateRange)}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+                className="w-auto p-0" 
+                align="start"
+                side="bottom"
+                sideOffset={4}
+              >
+                <div className="bg-white rounded-md border shadow-lg p-2">
+                  <DatePicker
+                    selected={dateRange.from}
+                    onChange={(dates) => {
+                      const [start, end] = dates as [Date, Date]
+                      setDateRange({ from: start, to: end })
+                    }}
+                    startDate={dateRange.from}
+                    endDate={dateRange.to}
+                    selectsRange
+                    monthsShown={2}
+                    inline
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    dateFormat="MMM d, yyyy"
+                    className="border-none"
+                    calendarClassName="border-none"
+                    popperClassName="react-datepicker-left"
+                    popperPlacement="bottom-start"
+                    popperModifiers={[
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, 8],
+                        },
+                      },
+                    ]}
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
