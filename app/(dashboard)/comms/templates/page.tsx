@@ -2,12 +2,9 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PlusCircle } from "lucide-react"
-import { DataTable } from "@/components/data/tables/DataTable"
+import { PlusCircle, Mail, Linkedin, Phone } from "lucide-react"
 import { PageLoader } from "@/components/core/loading/PageLoader"
 import { ROUTES } from "@/lib/constants/routes"
-import { templateColumns } from "@/components/data/tables/templateColumns"
 
 export const metadata = {
   title: "Templates | SIKRY",
@@ -20,7 +17,7 @@ export default function TemplatesPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Templates</h1>
-          <p className="text-muted-foreground">Create and manage your communication templates.</p>
+          <p className="text-muted-foreground">Manage your communication templates for different channels.</p>
         </div>
         <Button asChild>
           <Link href={ROUTES.TEMPLATES + "/new"}>
@@ -30,61 +27,62 @@ export default function TemplatesPage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="email" className="w-full">
-        <TabsList>
-          <TabsTrigger value="email">Email</TabsTrigger>
-          <TabsTrigger value="linkedin">LinkedIn</TabsTrigger>
-          <TabsTrigger value="phone">Phone</TabsTrigger>
-          <TabsTrigger value="all">All Templates</TabsTrigger>
-        </TabsList>
-        <TabsContent value="email" className="space-y-4">
-          <Suspense fallback={<PageLoader />}>
-            <TemplatesList type="email" />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="linkedin" className="space-y-4">
-          <Suspense fallback={<PageLoader />}>
-            <TemplatesList type="linkedin" />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="phone" className="space-y-4">
-          <Suspense fallback={<PageLoader />}>
-            <TemplatesList type="phone" />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="all" className="space-y-4">
-          <Suspense fallback={<PageLoader />}>
-            <TemplatesList />
-          </Suspense>
-        </TabsContent>
-      </Tabs>
+      <Suspense fallback={<PageLoader />}>
+        <TemplatesList />
+      </Suspense>
     </div>
   )
 }
 
-function TemplatesList({ type }: { type?: string }) {
-  // In a real app, this would fetch data from the API
-  const templates = Array.from({ length: 10 }).map((_, i) => ({
-    id: `temp-${i + 1}`,
-    name: `Template ${i + 1}`,
-    type: type || (i % 3 === 0 ? "email" : i % 3 === 1 ? "linkedin" : "phone"),
-    category: i % 4 === 0 ? "outreach" : i % 4 === 1 ? "follow-up" : i % 4 === 2 ? "nurture" : "announcement",
-    variables: Math.floor(Math.random() * 10),
-    isPublic: i % 2 === 0,
-    createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-    updatedAt: new Date(Date.now() - i * 43200000).toISOString(),
-  }))
-
-  const columns = templateColumns;
+function TemplatesList() {
+  const templates = [
+    {
+      id: "email-welcome",
+      name: "Welcome Email",
+      type: "email",
+      description: "Welcome email for new users",
+      lastModified: "2024-03-15",
+      icon: Mail,
+    },
+    {
+      id: "linkedin-connection",
+      name: "LinkedIn Connection Request",
+      type: "linkedin",
+      description: "Template for LinkedIn connection requests",
+      lastModified: "2024-03-14",
+      icon: Linkedin,
+    },
+    {
+      id: "phone-call-script",
+      name: "Sales Call Script",
+      type: "phone",
+      description: "Script for initial sales calls",
+      lastModified: "2024-03-13",
+      icon: Phone,
+    },
+  ]
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{type ? `${type.charAt(0).toUpperCase() + type.slice(1)} Templates` : "All Templates"}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <DataTable columns={columns} data={templates} />
-      </CardContent>
-    </Card>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {templates.map((template) => (
+        <Link key={template.id} href={`/comms/templates/${template.id}`}>
+          <Card className="h-full hover:bg-muted/50 transition-colors">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <template.icon className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">{template.name}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-2">{template.description}</p>
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span className="capitalize">{template.type}</span>
+                <span>Modified {template.lastModified}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      ))}
+    </div>
   )
 }

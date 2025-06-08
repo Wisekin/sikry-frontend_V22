@@ -48,11 +48,26 @@ export function SidebarNav() {
     { titleKey: "nav.companies", href: "/companies", icon: Building2 },
     { titleKey: "nav.marketIntel", href: "/market-intel", icon: TrendingUp },
     { titleKey: "nav.scrapers", href: "/scrapers", icon: Bot },
-    { titleKey: "nav.statistics", href: "/statistics", icon: BarChart3 },
-  ]
+  ];
+
+  // Add statistics section with subpages
+  const statisticsNavSection = {
+    section: "statistics",
+    titleKey: "nav.statistics",
+    icon: BarChart3,
+    basePath: "/statistics",
+    items: [
+      { titleKey: "statistics.overview", href: "/statistics", },
+      { titleKey: "statistics.collectionTrends", href: "/statistics/collection-trends" },
+      { titleKey: "statistics.geographicDistribution", href: "/statistics/geographic-distribution" },
+      { titleKey: "statistics.sectorDistribution", href: "/statistics/sector-distribution" },
+      { titleKey: "statistics.sourceComparison", href: "/statistics/source-comparison" },
+    ],
+  };
 
   // Section navigation with dropdowns
   const sectionNavItems = [
+    statisticsNavSection,
     {
       section: "communications",
       titleKey: "nav.communications",
