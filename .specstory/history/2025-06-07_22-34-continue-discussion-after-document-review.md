@@ -2636,6 +2636,437 @@ No iwas talking about the day actually. like  it should be Mo Tu WE TH FR SA SU 
 
 _**Assistant**_
 
+Ah, I understand now! You want a more traditional calendar layout with the day names (Mo, Tu, We, etc.) above the dates. The current React DayPicker component might not be the best choice for this layout. Let's switch to a more stylish and user-friendly calendar component.
+
+I recommend using `react-datepicker` which has better styling options and a more traditional calendar layout. Let me help you implement this:
+
+
+---
+
+```bash
+npm install react-datepicker @types/react-datepicker
+```
+
+```
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1  
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1    pnpm install
+                                in pwsh at 00:43:14
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ sikry-frontend_V22  psql -f scripts/013-search-rate-limit.sql
+
+psql : The term 'psql' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and 
+try again.
+At line:1 char:1
++ psql -f scripts/013-search-rate-limit.sql
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (psql:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1    mkdir -Path "c:\Users\Salo
+mon KS\ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1    mkdir -Path "c:\Use
+rs\Salomon...
+Oops, something went wrong.
+Please report this bug with ALL the details below, including both the 'Environment' and 'Exception' sections
+.
+Please report on GitHub: https://github.com/PowerShell/PSReadLine/issues/new?template=Bug_Report.yaml
+Thank you!
+
+### Environment
+PSReadLine: 2.3.6+d2e770f93b7a53d8660a6402eb29d1ae1c35e767
+PowerShell: 5.1.26100.4202
+OS: Microsoft Windows 10.0.26100
+BufferWidth: 115
+BufferHeight: 1
+
+Last 64 Keys:
+ sikry-frontend_V22  mkdir -p tests/search
+
+ sikry-frontend_V22  mkdir -p tests/search
+
+
+    Directory: C:\Users\Salomon KS\Documents\sikry-frontend_V22\tests
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          6/8/2025  12:58 AM                search
+
+
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1 ~2    npm install react-datep
+
+
+
+```
+
+---
+
+Now let me update the CommunicationFilters component to use react-datepicker:
+
+
+---
+
+```diff
+  import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
+  import { Input } from "@/components/ui/input"
+- import { Calendar } from "@/components/ui/calendar"
+  import { Card, CardContent } from "@/components/ui/card"
+  import { Button } from "@/components/ui/button"
+```
+
+```diff
+    PopoverTrigger,
+  } from "@/components/ui/popover"
++ import DatePicker from "react-datepicker"
++ import "react-datepicker/dist/react-datepicker.css"
+  
+  // Dummy getContacts, replace with real import if available
+```
+
+```diff
+                  side="bottom"
+                  sideOffset={4}
+-                 alignOffset={0}
+-                 avoidCollisions={true}
+                >
+-                 <div className="bg-white rounded-md border shadow-lg">
+-                   <Calendar
+-                     mode="range"
+-                     selected={dateRange}
+-                     onSelect={(range) => setDateRange(range ?? { from: undefined, to: undefined })}
+-                     numberOfMonths={2}
+-                     className="rounded-md [&_.rdp-button:hover]:bg-primary [&_.rdp-button:hover]:text-primary-foreground [&_.rdp-nav_button:hover]:bg-muted"
+-                     styles={{
+-                       day: { margin: 0 },
+-                       cell: { padding: 0 },
+-                       button: { 
+-                         borderRadius: '0.375rem',
+-                         margin: '0.125rem',
+-                         padding: '0.5rem'
+-                       },
+-                       head_cell: {
+-                         padding: '0.5rem',
+-                         fontWeight: '500'
+-                       },
+-                       nav_button: {
+-                         padding: '0.5rem',
+-                         borderRadius: '0.375rem'
+-                       }
+-                     }}
++                 <div className="bg-white rounded-md border shadow-lg p-2">
++                   <DatePicker
++                     selected={dateRange.from}
++                     onChange={(dates) => {
++                       const [start, end] = dates as [Date, Date]
++                       setDateRange({ from: start, to: end })
++                     }}
++                     startDate={dateRange.from}
++                     endDate={dateRange.to}
++                     selectsRange
++                     monthsShown={2}
++                     inline
++                     showMonthDropdown
++                     showYearDropdown
++                     dropdownMode="select"
++                     dateFormat="MMM d, yyyy"
++                     className="border-none"
++                     calendarClassName="border-none"
++                     popperClassName="react-datepicker-left"
++                     popperPlacement="bottom-start"
++                     popperModifiers={[
++                       {
++                         name: "offset",
++                         options: {
++                           offset: [0, 8],
++                         },
++                       },
++                     ]}
+                    />
+                  </div>
+```
+
+---
+
+Now let's add some custom styling to make the datepicker match our design system:
+
+
+---
+
+```diff
+    }
+  }
++ 
++ /* React DatePicker Custom Styles */
++ .react-datepicker {
++   font-family: inherit !important;
++   border: none !important;
++   background-color: hsl(var(--background)) !important;
++ }
++ 
++ .react-datepicker__header {
++   background-color: hsl(var(--background)) !important;
++   border-bottom: 1px solid hsl(var(--border)) !important;
++   padding-top: 0.5rem !important;
++ }
++ 
++ .react-datepicker__current-month {
++   font-size: 1rem !important;
++   font-weight: 500 !important;
++   color: hsl(var(--foreground)) !important;
++   margin-bottom: 0.5rem !important;
++ }
++ 
++ .react-datepicker__day-name {
++   color: hsl(var(--muted-foreground)) !important;
++   font-size: 0.875rem !important;
++   width: 2rem !important;
++   margin: 0.2rem !important;
++ }
++ 
++ .react-datepicker__day {
++   width: 2rem !important;
++   height: 2rem !important;
++   line-height: 2rem !important;
++   margin: 0.2rem !important;
++   border-radius: 0.375rem !important;
++   color: hsl(var(--foreground)) !important;
++ }
++ 
++ .react-datepicker__day:hover {
++   background-color: hsl(var(--primary)) !important;
++   color: hsl(var(--primary-foreground)) !important;
++ }
++ 
++ .react-datepicker__day--selected,
++ .react-datepicker__day--in-range {
++   background-color: hsl(var(--primary)) !important;
++   color: hsl(var(--primary-foreground)) !important;
++ }
++ 
++ .react-datepicker__day--in-selecting-range {
++   background-color: hsl(var(--primary) / 0.5) !important;
++ }
++ 
++ .react-datepicker__day--keyboard-selected {
++   background-color: hsl(var(--primary) / 0.2) !important;
++ }
++ 
++ .react-datepicker__navigation {
++   top: 0.5rem !important;
++ }
++ 
++ .react-datepicker__navigation-icon::before {
++   border-color: hsl(var(--foreground)) !important;
++ }
++ 
++ .react-datepicker__month-select,
++ .react-datepicker__year-select {
++   background-color: hsl(var(--background)) !important;
++   color: hsl(var(--foreground)) !important;
++   border: 1px solid hsl(var(--border)) !important;
++   border-radius: 0.375rem !important;
++   padding: 0.25rem 0.5rem !important;
++   font-size: 0.875rem !important;
++ }
++ 
++ .react-datepicker__month-select:hover,
++ .react-datepicker__year-select:hover {
++   background-color: hsl(var(--muted)) !important;
++ }
+  
+```
+
+---
+
+I've made the following improvements:
+
+1. Replaced the Calendar component with react-datepicker which has:
+   - Traditional calendar layout with day names (Mo, Tu, We, etc.) above the dates
+   - Two months visible at once
+   - Month and year dropdown selectors
+   - Better range selection visualization
+   - More intuitive date selection
+
+2. Added custom styling to match our design system:
+   - Proper font family and sizes
+   - Consistent colors using our CSS variables
+   - Rounded corners and proper spacing
+   - Hover and selection states
+   - Better dropdown styling
+   - Proper alignment and positioning
+
+The calendar now has:
+- Clear day names (Mo, Tu, We, etc.) above each date
+- Better visual hierarchy
+- More intuitive date range selection
+- Consistent styling with the rest of the application
+- Better accessibility with keyboard navigation
+- Month and year dropdowns for quick navigation
+
+Would you like me to:
+1. Adjust any of the styling (colors, sizes, spacing)?
+2. Add any additional features to the date picker?
+3. Make any other improvements to the component?
+
+---
+
+_**User**_
+
+great job I lve it. It worked. Now please fix the lint error:
+[{
+	"resource": "/c:/Users/Salomon KS/Documents/sikry-frontend_V22/app/(dashboard)/companies/page.tsx",
+	"owner": "typescript",
+	"code": "2339",
+	"severity": 8,
+	"message": "Property 'is_verified' does not exist on type 'DiscoveredCompany'.",
+	"source": "ts",
+	"startLineNumber": 208,
+	"startColumn": 54,
+	"endLineNumber": 208,
+	"endColumn": 65,
+	"modelVersionId": 2
+}]
+
+[{
+	"resource": "/c:/Users/Salomon KS/Documents/sikry-frontend_V22/components/communications/CommunicationFilters.tsx",
+	"owner": "typescript",
+	"code": "2741",
+	"severity": 8,
+	"message": "Property 'fn' is missing in type '{ name: string; options: { offset: number[]; }; }' but required in type '{ name: string; options?: any; fn: (state: { x: number; y: number; platform: Platform; placement: Placement; strategy: Strategy; initialPlacement: Placement; middlewareData: MiddlewareData; rects: ElementRects; elements: Elements; }) => Promisable<...>; }'.",
+	"source": "ts",
+	"startLineNumber": 206,
+	"startColumn": 23,
+	"endLineNumber": 211,
+	"endColumn": 24,
+	"relatedInformation": [
+		{
+			"startLineNumber": 204,
+			"startColumn": 5,
+			"endLineNumber": 204,
+			"endColumn": 62,
+			"message": "'fn' is declared here.",
+			"resource": "/c:/Users/Salomon KS/Documents/sikry-frontend_V22/node_modules/@floating-ui/dom/dist/floating-ui.dom.d.mts"
+		}
+	],
+	"modelVersionId": 75
+}]
+
+---
+
+_**Assistant**_
+
+I'll help fix both linting errors:
+
+1. First, let's fix the `is_verified` property error in the companies page:
+
+
+---
+
+Read file: app/(dashboard)/companies/page.tsx
+
+---
+
+Read file: types/database.ts
+
+---
+
+I see the issue. The `DiscoveredCompany` interface doesn't have an `is_verified` property, but we're using it in the companies page. Let's update the interface to include this property:
+
+
+---
+
+```diff
+    internal_notes?: string // Schema field name
+    searchable_tsvector?: string // Schema field name
++   is_verified: boolean // Schema field name
+    created_at: string
+    updated_at: string
+```
+
+---
+
+2. Now, let's fix the DatePicker popper modifier error in CommunicationFilters:
+
+
+---
+
+```diff
+                      className="border-none"
+                      calendarClassName="border-none"
+-                     popperClassName="react-datepicker-left"
+-                     popperPlacement="bottom-start"
+-                     popperModifiers={[
+-                       {
+-                         name: "offset",
+-                         options: {
+-                           offset: [0, 8],
+-                         },
+-                       },
+-                     ]}
+                    />
+                  </div>
+```
+
+---
+
+I've made two fixes:
+
+1. Added the `is_verified` property to the `DiscoveredCompany` interface in `types/database.ts`. This property is required since we're using it in the companies page to show the verification status.
+
+2. Removed the unnecessary popper configuration from the DatePicker component in `CommunicationFilters.tsx`. Since we're using the Popover component from our UI library to handle positioning, we don't need the DatePicker's built-in popper configuration. The Popover component already handles proper positioning and offset.
+
+The linting errors should now be resolved. The date picker will still work correctly with the Popover component handling the positioning, and the companies page will properly type-check the `is_verified` property.
+
+Would you like me to:
+1. Add any additional properties to the `DiscoveredCompany` interface?
+2. Make any other improvements to the date picker or companies page?
+3. Address any other linting errors?
+
+---
+
+_**User**_
+
+pease check: at app\(dashboard)\companies\page.tsx (102:11) 
+  100 |       <Card>
+  101 |         <CardHeader>
+> 102 |           <CardTitle className="text-lg">{t("search.filters")}</CardTitle>
+      |           ^
+  103 |         </CardHeader>
+  104 |         <CardContent>
+  105 |           <div className="flex items-center gap-4">
+
+C:\Users\Salomon KS\…ents\ui\card.tsx:25 Error: Objects are not valid as a React child (found: object with keys {label, dataSources, industry, allIndustries, softwareDev, marketing, fintech, location, enterLocation, companySize, allSizes, employees, minConfidence, anyScore, clear}). If you meant to render a collection of children, use an array instead.
+
+---
+
+_**Assistant**_
+
 
 
 ---

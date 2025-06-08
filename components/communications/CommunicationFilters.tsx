@@ -200,16 +200,6 @@ export function CommunicationFilters({ onChange }: CommunicationFiltersProps) {
                     dateFormat="MMM d, yyyy"
                     className="border-none"
                     calendarClassName="border-none"
-                    popperClassName="react-datepicker-left"
-                    popperPlacement="bottom-start"
-                    popperModifiers={[
-                      {
-                        name: "offset",
-                        options: {
-                          offset: [0, 8],
-                        },
-                      },
-                    ]}
                   />
                 </div>
               </PopoverContent>
