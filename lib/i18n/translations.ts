@@ -66,13 +66,35 @@ export const translations = {
       website: "Website",
       phone: "Phone",
       email: "Email",
-      employees: "Employees"
+      employees: "Employees",
+      card: {
+        employees: "employees",
+        extractedData: "Extracted Data",
+        lastUpdated: "Last Updated",
+        viewDetails: "View Details",
+        more: "more",
+        confidence: {
+          high: "High Confidence",
+          medium: "Medium Confidence",
+          low: "Low Confidence"
+        }
+      }
     },
     search: {
       title: "Search Companies",
       placeholder: "Search companies, contacts, or market data...",
       recentSearches: "Recent Searches",
-      suggestions: "Suggestions",
+      suggestions: {
+        title: "Suggestions",
+        quick: "Quick suggestions",
+        recent: "Recent Searches",
+        examples: {
+          marketing: "Marketing agencies in Geneva using HubSpot",
+          compare: "Compare SaaS companies with Series A funding",
+          analyze: "Analyze tech startups using React with >50 employees",
+          filter: "Filter Fintech companies in Switzerland by revenue"
+        }
+      },
       refine: "Refine your search...",
       searching: "Searching...",
       searchingMultiple: "Searching multiple sources...",
@@ -97,6 +119,13 @@ export const translations = {
         minConfidence: "Minimum Confidence",
         anyScore: "Any Score",
         clear: "Clear Filters"
+      },
+      dataSources: {
+        title: "Data Sources",
+        internal: "Internal Database",
+        wikidata: "Wikidata",
+        opencorporates: "OpenCorporates",
+        businessRegistries: "Business Registries"
       },
       viewModes: {
         grid: "Grid View",
@@ -303,7 +332,7 @@ export const translations = {
       companies: "Entreprises",
       communications: "Communications",
       marketIntel: "Intelligence marché",
-      scrapers: "Extracteurs",
+      scrapers: "Scrapeurs",
       statistics: "Statistiques",
       settings: "Paramètres",
       admin: "Administration",
@@ -316,17 +345,17 @@ export const translations = {
       vsl: "Pages VSL",
       leadResponse: "Réponse aux leads",
       analytics: "Analytique",
-      overview: "Aperçu",
+      overview: "Vue d'ensemble",
       secondary: {
-        addCompany: "Ajouter entreprise",
-        importCompanies: "Importer entreprises",
-        exportData: "Exporter données",
+        addCompany: "Ajouter une entreprise",
+        importCompanies: "Importer des entreprises",
+        exportData: "Exporter les données",
         newMessage: "Nouveau message",
         newCampaign: "Nouvelle campagne",
         templates: "Modèles",
-        newScraper: "Nouvel extracteur",
-        runScraper: "Lancer extracteur",
-        scheduleJob: "Planifier tâche"
+        newScraper: "Nouveau scrapeur",
+        runScraper: "Exécuter le scrapeur",
+        scheduleJob: "Planifier une tâche"
       }
     },
     comms: {
@@ -347,14 +376,14 @@ export const translations = {
     },
     companies: {
       title: "Entreprises",
-      addNew: "Nouvelle entreprise",
-      import: "Importer entreprises",
-      export: "Exporter entreprises",
+      addNew: "Ajouter une nouvelle entreprise",
+      import: "Importer des entreprises",
+      export: "Exporter des entreprises",
       name: "Nom de l'entreprise",
       domain: "Domaine",
-      industry: "Secteur",
+      industry: "Industrie",
       location: "Localisation",
-      size: "Taille entreprise",
+      size: "Taille de l'entreprise",
       confidence: "Confiance",
       lastContacted: "Dernier contact",
       status: "Statut",
@@ -363,13 +392,35 @@ export const translations = {
       website: "Site web",
       phone: "Téléphone",
       email: "Email",
-      employees: "Employés"
+      employees: "Employés",
+      card: {
+        employees: "employés",
+        extractedData: "Données extraites",
+        lastUpdated: "Dernière mise à jour",
+        viewDetails: "Voir les détails",
+        more: "plus",
+        confidence: {
+          high: "Confiance élevée",
+          medium: "Confiance moyenne",
+          low: "Confiance faible"
+        }
+      }
     },
     search: {
       title: "Rechercher des entreprises",
-      placeholder: "Rechercher des entreprises, contacts ou données de marché...",
+      placeholder: "Rechercher des entreprises ou des sujets...",
       recentSearches: "Recherches récentes",
-      suggestions: "Suggestions",
+      suggestions: {
+        title: "Suggestions",
+        quick: "Suggestions rapides",
+        recent: "Recherches récentes",
+        examples: {
+          marketing: "Agences de marketing à Genève utilisant HubSpot",
+          compare: "Comparer les entreprises SaaS avec un financement Series A",
+          analyze: "Analyser les startups tech utilisant React avec >50 employés",
+          filter: "Filtrer les entreprises Fintech en Suisse par revenu"
+        }
+      },
       refine: "Affinez votre recherche...",
       searching: "Recherche en cours...",
       searchingMultiple: "Recherche dans plusieurs sources...",
@@ -394,6 +445,13 @@ export const translations = {
         minConfidence: "Score de confiance minimum",
         anyScore: "Tous les scores",
         clear: "Effacer les filtres"
+      },
+      dataSources: {
+        title: "Sources de données",
+        internal: "Base de données interne",
+        wikidata: "Wikidata",
+        opencorporates: "OpenCorporates",
+        businessRegistries: "Registres du commerce"
       },
       viewModes: {
         grid: "Vue grille",

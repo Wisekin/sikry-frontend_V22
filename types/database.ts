@@ -90,6 +90,7 @@ export interface DiscoveredCompany {
   tags_list?: string[] // Schema field name
   internal_notes?: string // Schema field name
   searchable_tsvector?: string // Schema field name
+  is_verified: boolean // Schema field name
   created_at: string
   updated_at: string
 }

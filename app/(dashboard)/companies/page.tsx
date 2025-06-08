@@ -99,7 +99,7 @@ export default function CompaniesPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t("search.filters")}</CardTitle>
+          <CardTitle className="text-lg">{t("search.filters.label")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
@@ -116,7 +116,11 @@ export default function CompaniesPage() {
             </div>
             <Select value={industryFilter} onValueChange={setIndustryFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue>{industryFilter === "all" ? t("search.filters.allIndustries") : industryFilter}</SelectValue>
+                <SelectValue>
+                  {industryFilter === "all" 
+                    ? t("search.filters.allIndustries") 
+                    : t(`search.filters.${industryFilter.toLowerCase()}`)}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("search.filters.allIndustries")}</SelectItem>
@@ -127,7 +131,7 @@ export default function CompaniesPage() {
             </Select>
             <Button variant="outline">
               <Filter className="h-4 w-4 mr-2" />
-              {t("search.filters")}
+              {t("search.filters.label")}
             </Button>
           </div>
         </CardContent>

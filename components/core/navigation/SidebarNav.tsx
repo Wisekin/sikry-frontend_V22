@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { TranslationProvider, useTranslation } from "@/lib/i18n/useTranslation"
+import { useTranslation } from "@/lib/i18n/useTranslation"
 import {
   LayoutDashboard,
   Search,
@@ -24,10 +24,17 @@ import {
   Star,
   UserCheck,
   ChevronDown,
+  Bell,
 } from "lucide-react"
 import { Logo } from "@/components/core/branding/Logo"
 
 // NOTE: Sidebar color variables (--sidebar, --sidebar-hover, --sidebar-selected, --sidebar-foreground) must be defined in your theme CSS files (e.g., styles/themes/dark.css, styles/themes/light.css) for correct hover/selected/foreground colors.
+
+// Helper function to ensure we get a string from translation
+const getTranslation = (t: (key: string) => any, key: string): string => {
+  const translation = t(key)
+  return typeof translation === 'string' ? translation : key
+}
 
 export function SidebarNav() {
   const pathname = usePathname()
@@ -224,7 +231,7 @@ export function SidebarNav() {
           )}
         >
           <item.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
-          {t(item.titleKey)}
+          <span>{getTranslation(t, item.titleKey)}</span>
         </Link>
       ))}
 
@@ -246,7 +253,7 @@ export function SidebarNav() {
           >
             <div className="flex items-center">
               <section.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
-              {t(section.titleKey)}
+              <span>{getTranslation(t, section.titleKey)}</span>
             </div>
             <ChevronDown
               className={cn(
@@ -269,7 +276,7 @@ export function SidebarNav() {
                       : "text-sidebar-foreground/80 hover:bg-sidebar-hover hover:text-sidebar-foreground"
                   )}
                 >
-                  {t(item.titleKey)}
+                  <span>{getTranslation(t, item.titleKey)}</span>
                 </Link>
               ))}
             </div>
@@ -295,7 +302,7 @@ export function SidebarNav() {
             )}
           >
             <item.icon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
-            {t(item.titleKey)}
+            <span>{getTranslation(t, item.titleKey)}</span>
           </Link>
         ))}
       </nav>

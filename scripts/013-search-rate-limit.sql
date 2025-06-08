@@ -39,6 +39,15 @@ ALTER TABLE api_cache ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rate_limits ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for api_cache
+-- Drop existing policies for api_cache
+DROP POLICY IF EXISTS "Allow read access to authenticated users" ON api_cache;
+DROP POLICY IF EXISTS "Allow write access to authenticated users" ON api_cache;
+
+-- Drop existing policies for rate_limits
+DROP POLICY IF EXISTS "Allow read access to own rate limits" ON rate_limits;
+DROP POLICY IF EXISTS "Allow write access to own rate limits" ON rate_limits;
+
+-- Create new policies for api_cache
 CREATE POLICY "Allow read access to authenticated users"
   ON api_cache FOR SELECT TO authenticated
   USING (true);
@@ -48,7 +57,7 @@ CREATE POLICY "Allow write access to authenticated users"
   USING (true)
   WITH CHECK (true);
 
--- RLS Policies for rate_limits
+-- Create new policies for rate_limits
 CREATE POLICY "Allow read access to own rate limits"
   ON rate_limits FOR SELECT TO authenticated
   USING (key LIKE auth.uid() || ':%');
@@ -56,7 +65,7 @@ CREATE POLICY "Allow read access to own rate limits"
 CREATE POLICY "Allow write access to own rate limits"
   ON rate_limits FOR ALL TO authenticated
   USING (key LIKE auth.uid() || ':%')
-  WITH CHECK (key LIKE auth.uid() || ':%');
+  WITH CHECK (key LIKE auth.uid() || ':%'); 
 
 -- Helper Functions
 CREATE OR REPLACE FUNCTION clean_expired_cache()

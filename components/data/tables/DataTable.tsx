@@ -7,12 +7,18 @@ import { Input } from "@/components/ui/input"
 import { useTranslation } from "@/lib/i18n/useTranslation"
 import { Search, Filter, Download, RefreshCw } from "lucide-react"
 
+type Column = {
+  accessorKey: string;
+  header: string;
+  cell?: (props: { row: { original: any } }) => React.ReactNode;
+}
+
 interface DataTableProps {
-  data: any[]
-  columns: any[]
-  searchable?: boolean
-  filterable?: boolean
-  exportable?: boolean
+  data: any[];
+  columns: Column[];
+  searchable?: boolean;
+  filterable?: boolean;
+  exportable?: boolean;
 }
 
 export function DataTable({ data, columns, searchable = true, filterable = true, exportable = true }: DataTableProps) {
@@ -38,6 +44,20 @@ export function DataTable({ data, columns, searchable = true, filterable = true,
     setTimeout(() => setIsLoading(false), 1000)
   }
 
+  // Default translations in case the translation context is not available
+  const defaultTranslations = {
+    searchPlaceholder: "Search...",
+    filters: "Filters",
+    refresh: "Refresh",
+    export: "Export",
+    showing: "Showing",
+    to: "to",
+    of: "of",
+    results: "results",
+    filteredFrom: "filtered from",
+    total: "total"
+  }
+
   return (
     <div className="space-y-2">
       {/* Table Header with Actions */}
@@ -47,7 +67,7 @@ export function DataTable({ data, columns, searchable = true, filterable = true,
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder={t("search.placeholder")}
+                placeholder={t?.("search.placeholder") || defaultTranslations.searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 w-64 h-9 text-sm"
@@ -58,7 +78,7 @@ export function DataTable({ data, columns, searchable = true, filterable = true,
           {filterable && (
             <Button variant="outline" size="sm" className="h-9 gap-1 text-sm">
               <Filter className="w-3.5 h-3.5" />
-              {t("search.filters")}
+              {t?.("search.filters.label") || defaultTranslations.filters}
             </Button>
           )}
         </div>
@@ -72,13 +92,13 @@ export function DataTable({ data, columns, searchable = true, filterable = true,
             className="h-9 gap-1 text-sm"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-            Refresh
+            {t?.("common.refresh") || defaultTranslations.refresh}
           </Button>
 
           {exportable && (
             <Button variant="outline" size="sm" className="h-9 gap-1 text-sm">
               <Download className="w-3.5 h-3.5" />
-              Export
+              {t?.("common.export") || defaultTranslations.export}
             </Button>
           )}
         </div>
@@ -113,8 +133,8 @@ export function DataTable({ data, columns, searchable = true, filterable = true,
       {/* Pagination */}
       <div className="flex items-center justify-between px-4 py-2 text-sm">
         <div className="text-xs text-muted-foreground">
-          Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} results
-          {searchTerm && ` (filtered from ${data.length} total)`}
+          {t?.("pagination.showing") || defaultTranslations.showing} {startIndex + 1} {t?.("pagination.to") || defaultTranslations.to} {Math.min(endIndex, filteredData.length)} {t?.("pagination.of") || defaultTranslations.of} {filteredData.length} {t?.("pagination.results") || defaultTranslations.results}
+          {searchTerm && ` (${t?.("pagination.filteredFrom") || defaultTranslations.filteredFrom} ${data.length} ${t?.("pagination.total") || defaultTranslations.total})`}
         </div>
       </div>
     </div>

@@ -1,14 +1,23 @@
 "use client";
+
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable } from "@/components/data/tables/DataTable";
 import { ROUTES } from "@/lib/constants/routes";
 
-export const columns = [
+// Define the column types
+type Column = {
+  accessorKey: string;
+  header: string;
+  cell?: (props: { row: { original: any } }) => React.ReactNode;
+};
+
+// Define the columns configuration
+const columns: Column[] = [
   {
     accessorKey: "name",
     header: "Name",
-    cell: ({ row }: any) => (
+    cell: ({ row }) => (
       <Link href={ROUTES.CAMPAIGN_DETAIL(row.original.id)} className="font-medium hover:underline">
         {row.original.name}
       </Link>
@@ -17,12 +26,12 @@ export const columns = [
   {
     accessorKey: "type",
     header: "Type",
-    cell: ({ row }: any) => <div className="capitalize">{row.original.type}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.original.type}</div>,
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }: any) => {
+    cell: ({ row }) => {
       const status = row.original.status;
       const statusClasses = {
         active: "bg-green-100 text-green-800",
@@ -48,11 +57,19 @@ export const columns = [
   {
     accessorKey: "createdAt",
     header: "Created",
-    cell: ({ row }: any) => <div>{new Date(row.original.createdAt).toLocaleDateString()}</div>,
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return <div>{date.toISOString().split('T')[0]}</div>;
+    },
   },
 ];
 
-export default function CampaignsTable({ campaigns, status }: { campaigns: any[]; status?: string }) {
+interface CampaignsTableProps {
+  campaigns: any[];
+  status?: string;
+}
+
+export default function CampaignsTable({ campaigns, status }: CampaignsTableProps) {
   return (
     <Card>
       <CardHeader>

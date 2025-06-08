@@ -13,31 +13,16 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { LanguageSelector } from "@/components/core/navigation/LanguageSelector"
 import {
-  Bell, Search, HelpCircle, Settings, LogOut, User, Menu, Moon, Monitor, Sun,
-  UserPlus, Briefcase, AlertTriangle, Info // Added icons for notifications
+  Search, HelpCircle, Settings, LogOut, Menu, Moon, Monitor, Sun,
 } from "lucide-react"
 import { useTranslation } from "@/lib/i18n/useTranslation"
-import router from "next/router"
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import { useAuth } from "@/providers/AuthProvider"
 import { useRouter } from "next/navigation"
-
+import { NotificationCenter } from "@/components/notifications/NotificationCenter"
 
 export function TopNav() {
-  // Helper for notification styling
-  const getNotificationStyle = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'new':
-        return { icon: <UserPlus className="h-5 w-5 text-blue-500" />, bgColor: 'bg-blue-100 dark:bg-blue-900/50', textColor: 'text-blue-700 dark:text-blue-300' };
-      case 'job':
-        return { icon: <Briefcase className="h-5 w-5 text-green-500" />, bgColor: 'bg-green-100 dark:bg-green-900/50', textColor: 'text-green-700 dark:text-green-300' };
-      case 'alert': // Example for future use
-        return { icon: <AlertTriangle className="h-5 w-5 text-red-500" />, bgColor: 'bg-red-100 dark:bg-red-900/50', textColor: 'text-red-700 dark:text-red-300' };
-      default:
-        return { icon: <Info className="h-5 w-5 text-gray-500" />, bgColor: 'bg-gray-100 dark:bg-gray-700/50', textColor: 'text-gray-700 dark:text-gray-300' };
-    }
-  };
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const { t } = useTranslation()
   const { setTheme, theme } = useTheme()
@@ -51,33 +36,13 @@ export function TopNav() {
     }
   }, [theme, setTheme])
 
-  // Notification state
-  type NotificationType = {
-    id: number;
-    type: string;
-    message: string;
-    time: string;
-    read: boolean;
-  };
-  const [notifications, setNotifications] = useState<NotificationType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // Fetch notifications
-  useEffect(() => {
-    setLoading(true);
-    fetch("/api/notifications")
-      .then(res => res.ok ? res.json() : [])
-      .then(data => setNotifications(Array.isArray(data) ? data : []))
-      .finally(() => setLoading(false));
-  }, []);
-
   const handleLogout = async () => {
     await signOut()
     router.push("/")
   }
 
   return (
-    <header className="sticky right-0 h-16 bg-[var(--topnav-bg)] text-[var(--topnav-foreground)] z-50 px-3 flex items-center justify-between shadow-md">
+    <header className="sticky top-0 left-0 right-0 h-14 bg-[var(--topnav-bg)] text-[var(--topnav-foreground)] z-50 px-3 flex items-center justify-between shadow-md">
       <div className="flex items-center lg:hidden">
         <Button 
           variant="ghost" 
@@ -95,8 +60,7 @@ export function TopNav() {
           <input
             type="text"
             placeholder={t("search.placeholder")}
-             className="w-full bg-gray-700/60 border border-gray-300 rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-           // className="w-full bg-background border border-input rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+            className="w-full bg-gray-700/60 border border-gray-300 rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
       </div>
@@ -105,65 +69,8 @@ export function TopNav() {
       <div className="flex items-center space-x-2">
         <LanguageSelector />
 
-        {/* Notification Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-[var(--topnav-foreground)] relative hover:bg-[var(--topnav-hover)]">
-              <Bell className="h-5 w-5 text-[var(--topnav-foreground)]" />
-              {/* Notification badge (dynamic) */}
-              {/* This will show only if there are unread notifications */}
-              {notifications && notifications.filter(n => !n.read).length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full px-1.5 text-white border border-white" style={{display: 'inline-block'}}>
-                  {notifications.filter(n => !n.read).length}
-                </span>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[320px] max-w-xs">
-            <DropdownMenuLabel className="px-3 py-2 font-semibold">Notifications</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {/* Loading state */}
-            {loading && (
-              <DropdownMenuItem className="py-3 px-3 text-center text-muted-foreground">Loading...</DropdownMenuItem>
-            )}
-            {/* Empty state */}
-            {!loading && notifications.length === 0 && (
-              <DropdownMenuItem className="py-3 px-3 text-center text-muted-foreground">No new notifications</DropdownMenuItem>
-            )}
-            {/* Notifications list */}
-            {!loading && notifications.length > 0 && notifications.map((notif) => {
-              const style = getNotificationStyle(notif.type);
-              return (
-                <DropdownMenuItem key={notif.id} className={`p-0 hover:bg-muted/50 focus:bg-muted/50 cursor-pointer border-b border-border last:border-b-0 data-[highlighted]:bg-muted/50`}>
-                  <div className={`flex items-start gap-3 p-3 w-full ${!notif.read ? 'bg-primary/5 dark:bg-primary/10' : ''}`}>
-                    <div className={`p-1.5 rounded-full ${style.bgColor}`}>
-                      {style.icon}
-                    </div>
-                    <div className="flex-1">
-                      <p className={`text-sm leading-snug ${!notif.read ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
-                        {notif.message}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{notif.time}</p>
-                    </div>
-                    {!notif.read && (
-                      <div className="h-2.5 w-2.5 rounded-full bg-primary self-center"></div>
-                    )}
-                  </div>
-                </DropdownMenuItem>
-              );
-            })}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => router.push('/notifications')} // Assuming a /notifications page or implement action
-              className="py-2.5 text-center text-sm text-primary hover:bg-muted/50 focus:bg-muted/50 data-[highlighted]:bg-muted/50 cursor-pointer font-medium"
-            >
-              View all notifications
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Notification Center */}
+        <NotificationCenter />
 
         <Button 
           variant="ghost" 
