@@ -141,7 +141,7 @@ export default function AdminPage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-8 p-6 md:p-8 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
         {/* Header with Tabs */}
         <div className="flex flex-col space-y-4">
           <div className="flex justify-between items-center">
@@ -156,74 +156,75 @@ export default function AdminPage() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
-              <TabsTrigger value="billing">Billing</TabsTrigger>
+            {/* Enterprise Tab Styling */}
+            <TabsList className="grid grid-cols-4 w-full max-w-2xl bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-[#3C4568] data-[state=active]:text-white hover:bg-[#2A3050] hover:text-white data-[state=inactive]:hover:bg-[#2A3050] data-[state=inactive]:hover:text-white rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">Overview</TabsTrigger>
+              <TabsTrigger value="users" className="data-[state=active]:bg-[#3C4568] data-[state=active]:text-white hover:bg-[#2A3050] hover:text-white data-[state=inactive]:hover:bg-[#2A3050] data-[state=inactive]:hover:text-white rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">Users</TabsTrigger>
+              <TabsTrigger value="security" className="data-[state=active]:bg-[#3C4568] data-[state=active]:text-white hover:bg-[#2A3050] hover:text-white data-[state=inactive]:hover:bg-[#2A3050] data-[state=inactive]:hover:text-white rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">Security</TabsTrigger>
+              <TabsTrigger value="billing" className="data-[state=active]:bg-[#3C4568] data-[state=active]:text-white hover:bg-[#2A3050] hover:text-white data-[state=inactive]:hover:bg-[#2A3050] data-[state=inactive]:hover:text-white rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">Billing</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
 
         {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-4">
-          <Card className="shadow-sm border border-border/40 overflow-hidden">
+          <Card className="shadow-sm border border-border/40 overflow-hidden bg-white dark:bg-slate-800 hover:bg-[#2A3050] dark:hover:bg-[#2A3050] group transition-colors duration-200">
             <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-bl-full"></div>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-slate-200 dark:group-hover:text-slate-200 transition-colors duration-200">Total Users</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
+              <div className="text-2xl font-bold group-hover:text-white dark:group-hover:text-white transition-colors duration-200">12</div>
               <div className="flex items-center mt-1">
                 <ArrowTrendingUpIcon className="w-3 h-3 text-emerald-500 mr-1" />
-                <Text size="sm" className="text-emerald-600">
+                <Text size="sm" className="text-emerald-600 group-hover:text-emerald-300 dark:group-hover:text-emerald-300 transition-colors duration-200">
                   +2 this month
                 </Text>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm border border-border/40 overflow-hidden">
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col bg-white dark:bg-slate-800 hover:bg-[#2A3050] dark:hover:bg-[#2A3050] group">
             <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full"></div>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Usage</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-slate-200 dark:group-hover:text-slate-200 transition-colors duration-200">Monthly Usage</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$2,450</div>
+              <div className="text-2xl font-bold group-hover:text-white dark:group-hover:text-white transition-colors duration-200">$2,450</div>
               <div className="flex items-center mt-1">
-                <Text size="sm" className="text-muted-foreground">
+                <Text size="sm" className="text-muted-foreground group-hover:text-slate-300 dark:group-hover:text-slate-300 transition-colors duration-200">
                   Within budget
                 </Text>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm border border-border/40 overflow-hidden">
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col bg-white dark:bg-slate-800 hover:bg-[#2A3050] dark:hover:bg-[#2A3050] group">
             <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-bl-full"></div>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Compliance Score</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-slate-200 dark:group-hover:text-slate-200 transition-colors duration-200">Compliance Score</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-emerald-600">100%</div>
               <div className="flex items-center mt-1">
                 <ShieldCheckIcon className="w-3 h-3 text-emerald-500 mr-1" />
-                <Text size="sm" className="text-emerald-600">
+                <Text size="sm" className="text-emerald-600 group-hover:text-emerald-300 dark:group-hover:text-emerald-300 transition-colors duration-200">
                   Fully compliant
                 </Text>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm border border-border/40 overflow-hidden">
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col bg-white dark:bg-slate-800 hover:bg-[#2A3050] dark:hover:bg-[#2A3050] group">
             <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-bl-full"></div>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">System Health</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-slate-200 dark:group-hover:text-slate-200 transition-colors duration-200">System Health</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-emerald-600">99.9%</div>
               <div className="flex items-center mt-1">
                 <ServerIcon className="w-3 h-3 text-emerald-500 mr-1" />
-                <Text size="sm" className="text-emerald-600">
+                <Text size="sm" className="text-emerald-600 group-hover:text-emerald-300 dark:group-hover:text-emerald-300 transition-colors duration-200">
                   Uptime
                 </Text>
               </div>
@@ -237,7 +238,7 @@ export default function AdminPage() {
             {adminSections.map((section, index) => (
               <Card
                 key={index}
-                className="shadow-sm border border-border/40 hover:shadow-md transition-shadow overflow-hidden group"
+                className="shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col bg-white dark:bg-slate-800 hover:bg-[#2A3050] dark:hover:bg-[#2A3050] group"
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
@@ -246,11 +247,11 @@ export default function AdminPage() {
                         <section.icon className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">{section.title}</CardTitle>
+                        <CardTitle className="text-lg font-semibold group-hover:text-white dark:group-hover:text-white transition-colors duration-200">{section.title}</CardTitle>
                         <CardDescription>{section.description}</CardDescription>
                       </div>
                     </div>
-                    <ChevronRightIcon className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ChevronRightIcon className="w-5 h-5 text-muted-foreground group-hover:text-slate-300 dark:group-hover:text-slate-300 transition-colors duration-200" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -259,7 +260,7 @@ export default function AdminPage() {
                       <Badge variant="outline" className={getStatusColor(section.status)}>
                         {section.status}
                       </Badge>
-                      <Text size="sm" className="text-muted-foreground">
+                      <Text size="sm" className="text-muted-foreground group-hover:text-slate-300 dark:group-hover:text-slate-300 transition-colors duration-200">
                         {section.count}
                       </Text>
                     </div>
@@ -276,7 +277,7 @@ export default function AdminPage() {
           </div>
 
           {/* Recent Activity */}
-          <Card className="shadow-sm border border-border/40">
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col bg-white dark:bg-slate-800 hover:bg-[#2A3050] dark:hover:bg-[#2A3050] group">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <ClockIcon className="w-4 h-4 mr-2" />
@@ -292,11 +293,11 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <div className="font-medium text-sm">{activity.action}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                      <CardDescription className="text-sm text-muted-foreground mt-1 flex-grow group-hover:text-slate-300 dark:group-hover:text-slate-300 transition-colors duration-200">
                         <span>{activity.user}</span>
                         <span>•</span>
                         <span>{activity.time}</span>
-                      </div>
+                      </CardDescription>
                     </div>
                   </div>
                 ))}
