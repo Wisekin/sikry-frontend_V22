@@ -396,7 +396,7 @@ export default function StatisticsPage() {
                         <QualityMetricCard 
                             title="Completeness" 
                             percentage={96}
-                            color="text-green-500"
+                            color="text-emerald-500"
                             icon={DocumentTextIcon}
                         />
                         <QualityMetricCard 
