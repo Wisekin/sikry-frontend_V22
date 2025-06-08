@@ -7,6 +7,7 @@ import { PlusCircle } from "lucide-react"
 import { DataTable } from "@/components/data/tables/DataTable"
 import { PageLoader } from "@/components/core/loading/PageLoader"
 import { ROUTES } from "@/lib/constants/routes"
+import { templateColumns } from "@/components/data/tables/templateColumns"
 
 export const metadata = {
   title: "Templates | SIKRY",
@@ -74,36 +75,7 @@ function TemplatesList({ type }: { type?: string }) {
     updatedAt: new Date(Date.now() - i * 43200000).toISOString(),
   }))
 
-  const columns = [
-    {
-      accessorKey: "name",
-      header: "Name",
-      cell: ({ row }: any) => (
-        <Link href={`${ROUTES.TEMPLATES}/${row.original.id}`} className="font-medium hover:underline">
-          {row.original.name}
-        </Link>
-      ),
-    },
-    {
-      accessorKey: "category",
-      header: "Category",
-      cell: ({ row }: any) => <div className="capitalize">{row.original.category}</div>,
-    },
-    {
-      accessorKey: "variables",
-      header: "Variables",
-    },
-    {
-      accessorKey: "isPublic",
-      header: "Visibility",
-      cell: ({ row }: any) => <div>{row.original.isPublic ? "Public" : "Private"}</div>,
-    },
-    {
-      accessorKey: "updatedAt",
-      header: "Last Updated",
-      cell: ({ row }: any) => <div>{new Date(row.original.updatedAt).toLocaleDateString()}</div>,
-    },
-  ]
+  const columns = templateColumns;
 
   return (
     <Card>
