@@ -10,8 +10,7 @@ import { LeadScoreCard } from "@/components/market/LeadScoreCard"
 
 export default function MarketIntelPage() {
   return (
-    <AppShell>
-      <div className="space-y-6">
+      <div className="space-y">
         {/* Header */}
         <div>
           <Heading level={1}>Market Intelligence</Heading>
@@ -77,6 +76,5 @@ export default function MarketIntelPage() {
           </div>
         </div>
       </div>
-    </AppShell>
   )
 }

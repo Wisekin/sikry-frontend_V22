@@ -24,7 +24,6 @@ export default function StatisticsPage() {
   }
 
   return (
-    <AppShell>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -554,6 +553,5 @@ export default function StatisticsPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </AppShell>
   )
 }

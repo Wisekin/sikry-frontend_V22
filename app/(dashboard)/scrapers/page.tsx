@@ -145,7 +145,6 @@ export default function ScrapersPage() {
   }
 
   return (
-    <AppShell>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -336,6 +335,5 @@ export default function ScrapersPage() {
           </CardContent>
         </Card>
       </div>
-    </AppShell>
   )
 }
