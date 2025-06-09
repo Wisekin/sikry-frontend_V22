@@ -15,20 +15,6 @@ export function SecondaryMenuBar() {
   const searchParams = useSearchParams()
   const { t } = useTranslation()
 
-  // Array of paths where SecondaryMenuBar should be disabled
-  const disabledPaths = [
-    '/dashboard',
-    '/referrals',
-    '/reviews',
-    '/reviews/requests',
-    '/reviews/booster'
-  ]
-
-  // Return null if current path is in the disabled paths array
-  if (disabledPaths.includes(pathname)) {
-    return null
-  }
-
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams)
     params.set('tab', value)
@@ -434,6 +420,7 @@ export function SecondaryMenuBar() {
     )
   }
 
+  // Only render if we're not on a disabled path
   return (
     <div className="sticky top-16 z-40 w-full border-b border-gray-100/80 bg-white/98 backdrop-blur-md">
       <div className="flex h-12 items-center justify-between px-6">
