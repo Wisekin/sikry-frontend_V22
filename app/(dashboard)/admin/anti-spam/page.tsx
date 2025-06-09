@@ -35,7 +35,6 @@ export default function AntiSpamPage() {
   }
 
   return (
-    <AppShell>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -193,6 +192,5 @@ export default function AntiSpamPage() {
           </CardContent>
         </Card>
       </div>
-    </AppShell>
   )
 }

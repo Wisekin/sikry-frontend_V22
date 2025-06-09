@@ -99,7 +99,6 @@ export default function UsersPage() {
   })
 
   return (
-    <AppShell>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -251,6 +250,5 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       </div>
-    </AppShell>
   )
 }
