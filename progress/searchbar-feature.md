@@ -11,6 +11,45 @@ IMPORTANT: These rules must never be deleted and must be referenced before any a
    - What should be done next
 4. Never remove completed items - they serve as implementation history
 
+## 🏗️ Code Quality Rules
+IMPORTANT: These rules must be followed for all development work and must never be deleted:
+
+1. **Detailed Planning**
+   - Document architecture decisions
+   - Define clear interfaces and types
+   - Plan for error handling and edge cases
+   - Consider performance implications
+
+2. **Consistent Application of Design Patterns**
+   - Follow established patterns in the codebase
+   - Use appropriate design patterns (e.g., Repository, Factory, Strategy)
+   - Maintain consistent code organization
+   - Follow SOLID principles
+
+3. **Structured Code Generation**
+   - Even mock implementations should follow production-quality patterns
+   - Use TypeScript types/interfaces for all data structures
+   - Include JSDoc comments for complex logic
+   - Follow consistent naming conventions
+
+4. **Context-Aware Development**
+   - Thoroughly understand existing codebase before making changes
+   - Respect established patterns and conventions
+   - Consider impact on other components/systems
+   - Document integration points
+
+5. **Iterative Refinement**
+   - Implement in small, testable increments
+   - Get feedback early and often
+   - Refactor based on feedback and testing
+   - Update documentation with changes
+
+6. **Testing Strategy**
+   - Write tests for new features
+   - Include edge cases in test coverage
+   - Document test scenarios
+   - Maintain test data quality
+
 # Modular Natural Language Search Feature Progress
 
 This file tracks all progress, decisions, and implementation notes for the new modular search feature, until it is completed and summarized in `progress.md`.

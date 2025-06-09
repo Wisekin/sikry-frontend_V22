@@ -15,7 +15,7 @@ interface CacheConfig {
 }
 
 // Organization tier configuration
-const ORGANIZATION_TIERS: Record<string, {
+export const ORGANIZATION_TIERS: Record<string, {
   rateLimit: RateLimitTier
   cache: CacheConfig
 }> = {
