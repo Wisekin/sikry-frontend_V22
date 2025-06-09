@@ -1,3 +1,16 @@
+## 🤖 Agent Rules
+IMPORTANT: These rules must never be deleted and must be referenced before any action:
+1. Always verify file existence before creation using appropriate tools
+2. Update this progress file after EVERY significant change:
+   - Move completed items to "Completed ✅" section
+   - Add new tasks to "Next Steps 📝" section
+   - Update "In Progress 🚧" with current tasks
+3. Each update must maintain clear tracking of:
+   - What was just completed
+   - What is currently being worked on
+   - What should be done next
+4. Never remove completed items - they serve as implementation history
+
 # Modular Natural Language Search Feature Progress
 
 This file tracks all progress, decisions, and implementation notes for the new modular search feature, until it is completed and summarized in `progress.md`.
@@ -23,20 +36,22 @@ This file tracks all progress, decisions, and implementation notes for the new m
 ## Progress Tracking
 
 ### In Progress 🚧
-- [ ] Integrate modular query parser (OpenAI or local)
-- [ ] Supabase cache/database check
-- [ ] Public registry API integration (Companies House, etc.)
-- [ ] Modular data source adapters
-- [ ] Result merging & caching
-- [ ] Google search fallback
-- [ ] Error/failure handling
-- [ ] Automated tests for data integrations
-- [ ] Analytics for search usage
-- [ ] Granular quota system
-- [ ] Documentation
+- [ ] Implement additional data source adapters (Wikidata, OpenCorporates)
+- [ ] Enhance result deduplication and ranking
+- [ ] Add Google search fallback
+- [ ] Implement granular quota system
+- [ ] Write comprehensive tests
+- [ ] Document architecture and usage
 
 ### Completed ✅
-- _To be filled as tasks are finished_
+- [x] Integrated modular query parser with OpenAI and fallback to local parser
+- [x] Implemented Supabase cache/database check
+- [x] Created Companies House adapter
+- [x] Set up result merging from multiple sources
+- [x] Connected frontend to real API endpoint
+- [x] Added loading states and error handling
+- [x] Basic search analytics tracking
+- [x] Fixed UI issues in search results display
 
 ---
 
