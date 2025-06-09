@@ -1,33 +1,18 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import EnterprisePageHeader from '@/components/core/layout/EnterprisePageHeader';
+import { Skeleton } from '@/components/ui/skeleton'; // Assuming this path
 
 export default function AnalyticsLoading() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
+    <div className="min-h-screen bg-gray-50/50">
+      <EnterprisePageHeader title="Analytics Overview" subtitle="Loading insights..." />
+      <div className="p-6 md:p-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <Skeleton className="h-40 rounded-lg bg-white" />
+          <Skeleton className="h-40 rounded-lg bg-white" />
+          <Skeleton className="h-40 rounded-lg bg-white" />
         </div>
-        <Skeleton className="h-10 w-32" />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="space-y-3 p-6 border rounded-lg">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-8 w-16" />
-            <Skeleton className="h-3 w-32" />
-          </div>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        <Skeleton className="h-10 w-96" />
-        <div className="grid gap-4 md:grid-cols-2">
-          <Skeleton className="h-80" />
-          <Skeleton className="h-80" />
-        </div>
+        <Skeleton className="h-64 rounded-lg bg-white" />
       </div>
     </div>
-  )
+  );
 }

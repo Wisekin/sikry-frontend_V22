@@ -1,419 +1,186 @@
-"use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  Target,
-  Users,
-  Clock,
-  Zap,
-  Download,
-  Calendar,
-} from "lucide-react"
+"use client";
 
-// Define types for our data
-interface KPI {
-  name: string;
-  value: string | number;
-  change: string;
-  trend: 'up' | 'down';
-  target: string | number;
+import React, { useEffect, useState } from 'react';
+import EnterprisePageHeader from '@/components/core/layout/EnterprisePageHeader';
+import QualityMetricCard from '@/components/ui/quality-metric-card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Users, Eye, Clock, AlertCircle, ExternalLink, BarChart3, LineChart, Filter as FilterIcon } from 'lucide-react';
+
+interface PerformanceSummaryMetrics {
+  totalVisits: number;
+  uniqueVisitors: number;
+  avgSessionDurationMinutes: number;
+  bounceRatePercent: number;
+  pagesPerVisit: number;
+  topReferrer: string;
 }
 
-interface ChannelData {
-  channel: string;
-  leads: number;
-  conversion: number;
-  cost: string;
-  roi: string;
+interface ActivityDataPoint {
+  date: string; // YYYY-MM-DD
+  visits: number;
+  pageViews: number;
 }
 
-interface TeamMemberPerformance {
-  member: string;
-  leads: number;
-  conversion: number;
-  responseTime: string;
-  satisfaction: number;
+interface TopPage {
+  path: string;
+  views: number;
 }
 
-interface PerformanceAnalyticsPageProps {
-  // Add any props here if needed
+interface PerformanceData {
+    summaryMetrics: PerformanceSummaryMetrics;
+    activityOverTime: ActivityDataPoint[];
+    topPages: TopPage[];
 }
 
-export default function PerformanceAnalyticsPage({}: PerformanceAnalyticsPageProps) {
-  const [timeRange, setTimeRange] = useState("30d")
-  const [metric, setMetric] = useState("all")
+const PerformanceAnalyticsPage = () => {
+  const [data, setData] = useState<PerformanceData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [period, setPeriod] = useState('last30days'); // Mock filter state
 
-  const performanceData = {
-    overview: {
-      totalLeads: 15420,
-      conversionRate: 12.8,
-      responseTime: "1.8 min",
-      engagement: 78.5,
-      growth: "+15.2%",
-    },
-    kpis: [
-      { name: "Lead Generation", value: 15420, change: "+12.5%", trend: "up", target: 18000 },
-      { name: "Conversion Rate", value: "12.8%", change: "+2.1%", trend: "up", target: "15%" },
-      { name: "Response Time", value: "1.8 min", change: "-0.3 min", trend: "up", target: "1.5 min" },
-      { name: "Engagement Score", value: "78.5%", change: "+5.2%", trend: "up", target: "85%" },
-      { name: "Customer Satisfaction", value: "4.7/5", change: "+0.2", trend: "up", target: "4.8/5" },
-      { name: "Revenue Growth", value: "$2.4M", change: "+18.7%", trend: "up", target: "$3M" },
-    ],
-    channels: [
-      { channel: "Website Forms", leads: 5420, conversion: 15.2, cost: "$12.50", roi: "340%" },
-      { channel: "LinkedIn Outreach", leads: 3890, conversion: 11.8, cost: "$18.20", roi: "280%" },
-      { channel: "Google Ads", leads: 2840, conversion: 9.5, cost: "$25.80", roi: "220%" },
-      { channel: "Email Campaigns", leads: 2150, conversion: 14.7, cost: "$8.90", roi: "420%" },
-      { channel: "Referrals", leads: 1120, conversion: 22.3, cost: "$5.20", roi: "680%" },
-    ],
-    teamPerformance: [
-      { member: "Sarah Johnson", leads: 1247, conversion: 18.5, responseTime: "1.2 min", satisfaction: 4.8 },
-      { member: "Michael Chen", leads: 1089, conversion: 15.2, responseTime: "1.5 min", satisfaction: 4.6 },
-      { member: "Emily Rodriguez", leads: 987, conversion: 16.8, responseTime: "1.3 min", satisfaction: 4.7 },
-      { member: "David Kim", leads: 856, conversion: 14.1, responseTime: "1.8 min", satisfaction: 4.5 },
-      { member: "Lisa Wang", leads: 743, conversion: 13.9, responseTime: "1.6 min", satisfaction: 4.4 },
-    ],
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+    // Simulate API call
+    fetch(`/api/analytics/performance?period=${period}`)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch performance data');
+        }
+        return res.json();
+      })
+      .then(responseData => {
+        if (responseData.error) { // Check for application-level error from API
+            throw new Error(responseData.error.message || 'Failed to fetch performance data');
+        }
+        setData(responseData.data);
+      })
+      .catch(err => {
+        setError(err.message);
+        setData(null); // Clear data on error
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [period]);
+
+  if (isLoading) {
+    // This will be typically handled by loading.tsx via Next.js Suspense
+    // but as a fallback or for direct component loading state:
+    return (
+        <div className="min-h-screen bg-gray-50/50">
+          <EnterprisePageHeader title="Performance Analytics" subtitle="Crunching the numbers..." />
+          <div className="p-6 md:p-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+              {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-32 rounded-lg bg-white" />)}
+            </div>
+            <Skeleton className="h-96 rounded-lg bg-white" />
+            <Skeleton className="h-64 rounded-lg bg-white mt-6" />
+          </div>
+        </div>
+    );
   }
 
-  const getTrendIcon = (trend: string) => {
-    return trend === "up" ? (
-      <TrendingUp className="w-4 h-4 text-green-500" />
-    ) : (
-      <TrendingDown className="w-4 h-4 text-red-500" />
-    )
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50/50">
+        <EnterprisePageHeader title="Performance Analytics" subtitle="Error" />
+        <div className="p-6 md:p-10">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-red-200 flex flex-col items-center justify-center h-96">
+                <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+                <h2 className="text-xl font-semibold text-red-700 mb-2">Could not load performance data</h2>
+                <p className="text-gray-600 text-center mb-4">{error}</p>
+                <button
+                    onClick={() => { setIsLoading(true); setError(null); fetch(`/api/analytics/performance?period=${period}`).then(res => res.json()).then(responseData => { if(responseData.error) throw new Error(responseData.error.message); setData(responseData.data);}).catch(err => setError(err.message)).finally(() => setIsLoading(false)); }}
+                    className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm"
+                >
+                    Try Again
+                </button>
+            </div>
+        </div>
+      </div>
+    );
   }
 
-  const getTrendColor = (trend: string) => {
-    return trend === "up" ? "text-green-600" : "text-red-600"
+  if (!data) {
+     // Should be caught by loading or error state, but as a fallback
+    return (
+        <div className="min-h-screen bg-gray-50/50">
+            <EnterprisePageHeader title="Performance Analytics" subtitle="No data" />
+            <div className="p-6 md:p-10 text-center text-gray-500">No performance data available.</div>
+        </div>
+    );
   }
+
+  const { summaryMetrics, activityOverTime, topPages } = data;
+  const maxActivityVisits = Math.max(...activityOverTime.map(d => d.visits), 0) || 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-[#1B1F3B]">Performance Analytics</h1>
-            <p className="text-[#3C4568] mt-2">Comprehensive performance metrics and insights</p>
-          </div>
-          <div className="flex gap-3">
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-32 border-[#3C4568]/30 focus:border-[#1B1F3B]">
-                <Calendar className="w-4 h-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7d">Last 7 days</SelectItem>
-                <SelectItem value="30d">Last 30 days</SelectItem>
-                <SelectItem value="90d">Last 90 days</SelectItem>
-                <SelectItem value="1y">Last year</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" className="border-[#2A3050] text-[#2A3050] hover:bg-[#2A3050] hover:text-white">
-              <Download className="w-4 h-4 mr-2" />
-              Export Report
-            </Button>
-            <Button className="bg-[#1B1F3B] hover:bg-[#2A3050] text-white">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Advanced View
-            </Button>
-          </div>
-        </div>
-
-        {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <Card className="border-l-4 border-l-[#1B1F3B] hover:shadow-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-[#1B1F3B]/5 hover:to-transparent cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <Users className="w-5 h-5 text-[#1B1F3B]" />
-                <Badge variant="secondary" className="bg-green-100 text-green-700">
-                  {performanceData.overview.growth}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-[#1B1F3B]">
-                {performanceData.overview.totalLeads.toLocaleString()}
-              </div>
-              <p className="text-sm text-[#3C4568]">Total Leads</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-[#2A3050] hover:shadow-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-[#2A3050]/5 hover:to-transparent cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <Target className="w-5 h-5 text-[#2A3050]" />
-                <TrendingUp className="w-4 h-4 text-green-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-[#2A3050]">{performanceData.overview.conversionRate}%</div>
-              <p className="text-sm text-[#3C4568]">Conversion Rate</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-[#3C4568] hover:shadow-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-[#3C4568]/5 hover:to-transparent cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <Clock className="w-5 h-5 text-[#3C4568]" />
-                <Badge variant="outline" className="border-[#3C4568] text-[#3C4568]">
-                  Avg
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-[#3C4568]">{performanceData.overview.responseTime}</div>
-              <p className="text-sm text-[#3C4568]">Response Time</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <Activity className="w-5 h-5 text-blue-500" />
-                <TrendingUp className="w-4 h-4 text-green-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{performanceData.overview.engagement}%</div>
-              <p className="text-sm text-[#3C4568]">Engagement</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <Zap className="w-5 h-5 text-green-500" />
-                <Badge variant="outline" className="border-green-500 text-green-500">
-                  Live
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">94.2%</div>
-              <p className="text-sm text-[#3C4568]">System Uptime</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Analytics */}
-        <Tabs defaultValue="kpis" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white border border-[#3C4568]/20">
-            <TabsTrigger value="kpis" className="data-[state=active]:bg-[#1B1F3B] data-[state=active]:text-white">
-              KPIs
-            </TabsTrigger>
-            <TabsTrigger value="channels" className="data-[state=active]:bg-[#1B1F3B] data-[state=active]:text-white">
-              Channels
-            </TabsTrigger>
-            <TabsTrigger value="team" className="data-[state=active]:bg-[#1B1F3B] data-[state=active]:text-white">
-              Team
-            </TabsTrigger>
-            <TabsTrigger value="trends" className="data-[state=active]:bg-[#1B1F3B] data-[state=active]:text-white">
-              Trends
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="kpis" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {performanceData.kpis.map((kpi, index) => (
-                <Card
-                  key={index}
-                  className="hover:shadow-lg transition-all duration-300 hover:bg-gradient-to-r hover:from-[#1B1F3B]/2 hover:to-transparent"
+    <div className="min-h-screen bg-gray-50/50">
+      <EnterprisePageHeader title="Performance Analytics" subtitle="Track user engagement and website traffic metrics." />
+      <div className="p-6 md:p-10">
+        <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex flex-col md:flex-row justify-start items-center gap-3">
+                <label htmlFor="periodSelectPerf" className="text-sm font-medium text-gray-700">Time Period:</label>
+                <select
+                    id="periodSelectPerf"
+                    value={period}
+                    onChange={(e) => setPeriod(e.target.value)}
+                    className="p-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg text-[#1B1F3B]">{kpi.name}</CardTitle>
-                      {getTrendIcon(kpi.trend)}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-[#1B1F3B]">{kpi.value}</div>
-                        <Badge variant="outline" className={`${getTrendColor(kpi.trend)} border-current`}>
-                          {kpi.change}
-                        </Badge>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-sm mb-2">
-                          <span className="text-[#3C4568]">Target: {kpi.target}</span>
-                          <span className="text-[#3C4568]">
-                            {(() => {
-                              const valueStr = String(kpi.value);
-                              const targetStr = String(kpi.target);
-                              
-                              if (valueStr.includes("%")) {
-                                return Math.round((Number.parseFloat(valueStr) / Number.parseFloat(targetStr)) * 100);
-                              }
-                              
-                              const numericValue = Number.parseInt(valueStr.replace(/[^0-9.]/g, ""), 10) || 0;
-                              const numericTarget = Number.parseInt(targetStr.replace(/[^0-9.]/g, ""), 10) || 1;
-                              
-                              return Math.round((numericValue / numericTarget) * 100);
-                            })()}%
-                          </span>
-                        </div>
-                        <Progress
-                          value={
-                            (() => {
-                              const valueStr = String(kpi.value);
-                              const targetStr = String(kpi.target);
-                              
-                              if (valueStr.includes("%")) {
-                                return (Number.parseFloat(valueStr) / Number.parseFloat(targetStr)) * 100;
-                              }
-                              
-                              const numericValue = Number.parseInt(valueStr.replace(/[^0-9.]/g, ""), 10) || 0;
-                              const numericTarget = Number.parseInt(targetStr.replace(/[^0-9.]/g, ""), 10) || 1; // Avoid division by zero
-                              
-                              return (numericValue / numericTarget) * 100;
-                            })()
-                          }
-                          className="h-2"
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <option value="last7days">Last 7 Days</option>
+                    <option value="last30days">Last 30 Days</option>
+                    <option value="last3months">Last 3 Months</option>
+                </select>
+                {/* Add more filters if needed */}
             </div>
-          </TabsContent>
+        </div>
 
-          <TabsContent value="channels" className="space-y-6">
-            <Card className="hover:shadow-lg transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="text-[#1B1F3B]">Channel Performance</CardTitle>
-                <CardDescription>Performance metrics by acquisition channel</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {performanceData.channels.map((channel, index) => (
-                    <div
-                      key={index}
-                      className="p-4 border border-[#3C4568]/20 rounded-lg hover:bg-[#1B1F3B]/5 transition-colors"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium text-[#1B1F3B]">{channel.channel}</h4>
-                        <Badge variant="outline" className="border-[#2A3050] text-[#2A3050]">
-                          ROI: {channel.roi}
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <p className="text-[#3C4568]">Leads</p>
-                          <p className="font-semibold text-[#1B1F3B]">{channel.leads.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-[#3C4568]">Conversion</p>
-                          <p className="font-semibold text-green-600">{channel.conversion}%</p>
-                        </div>
-                        <div>
-                          <p className="text-[#3C4568]">Cost per Lead</p>
-                          <p className="font-semibold text-[#2A3050]">{channel.cost}</p>
-                        </div>
-                        <div>
-                          <p className="text-[#3C4568]">ROI</p>
-                          <p className="font-semibold text-green-600">{channel.roi}</p>
-                        </div>
-                      </div>
-                      <div className="mt-3">
-                        <Progress value={channel.conversion} className="h-2" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+          <QualityMetricCard title="Total Visits" value={summaryMetrics.totalVisits.toLocaleString()} icon={<Users className="text-blue-600" />} />
+          <QualityMetricCard title="Unique Visitors" value={summaryMetrics.uniqueVisitors.toLocaleString()} icon={<Users className="text-sky-600" />} />
+          <QualityMetricCard title="Avg. Session" value={`${summaryMetrics.avgSessionDurationMinutes.toFixed(1)} min`} icon={<Clock className="text-emerald-600" />} />
+          <QualityMetricCard title="Bounce Rate" value={`${summaryMetrics.bounceRatePercent.toFixed(1)}%`} icon={<AlertCircle className="text-red-500" />} />
+          <QualityMetricCard title="Pages / Visit" value={summaryMetrics.pagesPerVisit.toFixed(1)} icon={<ExternalLink className="text-purple-600" />} />
+          <QualityMetricCard title="Top Referrer" value={summaryMetrics.topReferrer} icon={<BarChart3 className="text-amber-600" />} />
+        </div>
 
-          <TabsContent value="team" className="space-y-6">
-            <Card className="hover:shadow-lg transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="text-[#1B1F3B]">Team Performance</CardTitle>
-                <CardDescription>Individual team member performance metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {performanceData.teamPerformance.map((member, index) => (
-                    <div
-                      key={index}
-                      className="p-4 border border-[#3C4568]/20 rounded-lg hover:bg-[#1B1F3B]/5 transition-colors"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium text-[#1B1F3B]">{member.member}</h4>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="border-yellow-500 text-yellow-600">
-                            ⭐ {member.satisfaction}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <p className="text-[#3C4568]">Leads Handled</p>
-                          <p className="font-semibold text-[#1B1F3B]">{member.leads.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-[#3C4568]">Conversion Rate</p>
-                          <p className="font-semibold text-green-600">{member.conversion}%</p>
-                        </div>
-                        <div>
-                          <p className="text-[#3C4568]">Avg Response Time</p>
-                          <p className="font-semibold text-[#2A3050]">{member.responseTime}</p>
-                        </div>
-                        <div>
-                          <p className="text-[#3C4568]">Satisfaction</p>
-                          <p className="font-semibold text-yellow-600">{member.satisfaction}/5</p>
-                        </div>
-                      </div>
-                      <div className="mt-3">
-                        <Progress value={member.conversion} className="h-2" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+        <div className="mb-8 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold text-[#1B1F3B] mb-4">User Activity Over Time</h2>
+          <div className="h-96 bg-slate-50 p-4 rounded-md border-gray-200 border flex items-end space-x-1 md:space-x-2 overflow-x-auto">
+            {activityOverTime.map((item, index) => (
+              <div key={index} className="flex-grow flex flex-col items-center justify-end h-full" title={`Date: ${item.date}, Visits: ${item.visits}`}>
+                <div className="w-full md:w-5 bg-blue-500 hover:bg-blue-600 transition-colors" style={{ height: `${(item.visits / maxActivityVisits) * 95}%` }}></div>
+                <span className="text-xs text-gray-500 mt-1 transform rotate-[-45deg] origin-center whitespace-nowrap md:rotate-0">{item.date.substring(5)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-          <TabsContent value="trends" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="hover:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-[#1B1F3B]">Performance Trends</CardTitle>
-                  <CardDescription>Key metrics over time</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 flex items-center justify-center bg-gradient-to-br from-[#1B1F3B]/5 to-[#2A3050]/5 rounded-lg">
-                    <p className="text-[#3C4568]">Performance trend chart will be rendered here</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-[#1B1F3B]">Predictive Analytics</CardTitle>
-                  <CardDescription>Forecasted performance metrics</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 flex items-center justify-center bg-gradient-to-br from-[#1B1F3B]/5 to-[#2A3050]/5 rounded-lg">
-                    <p className="text-[#3C4568]">Predictive analytics chart will be rendered here</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold text-[#1B1F3B] mb-4">Top Performing Pages</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">Page Path</th>
+                  <th className="px-4 py-3 text-right font-medium text-gray-600">Views</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {topPages.map(page => (
+                  <tr key={page.path} className="hover:bg-gray-50/50">
+                    <td className="px-4 py-3 font-medium text-blue-600 hover:underline"><a href={page.path} target="_blank" rel="noopener noreferrer">{page.path}</a></td>
+                    <td className="px-4 py-3 text-right text-gray-600">{page.views.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
+export default PerformanceAnalyticsPage;
