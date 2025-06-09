@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Download, Upload, Filter, Search, Calendar, Play, Settings, UserPlus, ShieldCheck } from "lucide-react"
-import { ViewColumnsIcon, ListBulletIcon } from "@heroicons/react/24/outline"
+import { Plus, Download, Upload, Filter, Search, Calendar, Play, Settings, UserPlus, ShieldCheck, LayoutGrid, List } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { useTranslation } from "@/lib/i18n/useTranslation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -34,7 +33,7 @@ export function SecondaryMenuBar() {
               size="sm"
               className="flex items-center gap-2"
             >
-              <ViewColumnsIcon className="w-4 h-4" />
+              <LayoutGrid className="w-4 h-4" />
               <span>Grid</span>
             </Button>
             <Button
@@ -42,7 +41,7 @@ export function SecondaryMenuBar() {
               size="sm"
               className="flex items-center gap-2"
             >
-              <ListBulletIcon className="w-4 h-4" />
+              <List className="w-4 h-4" />
               <span>List</span>
             </Button>
           </div>
@@ -68,7 +67,7 @@ export function SecondaryMenuBar() {
               size="sm"
               className="flex items-center gap-2"
             >
-              <ViewColumnsIcon className="w-4 h-4" />
+              <LayoutGrid className="w-4 h-4" />
               <span>Grid</span>
             </Button>
             <Button
@@ -76,7 +75,7 @@ export function SecondaryMenuBar() {
               size="sm"
               className="flex items-center gap-2"
             >
-              <ListBulletIcon className="w-4 h-4" />
+              <List className="w-4 h-4" />
               <span>List</span>
             </Button>
           </div>
