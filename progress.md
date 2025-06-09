@@ -246,28 +246,9 @@ Implementing a natural language search system with:
 - Add analytics for search patterns and user behavior.
 - Consider implementing query suggestions based on popular/past searches.
 
-### In Progress 🚧
-- Modular Natural Language Search Feature (tracked in detail in `searchbar-feature.md`):
-  - Integrate modular query parser (OpenAI or local, easily swappable)
-  - Always check Supabase cache/database first
-  - If not enough results, query at least one public/free registry (Companies House, Wikidata, OpenCorporates, etc.)
-  - Add modular adapters for each data source
-  - Merge results from all sources
-  - Cache successful results in Supabase
-  - Provide Google search fallback if no results
-  - Handle all third-party failures gracefully
-  - Add automated tests for external data integrations
-  - Add analytics for search usage and user behavior
-  - Implement granular quota system (per feature, per plan)
-  - Document modular architecture for easy swapping of parser or data sources
-
-### Next Steps 📝
-- Continue detailed tracking and implementation in `searchbar-feature.md` until feature is completed.
-- Once the feature is stable, summarize and move completed items to this file.
-
 ## Technical Stack
 - Next.js
 - Supabase
-- OpenAI API (requires API key; modular so can be replaced if needed)
+- OpenAI API
 - Various Public APIs (Wikidata, OpenCorporates, Business Registries)
 

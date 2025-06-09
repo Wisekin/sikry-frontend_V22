@@ -525,15 +525,19 @@ export const translations = {
       description: "Manage system settings, users, and compliance",
       teamManagement: "Team Management",
       billing: "Billing & Usage",
-      antiSpam: "Anti-Spam",
+      antiSpam: "Anti-Spam Settings",
       compliance: "Compliance",
       systemHealth: "System Health",
       recentActivity: "Recent Activity",
       users: "Users",
       roles: "Roles",
       permissions: "Permissions",
-      security: "Security",
-      monitoring: "Monitoring"
+      security: {
+        activeSessions: "Active Sessions",
+        manageActiveSessions: "Manage your active sessions",
+        recentEvents: "Recent Events",
+        securityEventLog: "Security Event Log"
+      }
     },
     form: {
       save: "Save",
@@ -1212,8 +1216,7 @@ export const translations = {
         manageActiveSessions: "Gérer vos sessions actives",
         recentEvents: "Événements récents",
         securityEventLog: "Journal des événements de sécurité"
-      },
-      monitoring: "Surveillance"
+      }
     },
     form: {
       save: "Enregistrer",

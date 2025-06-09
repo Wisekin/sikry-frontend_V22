@@ -2,7 +2,6 @@ import type React from "react"
 import { TranslationProvider } from "@/providers/TranslationProvider"
 import { SidebarNav } from "@/components/core/navigation/SidebarNav"
 import { TopNav } from "@/components/core/navigation/TopNav"
-import { SecondaryMenuBar } from "@/components/core/navigation/SecondaryMenuBar"
 import { ThemeProvider } from "@/providers/ThemeProvider"
 import { AuthProvider } from "@/providers/AuthProvider"
 import { SupabaseProvider } from "@/providers/SupabaseProvider"
@@ -28,9 +27,6 @@ export default function DashboardLayout({
               <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="h-16 flex-shrink-0 bg-background border-b">
                   <TopNav />
-                </div>
-                <div className="h-12 flex-shrink-0 bg-background border-b">
-                  <SecondaryMenuBar />
                 </div>
                 <main className="flex-1 overflow-y-auto bg-background pt-8">
                   <ThemeProvider attribute="class" defaultTheme="brand" enableSystem>

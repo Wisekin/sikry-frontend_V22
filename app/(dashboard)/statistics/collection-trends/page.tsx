@@ -1,32 +1,122 @@
-"use client"; // For potential future chart interactivity or filters
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import EnterprisePageHeader from '@/components/core/layout/EnterprisePageHeader';
 import QualityMetricCard from '@/components/ui/quality-metric-card';
-import { LineChart, TrendingUp, CalendarDays, BarChart3, Filter as FilterIcon } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton'; // For inline loading state
+import { TrendingUp, CalendarDays, BarChart3 as BarChart3Icon, Filter as FilterIcon, AlertCircle } from 'lucide-react';
 
-// Mock data structure for chart
+// Import chart components
+import type { ChartConfig } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"; // Removed ChartLegend, ChartLegendContent as not used for single series bar
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+
+
 interface TrendDataPoint {
-  date: string; // Could be day, week, month
+  date: string;
   count: number;
 }
 
-const CollectionTrendsPage = () => {
-  // Mock data
-  const stats = {
-    newRecordsThisMonth: 1250,
-    growthRatePercent: 15, // e.g., vs last month
-    peakCollectionValue: 180, // e.g., records on a specific day
-    peakCollectionPeriod: "November 10th",
-  };
+interface CollectionTrendsSummaryStats {
+    totalCollectedInPeriod: number;
+    averageDailyCollection?: number;
+    peakCollection: { date: string; count: number };
+}
 
-  const mockTrendData: TrendDataPoint[] = [
-    { date: '2023-11-01', count: 50 }, { date: '2023-11-02', count: 65 }, { date: '2023-11-03', count: 55 },
-    { date: '2023-11-04', count: 70 }, { date: '2023-11-05', count: 80 }, { date: '2023-11-06', count: 95 },
-    { date: '2023-11-07', count: 110 }, { date: '2023-11-08', count: 100 }, { date: '2023-11-09', count: 120 },
-    { date: '2023-11-10', count: 180 }, { date: '2023-11-11', count: 150 }, { date: '2023-11-12', count: 130 },
-  ];
-  const maxCount = Math.max(...mockTrendData.map(d => d.count), 100); // For chart scaling
+interface CollectionTrendsAPIData {
+    period: 'daily' | 'weekly' | 'monthly';
+    data: TrendDataPoint[];
+    summaryStats: CollectionTrendsSummaryStats;
+}
+
+const chartConfig = {
+  count: {
+    label: "Records Collected",
+    color: "hsl(200 70% 50%)",
+  },
+} satisfies ChartConfig;
+
+const CollectionTrendsPage = () => {
+  const [apiData, setApiData] = useState<CollectionTrendsAPIData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [periodFilter, setPeriodFilter] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [startDate, setStartDate] = useState<string>(''); // Example: '2023-11-01'
+  const [endDate, setEndDate] = useState<string>('');   // Example: '2023-11-15'
+
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+    // Construct API query params
+    const queryParams = new URLSearchParams();
+    queryParams.append('period', periodFilter);
+    if (startDate) queryParams.append('startDate', startDate);
+    if (endDate) queryParams.append('endDate', endDate);
+
+    fetch(`/api/statistics/collection-trends?${queryParams.toString()}`)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch collection trends data');
+        }
+        return res.json();
+      })
+      .then(responseData => {
+        if (responseData.error) {
+            throw new Error(responseData.error.message || 'Failed to fetch data');
+        }
+        setApiData(responseData.data);
+      })
+      .catch(err => {
+        setError(err.message);
+        setApiData(null);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [periodFilter, startDate, endDate]);
+
+
+  // Inline loading state (Next.js Suspense with loading.tsx is primary)
+  if (isLoading && !apiData) { // Show full page skeleton if apiData is null (initial load)
+    return (
+        <div className="min-h-screen bg-gray-50/50">
+          <EnterprisePageHeader title="Data Collection Trends" subtitle="Loading trend data..." />
+          <div className="p-6 md:p-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <Skeleton className="h-32 rounded-lg bg-white" />
+              <Skeleton className="h-32 rounded-lg bg-white" />
+              <Skeleton className="h-32 rounded-lg bg-white" />
+            </div>
+            <Skeleton className="h-[450px] rounded-lg bg-white" />
+          </div>
+        </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50/50">
+        <EnterprisePageHeader title="Data Collection Trends" subtitle="Error" />
+        <div className="p-6 md:p-10">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-red-200 flex flex-col items-center justify-center h-96">
+                <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+                <h2 className="text-xl font-semibold text-red-700 mb-2">Could not load data</h2>
+                <p className="text-gray-600 text-center mb-4">{error}</p>
+                <button
+                    onClick={() => { /* Simple refetch based on current filters */ setIsLoading(true); setError(null); const queryParams = new URLSearchParams({period: periodFilter}); if(startDate) queryParams.append('startDate', startDate); if(endDate) queryParams.append('endDate', endDate); fetch(`/api/statistics/collection-trends?${queryParams.toString()}`).then(res => res.json()).then(responseData => { if(responseData.error) throw new Error(responseData.error.message); setApiData(responseData.data);}).catch(err => setError(err.message)).finally(() => setIsLoading(false)); }}
+                    className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm"
+                >
+                    Try Again
+                </button>
+            </div>
+        </div>
+      </div>
+    );
+  }
+
+  const chartData = apiData?.data || [];
+  const summaryStats = apiData?.summaryStats;
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -34,44 +124,55 @@ const CollectionTrendsPage = () => {
 
       <div className="p-6 md:p-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <QualityMetricCard title="New Records This Period" value={stats.newRecordsThisMonth.toLocaleString()} icon={<BarChart3 className="text-blue-600" />} />
-          <QualityMetricCard title="Growth Rate" value={`${stats.growthRatePercent}%`} icon={<TrendingUp className="text-emerald-600" />} change="vs last period" changeColor="text-gray-500"/>
-          <QualityMetricCard title="Peak Collection" value={`${stats.peakCollectionValue} (on ${stats.peakCollectionPeriod})`} icon={<CalendarDays className="text-purple-600" />} />
+          <QualityMetricCard title="New Records This Period" value={summaryStats?.totalCollectedInPeriod.toLocaleString() ?? 'N/A'} icon={<BarChart3Icon className="text-blue-600" />} />
+          <QualityMetricCard title="Avg Daily Collection" value={summaryStats?.averageDailyCollection?.toLocaleString() ?? (periodFilter === 'daily' && summaryStats ? (summaryStats.totalCollectedInPeriod / (chartData.length || 1)).toFixed(0) : 'N/A')} icon={<TrendingUp className="text-emerald-600" />} />
+          <QualityMetricCard title="Peak Collection" value={summaryStats ? `${summaryStats.peakCollection.count.toLocaleString()} (on ${new Date(summaryStats.peakCollection.date).toLocaleDateString(undefined, {month:'short', day:'numeric'})})` : 'N/A'} icon={<CalendarDays className="text-purple-600" />} />
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
             <h2 className="text-xl font-semibold text-[#1B1F3B] flex items-center">
-              <LineChart className="mr-2 text-gray-500" /> Collection Volume Over Time
+              <BarChart3Icon className="mr-2 text-gray-500" /> Collection Volume Over Time
             </h2>
             <div className="flex items-center space-x-3">
-              <select className="p-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+              <select value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value as typeof periodFilter)} className="p-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
               </select>
-              <input type="date" className="p-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="p-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
               <span className="text-gray-500 text-sm">to</span>
-              <input type="date" className="p-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
-              <button className="bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 py-2 px-3 rounded-lg flex items-center text-sm">
-                <FilterIcon size={16} className="mr-1.5" /> Apply
-              </button>
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="p-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
+              {/* Apply button might not be needed if useEffect triggers on filter change */}
             </div>
           </div>
 
-          {/* Mock Chart Area */}
-          <div className="h-96 bg-slate-50 p-4 rounded-md border border-dashed border-gray-200 flex items-end space-x-1 md:space-x-2 overflow-x-auto">
-            {mockTrendData.map((data, index) => (
-              <div key={index} className="flex-grow flex flex-col items-center justify-end h-full" title={`Date: ${data.date}, Count: ${data.count}`}>
-                <div
-                  className="w-full md:w-6 bg-blue-500 hover:bg-blue-600 transition-colors"
-                  style={{ height: `${(data.count / maxCount) * 100}%` }}
-                ></div>
-                <span className="text-xs text-gray-500 mt-1 transform rotate-[-45deg] origin-center whitespace-nowrap md:rotate-0">{data.date.substring(5)}</span>
-              </div>
-            ))}
-          </div>
-          {mockTrendData.length === 0 && <p className="text-center py-10 text-gray-500">No trend data available for the selected period.</p>}
+          {isLoading && apiData ? // Show chart skeleton if loading new data after initial load
+            <Skeleton className="h-96 w-full rounded-md bg-slate-50 border-dashed border-gray-200" />
+            : chartData.length > 0 ? (
+            <div className="h-96 w-full mt-4">
+              <ChartContainer config={chartConfig} className="h-full w-full">
+                <BarChart accessibilityLayer data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) => typeof value === 'string' ? (periodFilter === 'monthly' ? value : value.substring(5)) : String(value)}
+                  />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={8} />
+                  <ChartTooltip
+                    cursor={true}
+                    content={<ChartTooltipContent indicator="dot" hideLabel />}
+                  />
+                  <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                </BarChart>
+              </ChartContainer>
+            </div>
+          ) : (
+            <p className="text-center py-10 text-gray-500 h-96 flex items-center justify-center">No trend data available for the selected filters.</p>
+          )}
         </div>
       </div>
     </div>
