@@ -2,79 +2,11 @@
 
 export const translations = {
   en: {
-    statistics: {
-      dashboard: {
-        title: "Enterprise Analytics Dashboard",
-        description: "Monitor key metrics, track performance, and gain valuable insights into your business operations.",
-        keyMetrics: {
-          totalCompanies: "Total Companies",
-          activeScrapers: "Active Scrapers",
-          campaigns: "Campaigns",
-          dataQuality: "Data Quality",
-          lastRun: "Last run: {time} ago",
-          deliveryRate: "{rate}% delivery rate",
-          changeFromLastMonth: "{change}% from last month"
-        },
-        analyticsCards: {
-          collectionTrends: "Collection Trends",
-          sectorAnalysis: "Sector Analysis",
-          expand: "Expand",
-          collapse: "Collapse",
-          topPerformingSources: "Top Performing Sources:",
-          linkedinScraper: "LinkedIn Scraper",
-          companyWebsites: "Company Websites",
-          publicDirectories: "Public Directories"
-        },
-        tabs: {
-          overview: "Overview",
-          performance: "Performance",
-          dataSources: "Data Sources",
-          quality: "Quality"
-        },
-        overview: {
-          dataCollectionSummary: "Data Collection Summary",
-          totalRecords: "Total Records",
-          thisMonth: "This Month",
-          successRate: "Success Rate",
-          topIndustries: "Top Industries",
-          technology: "Technology",
-          finance: "Finance",
-          healthcare: "Healthcare",
-          regionalDistribution: "Regional Distribution",
-          dachRegion: "DACH Region",
-          eu: "EU",
-          global: "Global"
-        },
-        performance: {
-          metrics: "Performance Metrics",
-          uptime: "Uptime",
-          avgResponse: "Avg Response",
-          errorRate: "Error Rate"
-        },
-        dataSources: {
-          title: "Data Source Performance",
-          source: "Source",
-          records: "Records",
-          quality: "Quality",
-          status: "Status",
-          active: "Active",
-          monitoring: "Monitoring",
-          needsAttention: "Needs Attention",
-          apiIntegrations: "API Integrations"
-        },
-        quality: {
-          title: "Data Quality Breakdown",
-          description: "An overview of the core data quality dimensions.",
-          completeness: "Completeness",
-          accuracy: "Accuracy",
-          freshness: "Freshness"
-        }
-      }
-    },
     nav: {
       dashboard: "Dashboard",
       search: "Search",
       companies: "Companies",
+      communications: "Communications",
       marketIntel: "Market Intel",
       scrapers: "Scrapers",
       statistics: "Statistics",
@@ -98,6 +30,7 @@ export const translations = {
       vsl: "VSL Pages",
       leadResponse: "Lead Response",
       analytics: "Analytics",
+      overview: "Overview",
       secondary: {
         addCompany: "Add Company",
         importCompanies: "Import Companies",
@@ -112,6 +45,7 @@ export const translations = {
     },
     comms: {
       campaigns: "Campaigns",
+      templates: "Templates",
       bulkSender: "Bulk Sender",
       newMessage: "New Message",
       newCampaign: "New Campaign",
@@ -137,10 +71,12 @@ export const translations = {
       size: "Company Size",
       confidence: "Confidence",
       lastContacted: "Last Contacted",
+      status: "Status",
       verified: "Verified",
       description: "Description",
       website: "Website",
       phone: "Phone",
+      email: "Email",
       employees: "Employees",
       card: {
         employees: "employees",
@@ -286,6 +222,7 @@ export const translations = {
       antiSpam: "Anti-Spam Settings",
       compliance: "Compliance",
       systemHealth: "System Health",
+      recentActivity: "Recent Activity",
       users: "Users",
       roles: "Roles",
       permissions: "Permissions",
@@ -320,6 +257,9 @@ export const translations = {
     common: {
       previous: "Previous",
       next: "Next",
+      loading: "Loading...",
+      save: "Save",
+      cancel: "Cancel",
       delete: "Delete",
       edit: "Edit",
       view: "View",
@@ -368,6 +308,7 @@ export const translations = {
       contactSupport: "Contact support if the problem persists"
     },
     success: {
+      saved: "Saved successfully",
       created: "Created successfully",
       updated: "Updated successfully",
       deleted: "Deleted successfully",
@@ -379,6 +320,7 @@ export const translations = {
       title: "AI Assistant",
       welcome: "Hi! I'm your AI assistant. I can help you find companies, create scrapers, or analyze market data. What would you like to do?",
       openAssistant: "Open AI Assistant",
+      close: "Close",
       placeholder: "Ask me anything...",
       quickSuggestions: "Quick suggestions",
       response: "I understand you want to {{query}}. Let me help you with that...",
@@ -393,49 +335,15 @@ export const translations = {
       collectionTrends: {
         pageTitle: "Data Collection Trends",
         pageSubtitle: "Analyze trends in data acquisition over time.",
-        newRecordsThisPeriod: "New Records This Period",
-        growthRate: "Growth Rate",
-        peakCollection: "Peak Collection",
-        peakCollectionDetail: "on {peakDate}",
-        volumeOverTime: "Collection Volume Over Time",
-        daily: "Daily",
-        weekly: "Weekly",
-        monthly: "Monthly",
-        vsLastPeriod: "vs last period",
-        noTrendData: "No trend data available for the selected period.",
-        dataQuality: "Data Quality Metrics",
-        completeness: "Completeness",
-        accuracy: "Accuracy",
-        timeliness: "Timeliness",
-        dataSources: "Data Sources"
+        newRecordsThisPeriod: "New Records This Period"
       },
       geographicDistribution: {
         pageTitle: "Geographic Distribution",
-        pageSubtitle: "View the geographic spread of your data collection.",
-        totalRegionsCovered: "Total Regions Covered",
-        topRegion: "Top Region",
-        regionsWithGrowth: "Regions with Growth",
-        distributionMap: "Distribution Map",
-        allDataTypes: "All Data Types",
-        topRegionsByVolume: "Top Regions by Data Volume",
-        region: "Region",
-        recordCount: "Record Count",
-        growth: "Growth",
-        filterByCountry: "Filter by Country",
-        filterByRegion: "Filter by Region"
+        pageSubtitle: "View the geographic spread of your data collection."
       },
       sectorDistribution: {
         pageTitle: "Sector Distribution",
-        pageSubtitle: "Analyze the distribution of data across different sectors.",
-        totalSectorsTracked: "Total Sectors Tracked",
-        fastestGrowingSector: "Fastest Growing Sector",
-        distributionBySector: "Distribution by Sector",
-        companiesPerSector: "Companies per Sector",
-        sectorGrowth: "Sector Growth",
-        filterBySector: "Filter by Sector",
-        noSectorData: "No sector data available",
-        sectorBreakdown: "Sector Breakdown",
-        companyCount: "Company Count"
+        pageSubtitle: "Analyze the distribution of data across different sectors."
       },
       sourceComparison: {
         pageTitle: "Comparaison des Sources de Données",
@@ -465,91 +373,47 @@ export const translations = {
       }
     },
     status: {
+      active: "Active",
+      inactive: "Inactive",
+      pending: "Pending",
+      completed: "Completed",
+      failed: "Failed",
+      running: "Running",
+      scheduled: "Scheduled",
+      draft: "Draft",
       sent: "Sent",
+      delivered: "Delivered",
+      opened: "Opened",
+      clicked: "Clicked",
       bounced: "Bounced"
     },
     error: {
+      general: "An error occurred",
+      notFound: "Not found",
+      unauthorized: "Unauthorized",
+      forbidden: "Forbidden",
+      serverError: "Server error",
+      networkError: "Network error",
+      tryAgain: "Please try again",
       contactSupport: "Contact support if the problem persists"
     },
     success: {
+      saved: "Saved successfully",
+      created: "Created successfully",
+      updated: "Updated successfully",
+      deleted: "Deleted successfully",
       sent: "Sent successfully",
+      imported: "Imported successfully",
       exported: "Exported successfully"
     },
 
     ai: {
+      title: "AI Assistant",
+      welcome: "Hi! I'm your AI assistant. I can help you find companies, create scrapers, or analyze market data. What would you like to do?",
       openAssistant: "Open AI Assistant"
     }
   },
   fr: {
-    statistics: {
-      dashboard: {
-        title: "Tableau de Bord d'Analyse d'Entreprise",
-        description: "Surveillez les indicateurs clés, suivez les performances et obtenez des informations précieuses sur vos opérations commerciales.",
-        keyMetrics: {
-          totalCompanies: "Total des Entreprises",
-          activeScrapers: "Scrapeurs Actifs",
-          campaigns: "Campagnes",
-          dataQuality: "Qualité des Données",
-          lastRun: "Dernière exécution : il y a {time}",
-          deliveryRate: "Taux de livraison de {rate}%",
-          changeFromLastMonth: "{change}% par rapport au mois dernier"
-        },
-        analyticsCards: {
-          collectionTrends: "Tendances de Collecte",
-          sectorAnalysis: "Analyse par Secteur",
-          expand: "Développer",
-          collapse: "Réduire",
-          topPerformingSources: "Sources les plus performantes :",
-          linkedinScraper: "Extracteur LinkedIn",
-          companyWebsites: "Sites Web d'Entreprises",
-          publicDirectories: "Annuaires Publics"
-        },
-        tabs: {
-          overview: "Vue d'Ensemble",
-          performance: "Performance",
-          dataSources: "Sources de Données",
-          quality: "Qualité"
-        },
-        overview: {
-          dataCollectionSummary: "Résumé de la Collecte de Données",
-          totalRecords: "Total des Enregistrements",
-          thisMonth: "Ce Mois-ci",
-          successRate: "Taux de Réussite",
-          topIndustries: "Secteurs Principaux",
-          technology: "Technologie",
-          finance: "Finance",
-          healthcare: "Santé",
-          regionalDistribution: "Répartition Régionale",
-          dachRegion: "Région DACH",
-          eu: "UE",
-          global: "Monde"
-        },
-        performance: {
-          metrics: "Métriques de Performance",
-          uptime: "Disponibilité",
-          avgResponse: "Temps de Réponse Moyen",
-          errorRate: "Taux d'Erreur"
-        },
-        dataSources: {
-          title: "Performance des Sources de Données",
-          source: "Source",
-          records: "Enregistrements",
-          quality: "Qualité",
-          status: "Statut",
-          active: "Actif",
-          monitoring: "Surveillance",
-          needsAttention: "Nécessite une Attention",
-          apiIntegrations: "Intégrations API"
-        },
-        quality: {
-          title: "Analyse de la Qualité des Données",
-          description: "Aperçu des dimensions clés de la qualité des données.",
-          completeness: "Exhaustivité",
-          accuracy: "Exactitude",
-          freshness: "Fraîcheur"
-        }
-      }
-    },
     statisticsPages: {
       collectionTrends: {
         pageTitle: "Tendances de la Collecte de Données",
@@ -563,12 +427,7 @@ export const translations = {
         weekly: "Hebdomadaire",
         monthly: "Mensuel",
         vsLastPeriod: "vs période précédente",
-        noTrendData: "Aucune donnée de tendance disponible pour la période sélectionnée.",
-        dataQuality: "Métriques de Qualité des Données",
-        completeness: "Exhaustivité",
-        accuracy: "Exactitude",
-        timeliness: "Actualité",
-        dataSources: "Sources de Données"
+        noTrendData: "Aucune donnée de tendance disponible pour la période sélectionnée."
       },
       geographicDistribution: {
         pageTitle: "Distribution Géographique des Données",
@@ -578,12 +437,7 @@ export const translations = {
         regionsWithGrowth: "Régions en Croissance",
         distributionMap: "Carte de Distribution",
         allDataTypes: "Tous Types de Données",
-        topRegionsByVolume: "Top Régions par Volume de Données",
-        region: "Région",
-        recordCount: "Nombre d'Enregistrements",
-        growth: "Croissance",
-        filterByCountry: "Filtrer par Pays",
-        filterByRegion: "Filtrer par Région"
+        topRegionsByVolume: "Top Régions par Volume de Données"
       },
       sectorDistribution: {
         pageTitle: "Distribution des Données par Secteur",
@@ -591,17 +445,23 @@ export const translations = {
         totalSectorsTracked: "Total Secteurs Suivis",
         fastestGrowingSector: "Secteur à Croissance Rapide",
         distributionBySector: "Distribution par Secteur",
-        companiesPerSector: "Entreprises par Secteur",
-        sectorGrowth: "Croissance par Secteur",
-        filterBySector: "Filtrer par Secteur",
-        noSectorData: "Aucune donnée de secteur disponible",
-        sectorBreakdown: "Répartition par Secteur",
-        companyCount: "Nombre d'Entreprises",
-        contacts: "Contacts"
+        contacts: "Contacts",
+        sectorBreakdown: "Répartition par Secteur"
       },
       sourceComparison: {
         pageTitle: "Comparaison des Sources de Données",
         pageSubtitle: "Évaluez et comparez la performance de vos différentes sources de données.",
+        totalDataSources: "Total Sources de Données",
+        highestVolumeSource: "Source au Volume le Plus Élevé",
+        bestQualitySource: "Source de Meilleure Qualité",
+        compareBy: "Comparer par :",
+        allMetrics: "Toutes Métriques",
+        dataVolume: "Volume de Données",
+        qualityScore: "Score de Qualité",
+        coveragePercentage: "Pourcentage de Couverture",
+        sourcePerformanceMetrics: "Métriques de Performance des Sources",
+        detailedSourceMetrics: "Métriques Détaillées des Sources",
+        sourceName: "Nom de la Source",
         updateFrequency: "Fréquence de Mise à Jour"
       },
       commonFilters: {
@@ -675,7 +535,9 @@ export const translations = {
       size: "Taille de l'entreprise",
       confidence: "Confiance",
       lastContacted: "Dernier contact",
+      status: "Statut",
       verified: "Vérifié",
+      description: "Description",
       website: "Site web",
       phone: "Téléphone",
       email: "Email",
@@ -730,11 +592,14 @@ export const translations = {
         allSizes: "Toutes les tailles",
         employees: "Employés",
         minConfidence: "Score de confiance minimum",
+        anyScore: "Tous les scores",
         clear: "Effacer les filtres"
       },
       dataSources: {
         title: "Sources de données",
         internal: "Base de données interne",
+        wikidata: "Wikidata",
+        opencorporates: "OpenCorporates",
         businessRegistries: "Registres du commerce"
       },
       viewModes: {
@@ -752,6 +617,7 @@ export const translations = {
       activeScrapers: "Extracteurs actifs",
       recentActivity: "Activité récente",
       quickActions: "Actions rapides",
+      insights: "Insights",
       performance: "Performance"
     },
     financial: {
@@ -769,6 +635,8 @@ export const translations = {
       expense: "Dépense",
       refund: "Remboursement",
       currency: "Devise",
+      type: "Type",
+      source: "Source",
       amount: "Montant",
       category: "Catégorie",
       netProfit: "Bénéfice net",
@@ -776,6 +644,7 @@ export const translations = {
     },
     reengagement: {
       tasks: "Tâches",
+      classification: "Classification",
       automation: "Automatisation"
     },
     referrals: {
@@ -785,6 +654,7 @@ export const translations = {
     },
     reviews: {
       requests: "Demandes",
+      booster: "Booster",
       monitoring: "Surveillance"
     },
     funnels: {
@@ -798,6 +668,8 @@ export const translations = {
       results: "Résultats"
     },
     vsl: {
+      templates: "Modèles",
+      pages: "Pages",
       tracking: "Suivi"
     },
     leadResponse: {
@@ -808,7 +680,24 @@ export const translations = {
     analytics: {
       performance: "Performance",
       conversion: "Conversion",
-      revenue: "Revenu",
+      revenue: "Revenu"
+    },
+    marketIntel: {
+      title: "Tableau de Bord d'Intelligence Marché",
+      description: "Informations stratégiques sur les concurrents, les tendances du marché et les opportunités de croissance",
+      stats: {
+        marketSize: "Taille du Marché",
+        competitorsTracked: "Concurrents Suivis",
+        leadScoreAvg: "Score Moyen des Leads",
+        opportunities: "Opportunités",
+        currentlyRunning: "Actuellement en cours",
+        highPotential: "Haut potentiel"
+      },
+      competitorLandscape: "Paysage Concurrentiel",
+      marketPosition: "Analyse de la position sur le marché",
+      relationshipMapping: "Cartographie des Relations",
+      industryConnections: "Connexions entre les acteurs du secteur et les parties prenantes clés",
+      leadScoring: "Notation des Leads",
       prioritizedProspects: "Prospects prioritaires par potentiel d'engagement",
       marketTrends: "Tendances du Marché",
       emergingOpportunities: "Opportunités émergentes par secteur",
@@ -863,36 +752,64 @@ export const translations = {
       relationshipMapping: "Cartographie des Relations",
       industryConnections: "Connexions entre les acteurs du secteur et les parties prenantes clés",
       leadScoring: "Notation des Leads",
+      prioritizedProspects: "Prospects prioritaires par potentiel d'engagement",
+      marketTrends: "Tendances du Marché",
+      emergingOpportunities: "Opportunités émergentes par secteur",
+      growth: "croissance",
+      marketOpportunityAlert: "Alerte d'Opportunité de Marché",
+      fintechSector: "Secteur fintech affichant un potentiel de croissance de 23% - 42 cibles à haute valeur identifiées",
       exploreOpportunities: "Explorer les Opportunités"
     },
     search: {
       title: "Recherche d'Entreprises",
       placeholder: "Rechercher des entreprises, contacts ou données de marché...",
+      recentSearches: "Recherches récentes",
       suggestions: {
         title: "Suggestions",
+        quick: "Suggestions rapides",
+        recent: "Recherches récentes",
         examples: {
+          marketing: "Agences de marketing à Genève utilisant HubSpot",
           compare: "Comparer les entreprises SaaS avec un financement Série A",
           analyze: "Analyser les startups tech utilisant React avec plus de 50 employés",
           filter: "Filtrer les entreprises Fintech en Suisse par chiffre d'affaires"
         }
       },
+      refine: "Affinez votre recherche...",
+      searching: "Recherche en cours...",
+      searchingMultiple: "Recherche dans plusieurs sources...",
+      results: "{{count}} résultats trouvés pour '{{query}}'",
+      all: "toutes les entreprises",
       export: "Exporter les résultats",
+      noResults: "Aucun résultat trouvé",
       tryAdjusting: "Essayez d'ajuster vos filtres ou vos termes de recherche pour une meilleure correspondance.",
       clearAllFilters: "Réinitialiser tous les filtres",
       advancedFilters: "Filtres avancés",
       locationPlaceholder: "ex: Genève, Suisse",
       filters: {
+        label: "Filtres",
         allFilters: "Tous les filtres",
         industry: "Secteur d'activité",
         allIndustries: "Tous les secteurs",
+        location: "Localisation",
+        companySize: "Taille de l'entreprise",
+        clearAll: "Tout effacer",
+        dataSources: "Sources de données",
+        softwareDev: "Développement Logiciel",
         marketing: "Marketing et Publicité",
         fintech: "Technologie Financière",
         enterLocation: "Saisir une localisation...",
         allSizes: "Toutes tailles",
+        employees: "Employés",
+        minConfidence: "Score de confiance minimum",
         anyScore: "Tous les scores",
+        clear: "Réinitialiser les filtres"
       },
       dataSources: {
         title: "Sources de données",
+        internal: "Base de données interne",
+        wikidata: "Wikidata",
+        opencorporates: "OpenCorporates",
         businessRegistries: "Registres du commerce"
       },
       viewModes: {
@@ -939,8 +856,10 @@ export const translations = {
       antiSpam: "Paramètres anti-spam",
       compliance: "Conformité",
       systemHealth: "Santé du système",
+      recentActivity: "Activité récente",
       users: "Utilisateurs",
       roles: "Rôles",
+      permissions: "Permissions",
       security: {
         activeSessions: "Sessions actives",
         manageActiveSessions: "Gérer vos sessions actives",
@@ -950,6 +869,7 @@ export const translations = {
     },
     form: {
       save: "Enregistrer",
+      cancel: "Annuler",
       submit: "Soumettre",
       reset: "Réinitialiser",
       required: "Requis",
@@ -965,17 +885,23 @@ export const translations = {
       of: "sur",
       results: "résultats",
       rowsPerPage: "Lignes par page :",
+      page: "Page",
       goToPage: "Aller à la page"
     },
     common: {
       previous: "Précédent",
       next: "Suivant",
+      loading: "Chargement...",
+      save: "Enregistrer",
+      cancel: "Annuler",
       delete: "Supprimer",
       edit: "Modifier",
       view: "Voir",
+      actions: "Actions",
       yes: "Oui",
       no: "Non",
       confirm: "Confirmer",
+      close: "Fermer",
       open: "Ouvrir",
       new: "Nouveau",
       create: "Créer",
@@ -991,9 +917,12 @@ export const translations = {
       date: "Date"
     },
     status: {
+      active: "Actif",
+      inactive: "Inactif",
       pending: "En attente",
       completed: "Terminé",
       failed: "Échoué",
+      running: "En cours",
       scheduled: "Planifié",
       draft: "Brouillon",
       sent: "Envoyé",
@@ -1013,6 +942,7 @@ export const translations = {
       contactSupport: "Contactez le support si le problème persiste"
     },
     success: {
+      saved: "Enregistré avec succès",
       created: "Créé avec succès",
       updated: "Mis à jour avec succès",
       deleted: "Supprimé avec succès",
@@ -1024,6 +954,7 @@ export const translations = {
       title: "Assistant IA",
       welcome: "Salut ! Je suis votre assistant IA. Je peux vous aider à trouver des entreprises, créer des extracteurs, ou analyser les données du marché. Que souhaitez-vous faire ?",
       openAssistant: "Ouvrir l'Assistant IA",
+      close: "Fermer",
       placeholder: "Demandez-moi n'importe quoi...",
       quickSuggestions: "Suggestions rapides",
       response: "Je comprends que vous voulez {{query}}. Laissez-moi vous aider avec cela...",

@@ -145,195 +145,181 @@ export default function ScrapersPage() {
   }
 
   return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <Heading level={1}>{t("scrapers.title")}</Heading>
-            <Text className="text-muted-foreground">{t("scrapers.description")}</Text>
-          </div>
-          <Button asChild className="bg-primary hover:bg-primary/90">
-            <Link href="/scrapers/new">
-              <PlusIcon className="w-4 h-4 mr-2" />
-              {t("scrapers.createScraper")}
-            </Link>
-          </Button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <Heading level={1}>{t("scrapers.title")}</Heading>
+          <Text className="text-muted-foreground">{t("scrapers.description")}</Text>
         </div>
+        <Button asChild className="bg-primary hover:bg-primary/90">
+          <Link href="/scrapers/new">
+            <PlusIcon className="w-4 h-4 mr-2" />
+            {t("scrapers.createScraper")}
+          </Link>
+        </Button>
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-4">
-          <Card className="shadow-sm border border-border/40">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t("scrapers.activeScrapers")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-emerald-600">{stats.activeScrapers}</div>
-              <Text size="sm" className="text-emerald-600">
-                Currently running
-              </Text>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border border-border/40">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{t("scrapers.successRate")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.successRate}%</div>
-              <Progress value={stats.successRate} className="h-2 mt-2" />
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border border-border/40">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{t("scrapers.totalJobs")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalJobs}</div>
-              <Text size="sm" className="text-muted-foreground">
-                Last 24 hours
-              </Text>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border border-border/40">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{t("scrapers.v2Scrapers")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.v2Scrapers}</div>
-              <Text size="sm" className="text-muted-foreground">
-                Next-gen scrapers
-              </Text>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters and Search */}
+      {/* Stats Cards */}
+      <div className="grid md:grid-cols-4 gap-4">
         <Card className="shadow-sm border border-border/40">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <ChartBarIcon className="w-4 h-4 mr-2" />
-              {t("scrapers.scraperManagement")}
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t("scrapers.activeScrapers")}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4 mb-6">
-              <div className="relative flex-1">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder={t("scrapers.searchPlaceholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48">
-                  <FunnelIcon className="w-4 h-4 mr-2" />
-                  <SelectValue placeholder={t("scrapers.filterByStatus")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t("scrapers.allStatuses")}</SelectItem>
-                  <SelectItem value="active">{t("scrapers.active")}</SelectItem>
-                  <SelectItem value="inactive">{t("scrapers.inactive")}</SelectItem>
-                  <SelectItem value="running">{t("scrapers.running")}</SelectItem>
-                  <SelectItem value="error">{t("scrapers.error")}</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder={t("scrapers.filterByType")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t("scrapers.allTypes")}</SelectItem>
-                  <SelectItem value="v1">{t("scrapers.v1")}</SelectItem>
-                  <SelectItem value="v2">{t("scrapers.v2")}</SelectItem>
-                  <SelectItem value="api">{t("scrapers.api")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <div className="text-2xl font-bold text-emerald-600">{stats.activeScrapers}</div>
+            <Text size="sm" className="text-emerald-600">
+              {t('scrapers.currentlyRunning')}
+            </Text>
+          </CardContent>
+        </Card>
 
-            {/* Scrapers Table */}
-            <div className="space-y-4">
-              {filteredScrapers.length === 0 ? (
-                <div className="text-center py-8">
-                  <Text className="text-muted-foreground">{t("scrapers.noScrapers")}</Text>
-                  <Button asChild className="mt-4">
-                    <Link href="/scrapers/new">
-                      <PlusIcon className="w-4 h-4 mr-2" />
-                      {t("scrapers.createFirstScraper")}
-                    </Link>
-                  </Button>
-                </div>
-              ) : (
-                filteredScrapers.map((scraper) => (
-                  <div
-                    key={scraper.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                        {getStatusIcon(scraper.status)}
-                      </div>
-                      <div>
-                        <div className="font-medium">{scraper.name}</div>
-                        <Text size="sm" className="text-muted-foreground">
-                          {scraper.url}
-                        </Text>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">
-                            {scraper.type.toUpperCase()}
-                          </Badge>
-                          <Text size="sm" className="text-muted-foreground">
-                            {scraper.total_runs} runs • {scraper.success_rate}% success
-                          </Text>
-                        </div>
-                      </div>
-                    </div>
+        <Card className="shadow-sm border border-border/40">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("scrapers.successRate")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.successRate}%</div>
+            <Progress value={stats.successRate} className="h-2 mt-2" />
+          </CardContent>
+        </Card>
 
-                    <div className="flex items-center gap-4">
-                      <Badge variant="outline" className={getStatusBadgeColor(scraper.status)}>
-                        {t(`scrapers.${scraper.status}`)}
-                      </Badge>
-                      <Text size="sm" className="text-muted-foreground w-24">
-                        {scraper.last_run ? new Date(scraper.last_run).toLocaleDateString() : "Never"}
-                      </Text>
-                      <div className="flex items-center gap-2">
-                        {scraper.status === "inactive" && (
-                          <Button variant="outline" size="sm" onClick={() => handleStatusChange(scraper.id, "active")}>
-                            <PlayIcon className="w-3 h-3" />
-                          </Button>
-                        )}
-                        {scraper.status === "active" && (
-                          <Button variant="outline" size="sm" onClick={() => handleExecute(scraper.id, scraper.url)}>
-                            <PlayIcon className="w-3 h-3" />
-                          </Button>
-                        )}
-                        {scraper.status === "running" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleStatusChange(scraper.id, "inactive")}
-                          >
-                            <StopIcon className="w-3 h-3" />
-                          </Button>
-                        )}
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/scrapers/${scraper.id}/configure`}>
-                            <Cog6ToothIcon className="w-3 h-3" />
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+        <Card className="shadow-sm border border-border/40">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("scrapers.totalJobs")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalJobs}</div>
+            <Text size="sm" className="text-muted-foreground">
+              {t('scrapers.last24Hours')}
+            </Text>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border border-border/40">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("scrapers.v2Scrapers")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.v2Scrapers}</div>
+            <Text size="sm" className="text-muted-foreground">
+              {t('scrapers.nextGenScrapers')}
+            </Text>
           </CardContent>
         </Card>
       </div>
+
+      {/* Filters and Search */}
+      <Card className="shadow-sm border border-border/40">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <ChartBarIcon className="w-4 h-4 mr-2" />
+            {t("scrapers.scraperManagement")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4 mb-6">
+            <div className="relative flex-1">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder={t("scrapers.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <FunnelIcon className="w-4 h-4 mr-2" />
+                <SelectValue placeholder={t("scrapers.filterByStatus")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("scrapers.allStatuses")}</SelectItem>
+                <SelectItem value="active">{t("scrapers.active")}</SelectItem>
+                <SelectItem value="inactive">{t("scrapers.inactive")}</SelectItem>
+                <SelectItem value="running">{t("scrapers.running")}</SelectItem>
+                <SelectItem value="error">{t("scrapers.error")}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder={t("scrapers.filterByType")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("scrapers.allTypes")}</SelectItem>
+                <SelectItem value="v1">{t("scrapers.v1")}</SelectItem>
+                <SelectItem value="v2">{t("scrapers.v2")}</SelectItem>
+                <SelectItem value="api">{t("scrapers.api")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Scrapers Table */}
+      <div className="space-y-4">
+        {filteredScrapers.length === 0 ? (
+          <div className="text-center py-8">
+            <Text className="text-muted-foreground">{t("scrapers.noScrapers")}</Text>
+            <Button asChild className="mt-4">
+              <Link href="/scrapers/new">
+                <PlusIcon className="w-4 h-4 mr-2" />
+                {t("scrapers.createFirstScraper")}
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          filteredScrapers.map((scraper) => (
+            <div
+              key={scraper.id}
+              className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+                  {getStatusIcon(scraper.status)}
+                </div>
+                <div>
+                  <div className="font-medium">{scraper.name}</div>
+                  <Text size="sm" className="text-muted-foreground">
+                    {scraper.url}
+                  </Text>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline" className="text-xs">
+                      {scraper.type.toUpperCase()}
+                    </Badge>
+                    <Text size="sm" className="text-muted-foreground">
+                      {scraper.total_runs} {t('scrapers.runs')} • {scraper.success_rate}% {t('scrapers.success')}
+                    </Text>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {scraper.status === "active" && (
+                    <Button variant="outline" size="sm" onClick={() => handleExecute(scraper.id, scraper.url)}>
+                      <PlayIcon className="w-3 h-3" />
+                    </Button>
+                  )}
+                  {scraper.status === "running" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleStatusChange(scraper.id, "inactive")}
+                    >
+                      <StopIcon className="w-3 h-3" />
+                    </Button>
+                  )}
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/scrapers/${scraper.id}/configure`}>
+                      <Cog6ToothIcon className="w-3 h-3" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   )
 }

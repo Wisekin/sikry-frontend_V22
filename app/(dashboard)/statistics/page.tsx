@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslation } from "@/lib/i18n/useTranslation"
 import { Bar, Pie, Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -30,8 +31,9 @@ import {
   CpuChipIcon,
   CheckCircleIcon,
   ClockIcon,
-  DocumentTextIcon,
+  DocumentTextIcon
 } from "@heroicons/react/24/solid"
+import { ArrowPathIcon } from "@heroicons/react/24/outline"
 
 // Register Chart.js components
 ChartJS.register(
@@ -193,13 +195,17 @@ export default function StatisticsPage() {
     }],
   };
 
+  const { t } = useTranslation()
+
   return (
     <div className="min-h-screen space-y-8 bg-white text-[#1B1F3B] p-6 md:p-10">
       {/* Header */}
       <div>
-        <h1 className="text-3xl md:text-4xl font-bold text-[#1B1F3B]">Enterprise Analytics Dashboard</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-[#1B1F3B]">
+          {t('statistics.dashboard.title')}
+        </h1>
         <p className="text-gray-500 mt-1">
-          Monitor key metrics, track performance, and gain valuable insights into your business operations.
+          {t('statistics.dashboard.description')}
         </p>
       </div>
 
@@ -208,47 +214,47 @@ export default function StatisticsPage() {
         <Card className="bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors duration-300">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-              <BuildingOfficeIcon className="w-4 h-4" /> Total Companies
+              <BuildingOfficeIcon className="w-4 h-4" /> {t('statistics.dashboard.keyMetrics.totalCompanies')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-[#1B1F3B]">12,458</div>
             <p className="text-sm text-green-600 flex items-center gap-1">
-              <ArrowTrendingUpIcon className="w-3 h-3" /> +124 this month
+              <ArrowTrendingUpIcon className="w-3 h-3" /> +124 {t('statistics.dashboard.keyMetrics.thisMonth', { count: 1 })}
             </p>
           </CardContent>
         </Card>
         <Card className="bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors duration-300">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-              <ChartBarIcon className="w-4 h-4" /> Active Scrapers
+              <ChartBarIcon className="w-4 h-4" /> {t('statistics.dashboard.keyMetrics.activeScrapers')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-[#1B1F3B]">87</div>
-            <p className="text-sm text-gray-500">Last run: 2 hours ago</p>
+            <p className="text-sm text-gray-500">{t('statistics.dashboard.keyMetrics.lastRun', { time: '2 hours' })}</p>
           </CardContent>
         </Card>
         <Card className="bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors duration-300">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-              <GlobeAltIcon className="w-4 h-4" /> Campaigns
+              <GlobeAltIcon className="w-4 h-4" /> {t('statistics.dashboard.keyMetrics.campaigns')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-[#1B1F3B]">34</div>
-            <p className="text-sm text-green-600">92% delivery rate</p>
+            <p className="text-sm text-green-600">{t('statistics.dashboard.keyMetrics.deliveryRate', { rate: 92 })}</p>
           </CardContent>
         </Card>
         <Card className="bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors duration-300">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-              <EyeIcon className="w-4 h-4" /> Data Quality
+              <EyeIcon className="w-4 h-4" /> {t('statistics.dashboard.keyMetrics.dataQuality')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600">94%</div>
-            <p className="text-sm text-green-600">+2% from last month</p>
+            <p className="text-sm text-green-600">{t('statistics.dashboard.keyMetrics.changeFromLastMonth', { change: '+2' })}</p>
           </CardContent>
         </Card>
       </div>
@@ -259,10 +265,10 @@ export default function StatisticsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg text-[#1B1F3B]">
-                <ChartBarIcon className="w-5 h-5 text-blue-600" /> Collection Trends
+                <ChartBarIcon className="w-5 h-5 text-blue-600" /> {t('statistics.dashboard.analyticsCards.collectionTrends')}
               </CardTitle>
               <Button variant="ghost" size="sm" onClick={() => toggleCard("collection")} className="flex items-center gap-1 text-gray-600 hover:bg-gray-100">
-                {expandedCard === "collection" ? "Collapse" : "Expand"}
+                {expandedCard === "collection" ? t('statistics.dashboard.analyticsCards.collapse') : t('statistics.dashboard.analyticsCards.expand')}
                 {expandedCard === "collection" ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />}
               </Button>
             </div>
@@ -271,12 +277,21 @@ export default function StatisticsPage() {
             <div className="h-64"><Bar data={collectionTrendsData} options={chartOptions} /></div>
             {expandedCard === "collection" && (
               <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
-                  <h4 className="font-medium mb-2 text-gray-800">Top Performing Sources:</h4>
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-sm"><span className="text-gray-600">LinkedIn Scraper</span><span className="font-medium text-[#1B1F3B]">34%</span></div>
-                    <div className="flex justify-between text-sm"><span className="text-gray-600">Company Websites</span><span className="font-medium text-[#1B1F3B]">28%</span></div>
-                    <div className="flex justify-between text-sm"><span className="text-gray-600">Public Directories</span><span className="font-medium text-[#1B1F3B]">22%</span></div>
+                <h4 className="font-medium mb-2 text-gray-800">{t('statistics.dashboard.analyticsCards.topPerformingSources')}</h4>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{t('statistics.dashboard.analyticsCards.linkedinScraper')}</span>
+                    <span className="font-medium text-[#1B1F3B]">34%</span>
                   </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{t('statistics.dashboard.analyticsCards.companyWebsites')}</span>
+                    <span className="font-medium text-[#1B1F3B]">28%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{t('statistics.dashboard.analyticsCards.publicDirectories')}</span>
+                    <span className="font-medium text-[#1B1F3B]">22%</span>
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>
@@ -285,10 +300,10 @@ export default function StatisticsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg text-[#1B1F3B]">
-                <CircleStackIcon className="w-5 h-5 text-purple-600" /> Sector Analysis
+                <CircleStackIcon className="w-5 h-5 text-purple-600" /> {t('statistics.dashboard.analyticsCards.sectorAnalysis')}
               </CardTitle>
               <Button variant="ghost" size="sm" onClick={() => toggleCard("sector")} className="flex items-center gap-1 text-gray-600 hover:bg-gray-100">
-                {expandedCard === "sector" ? "Collapse" : "Expand"}
+                {expandedCard === "sector" ? t('statistics.dashboard.analyticsCards.collapse') : t('statistics.dashboard.analyticsCards.expand')}
                 {expandedCard === "sector" ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />}
               </Button>
             </div>
@@ -302,36 +317,83 @@ export default function StatisticsPage() {
       {/* Detailed Analytics Tabs */}
       <Tabs defaultValue="quality" className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-6 bg-gray-100 p-1 rounded-lg">
-          <TabsTrigger value="overview" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Overview</TabsTrigger>
-          <TabsTrigger value="performance" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Performance</TabsTrigger>
-          <TabsTrigger value="sources" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Data Sources</TabsTrigger>
-          <TabsTrigger value="quality" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Quality</TabsTrigger>
+          <TabsTrigger value="overview" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">
+            {t('statistics.dashboard.tabs.overview')}
+          </TabsTrigger>
+          <TabsTrigger value="performance" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">
+            {t('statistics.dashboard.tabs.performance')}
+          </TabsTrigger>
+          <TabsTrigger value="sources" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">
+            {t('statistics.dashboard.tabs.dataSources')}
+          </TabsTrigger>
+          <TabsTrigger value="quality" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">
+            {t('statistics.dashboard.tabs.quality')}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="bg-white border-gray-200 hover:border-[#3C4568] transition-colors duration-300">
-              <CardHeader><CardTitle className="text-base text-gray-800">Data Collection Summary</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="text-base text-gray-800">
+                  {t('statistics.dashboard.overview.dataCollectionSummary')}
+                </CardTitle>
+              </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex justify-between"><span className="text-sm text-gray-600">Total Records</span><span className="font-medium text-[#1B1F3B]">124,567</span></div>
-                <div className="flex justify-between"><span className="text-sm text-gray-600">This Month</span><span className="font-medium text-[#1B1F3B]">11,234</span></div>
-                <div className="flex justify-between"><span className="text-sm text-gray-600">Success Rate</span><span className="font-medium text-green-600">94.2%</span></div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.totalRecords')}</span>
+                  <span className="font-medium text-[#1B1F3B]">124,567</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.thisMonth')}</span>
+                  <span className="font-medium text-[#1B1F3B]">11,234</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.successRate')}</span>
+                  <span className="font-medium text-green-600">94.2%</span>
+                </div>
               </CardContent>
             </Card>
             <Card className="bg-white border-gray-200 hover:border-[#3C4568] transition-colors duration-300">
-              <CardHeader><CardTitle className="text-base text-gray-800">Top Industries</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="text-base text-gray-800">
+                  {t('statistics.dashboard.overview.topIndustries')}
+                </CardTitle>
+              </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between"><span className="text-sm text-gray-600">Technology</span><span className="font-medium text-[#1B1F3B]">35%</span></div>
-                <div className="flex justify-between"><span className="text-sm text-gray-600">Finance</span><span className="font-medium text-[#1B1F3B]">25%</span></div>
-                <div className="flex justify-between"><span className="text-sm text-gray-600">Healthcare</span><span className="font-medium text-[#1B1F3B]">15%</span></div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.technology')}</span>
+                  <span className="font-medium text-[#1B1F3B]">35%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.finance')}</span>
+                  <span className="font-medium text-[#1B1F3B]">25%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.healthcare')}</span>
+                  <span className="font-medium text-[#1B1F3B]">15%</span>
+                </div>
               </CardContent>
             </Card>
             <Card className="bg-white border-gray-200 hover:border-[#3C4568] transition-colors duration-300">
-              <CardHeader><CardTitle className="text-base text-gray-800">Regional Distribution</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="text-base text-gray-800">
+                  {t('statistics.dashboard.overview.regionalDistribution')}
+                </CardTitle>
+              </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between"><span className="text-sm text-gray-600">DACH Region</span><span className="font-medium text-[#1B1F3B]">68%</span></div>
-                <div className="flex justify-between"><span className="text-sm text-gray-600">EU</span><span className="font-medium text-[#1B1F3B]">22%</span></div>
-                <div className="flex justify-between"><span className="text-sm text-gray-600">Global</span><span className="font-medium text-[#1B1F3B]">10%</span></div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.dachRegion')}</span>
+                  <span className="font-medium text-[#1B1F3B]">68%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.eu')}</span>
+                  <span className="font-medium text-[#1B1F3B]">22%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">{t('statistics.dashboard.overview.global')}</span>
+                  <span className="font-medium text-[#1B1F3B]">10%</span>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -339,13 +401,27 @@ export default function StatisticsPage() {
 
         <TabsContent value="performance">
           <Card className="bg-white border-gray-200">
-            <CardHeader><CardTitle className="flex items-center gap-2 text-[#1B1F3B]"><CpuChipIcon className="w-5 h-5 text-orange-500"/> Performance Metrics</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-[#1B1F3B]">
+                <CpuChipIcon className="w-5 h-5 text-orange-500"/>
+                {t('statistics.dashboard.performance.metrics')}
+              </CardTitle>
+            </CardHeader>
             <CardContent>
               <div className="h-72 mb-4"><Line data={performanceMetricsData} options={chartOptions} /></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                  <div className="p-3 bg-gray-50 rounded-lg"><div className="text-lg font-bold text-green-600">98.5%</div><div className="text-xs text-gray-500">Uptime</div></div>
-                  <div className="p-3 bg-gray-50 rounded-lg"><div className="text-lg font-bold text-blue-600">156ms</div><div className="text-xs text-gray-500">Avg Response</div></div>
-                  <div className="p-3 bg-gray-50 rounded-lg"><div className="text-lg font-bold text-green-600">↓ 0.3%</div><div className="text-xs text-gray-500">Error Rate</div></div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-bold text-green-600">98.5%</div>
+                  <div className="text-xs text-gray-500">{t('statistics.dashboard.performance.uptime')}</div>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-bold text-blue-600">156ms</div>
+                  <div className="text-xs text-gray-500">{t('statistics.dashboard.performance.avgResponse')}</div>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-bold text-green-600">↓ 0.3%</div>
+                  <div className="text-xs text-gray-500">{t('statistics.dashboard.performance.errorRate')}</div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -353,30 +429,80 @@ export default function StatisticsPage() {
 
         <TabsContent value="sources">
           <Card className="bg-white border-gray-200">
-            <CardHeader><CardTitle className="text-gray-800">Data Source Performance</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-gray-800">
+                {t('statistics.dashboard.dataSources.title')}
+              </CardTitle>
+            </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead className="border-b border-gray-200">
                     <tr className="text-sm font-medium text-gray-500">
-                      <th className="p-3">Source</th><th className="p-3">Records</th><th className="p-3">Quality</th><th className="p-3">Status</th>
+                      <th className="p-3">{t('statistics.dashboard.dataSources.source')}</th>
+                      <th className="p-3">{t('statistics.dashboard.dataSources.records')}</th>
+                      <th className="p-3">{t('statistics.dashboard.dataSources.quality')}</th>
+                      <th className="p-3">{t('statistics.dashboard.dataSources.status')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                      <td className="p-3 font-medium text-gray-800">LinkedIn Scraper</td><td>42,567</td><td className="text-green-600 font-medium">98%</td><td><span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full font-semibold">Active</span></td>
+                      <td className="p-3 font-medium text-gray-800">{t('statistics.dashboard.analyticsCards.linkedinScraper')}</td>
+                      <td>42,567</td>
+                      <td className="text-green-600 font-medium">98%</td>
+                      <td><span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full font-semibold">
+                        {t('statistics.dashboard.dataSources.active')}
+                      </span></td>
                     </tr>
                     <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                      <td className="p-3 font-medium text-gray-800">Company Websites</td><td>34,891</td><td className="text-green-600 font-medium">95%</td><td><span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full font-semibold">Active</span></td>
+                      <td className="p-3 font-medium text-gray-800">{t('statistics.dashboard.analyticsCards.companyWebsites')}</td>
+                      <td>38,921</td>
+                      <td className="text-green-600 font-medium">96%</td>
+                      <td><span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full font-semibold">
+                        {t('statistics.dashboard.dataSources.active')}
+                      </span></td>
                     </tr>
-                     <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                      <td className="p-3 font-medium text-gray-800">Public Directories</td><td>28,234</td><td className="text-yellow-600 font-medium">87%</td><td><span className="bg-yellow-100 text-yellow-800 px-2 py-1 text-xs rounded-full font-semibold">Monitoring</span></td>
+                    <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                      <td className="p-3 font-medium text-gray-800">{t('statistics.dashboard.analyticsCards.publicDirectories')}</td>
+                      <td>27,459</td>
+                      <td className="text-yellow-600 font-medium">85%</td>
+                      <td><span className="bg-yellow-100 text-yellow-800 px-2 py-1 text-xs rounded-full font-semibold">
+                        {t('statistics.dashboard.dataSources.monitoring')}
+                      </span></td>
                     </tr>
                     <tr className="hover:bg-gray-50 transition-colors">
-                        <td className="p-3 font-medium text-gray-800">API Integrations</td><td>18,875</td><td className="text-red-600 font-medium">72%</td><td><span className="bg-red-100 text-red-800 px-2 py-1 text-xs rounded-full font-semibold">Needs Attention</span></td>
+                      <td className="p-3 font-medium text-gray-800">Third-party APIs</td>
+                      <td>15,610</td>
+                      <td className="text-red-600 font-medium">72%</td>
+                      <td><span className="bg-red-100 text-red-800 px-2 py-1 text-xs rounded-full font-semibold">
+                        {t('statistics.dashboard.dataSources.needsAttention')}
+                      </span></td>
                     </tr>
                   </tbody>
                 </table>
+              </div>
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <h4 className="font-medium mb-3 text-gray-800">{t('statistics.dashboard.dataSources.apiIntegrations')}</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                      <ArrowPathIcon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800">Salesforce</div>
+                      <div className="text-sm text-gray-500">Connected</div>
+                    </div>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
+                      <ArrowPathIcon className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800">HubSpot</div>
+                      <div className="text-sm text-gray-500">Connected</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

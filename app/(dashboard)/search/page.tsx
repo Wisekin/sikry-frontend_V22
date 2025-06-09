@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Slider } from "@/components/ui/slider"
+import { useTranslation } from "@/lib/i18n/useTranslation"
 import {
   Filter, Download, Grid, Map as MapIcon, List, Loader2, X, ChevronDown, Globe, Linkedin, Database,
   Building2, Users, MapPin, BarChart3, Mail, Phone, Clock, RefreshCw, Star, ExternalLink, Briefcase, Tag
@@ -206,10 +207,11 @@ function SearchContent() {
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
   const [selectedSources, setSelectedSources] = useState<string[]>(["google", "linkedin"]);
+  const { t } = useTranslation();
   const [filters, setFilters] = useState({
-    industry: "All Industries",
+    industry: t('search.filters.allIndustries'),
     location: "",
-    employeeCount: "All Sizes",
+    employeeCount: t('search.filters.allSizes'),
     confidenceScore: 70, // Default to a reasonable minimum
     hasEmail: false,
     hasPhone: false,
@@ -257,16 +259,16 @@ function SearchContent() {
   }, [searchParams, query]);
 
   const filteredCompanies = companies.filter(company => {
-    if (filters.industry !== "All Industries" && company.industry !== filters.industry) return false;
+    if (filters.industry !== t('search.filters.allIndustries') && company.industry !== filters.industry) return false;
     if (filters.location && !company.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
-    if (filters.employeeCount !== "All Sizes" && company.employees !== filters.employeeCount) return false;
+    if (filters.employeeCount !== t('search.filters.allSizes') && company.employees !== filters.employeeCount) return false;
     if (filters.confidenceScore && company.confidenceScore < filters.confidenceScore) return false;
     if (filters.hasEmail && company.extractedData.emails.length === 0) return false;
     if (filters.hasPhone && company.extractedData.phones.length === 0) return false;
     return true;
   });
 
-  const handleClearFilters = () => setFilters({ industry: "All Industries", location: "", employeeCount: "All Sizes", confidenceScore: 0, hasEmail: false, hasPhone: false });
+  const handleClearFilters = () => setFilters({ industry: t('search.filters.allIndustries'), location: "", employeeCount: t('search.filters.allSizes'), confidenceScore: 0, hasEmail: false, hasPhone: false });
 
   const toggleSource = (source: string) => setSelectedSources(prev => prev.includes(source) ? prev.filter(s => s !== source) : [...prev, source]);
 
@@ -275,18 +277,18 @@ function SearchContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#1B1F3B]">Company Search</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-[#1B1F3B]">{t('search.title')}</h1>
           <p className="text-gray-500 mt-1">
-            {loading ? "Searching for companies..." : `${filteredCompanies.length} results found.`}
+            {loading ? t('search.searching') : t('search.results', { count: filteredCompanies.length, query: query || '' })}
           </p>
           {error && (
             <div className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-              Error: {error}
+              Error: {t('search.error', { error })}
             </div>
           )}
         </div>
         <Button size="lg" className="bg-[#1B1F3B] text-white hover:bg-[#2A3050] flex items-center gap-2">
-            <Download className="w-5 h-5" /> Export Results
+            <Download className="w-5 h-5" /> {t('search.export')}
         </Button>
       </div>
 
@@ -294,10 +296,10 @@ function SearchContent() {
       <Card className="bg-white p-4 shadow-sm">
         <div className="grid md:grid-cols-3 gap-4 items-center">
             <div className="md:col-span-2">
-                <Input placeholder="Search by company name, domain, or industry..." className="p-6 text-base border-gray-300 focus:ring-2 focus:ring-[#2A3050]"/>
+                <Input placeholder={t('search.placeholder')} className="p-6 text-base border-gray-300 focus:ring-2 focus:ring-[#2A3050]"/>
             </div>
             <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-600">Sources:</span>
+                <span className="text-sm font-medium text-gray-600">{t('search.filters.dataSources')}:</span>
                 {["google", "linkedin", "crunchbase"].map(source => (
                     <button key={source} onClick={() => toggleSource(source)} className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full transition-colors duration-200 ${selectedSources.includes(source) ? 'bg-[#1B1F3B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                         {source === "google" && <Globe className="w-4 h-4" />}
@@ -317,17 +319,17 @@ function SearchContent() {
             <Card className="bg-white border-none shadow-sm">
                 <CardHeader className="border-b border-gray-100">
                     <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                        <Filter className="w-5 h-5 text-[#1B1F3B]" /> Advanced Filters
+                        <Filter className="w-5 h-5 text-[#1B1F3B]" /> {t('search.advancedFilters')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-6">
                     {/* Industry */}
                     <div>
-                        <h3 className="text-sm font-semibold mb-2 flex items-center text-gray-700"><Briefcase className="w-4 h-4 mr-2" /> Industry</h3>
+                        <h3 className="text-sm font-semibold mb-2 flex items-center text-gray-700"><Briefcase className="w-4 h-4 mr-2" /> {t('search.filters.industry')}</h3>
                         <Select value={filters.industry} onValueChange={value => setFilters(prev => ({ ...prev, industry: value }))}>
                             <SelectTrigger className="w-full bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="All Industries">All Industries</SelectItem>
+                                <SelectItem value={t('search.filters.allIndustries')}>{t('search.filters.allIndustries')}</SelectItem>
                                 <SelectItem value="Luxury Goods & Jewelry">Luxury Goods & Jewelry</SelectItem>
                                 <SelectItem value="Marketing & Advertising">Marketing & Advertising</SelectItem>
                                 <SelectItem value="Financial Technology">Financial Technology</SelectItem>
@@ -337,20 +339,20 @@ function SearchContent() {
                     </div>
                      {/* Location */}
                     <div>
-                        <h3 className="text-sm font-semibold mb-2 flex items-center text-gray-700"><MapPin className="w-4 h-4 mr-2" /> Location</h3>
-                        <Input placeholder="e.g., Geneva, Switzerland" value={filters.location} onChange={e => setFilters(prev => ({ ...prev, location: e.target.value }))} className="bg-gray-50 border-gray-200" />
+                        <h3 className="text-sm font-semibold mb-2 flex items-center text-gray-700"><MapPin className="w-4 h-4 mr-2" /> {t('search.filters.location')}</h3>
+                        <Input placeholder={t('search.locationPlaceholder')} value={filters.location} onChange={e => setFilters(prev => ({ ...prev, location: e.target.value }))} className="bg-gray-50 border-gray-200" />
                     </div>
                     {/* Confidence Score */}
                     <div className="pt-4 border-t border-gray-100">
-                        <h3 className="text-sm font-semibold mb-3 flex items-center text-gray-700"><Star className="w-4 h-4 mr-2" /> Minimum Confidence</h3>
+                        <h3 className="text-sm font-semibold mb-3 flex items-center text-gray-700"><Star className="w-4 h-4 mr-2" /> {t('search.filters.minConfidence')}</h3>
                         <div className="flex items-center gap-4">
                              <Slider value={[filters.confidenceScore]} min={0} max={100} step={1} onValueChange={value => setFilters(prev => ({ ...prev, confidenceScore: value[0] }))}/>
                              <span className="px-3 py-1 text-sm font-semibold rounded-md bg-gray-100 text-[#1B1F3B] w-20 text-center">{filters.confidenceScore}%</span>
                         </div>
                     </div>
-                    <Button variant="outline" onClick={handleClearFilters} className="w-full border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-[#1B1F3B]">
-                        <RefreshCw className="w-4 h-4 mr-2" /> Clear All Filters
-                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleClearFilters} className="flex items-center gap-1 text-gray-600">
+                <X className="h-4 w-4" /> {t('search.filters.clearAll')}
+              </Button>
                 </CardContent>
             </Card>
         </aside>
@@ -360,17 +362,17 @@ function SearchContent() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <Tabs value={viewMode} onValueChange={value => setViewMode(value as "grid" | "list" | "map")}>
               <TabsList className="bg-white shadow-sm border">
-                <TabsTrigger value="grid"><Grid className="w-4 h-4 mr-1"/> Grid</TabsTrigger>
-                <TabsTrigger value="list"><List className="w-4 h-4 mr-1"/> List</TabsTrigger>
-                <TabsTrigger value="map"><MapIcon className="w-4 h-4 mr-1"/> Map</TabsTrigger>
+                <TabsTrigger value="grid"><Grid className="w-4 h-4 mr-1"/> {t('search.viewModes.grid')}</TabsTrigger>
+                <TabsTrigger value="list"><List className="w-4 h-4 mr-1"/> {t('search.viewModes.list')}</TabsTrigger>
+                <TabsTrigger value="map"><MapIcon className="w-4 h-4 mr-1"/> {t('search.viewModes.map')}</TabsTrigger>
               </TabsList>
             </Tabs>
             <Select>
-                <SelectTrigger className="w-full md:w-[200px] bg-white shadow-sm border"><SelectValue placeholder="Sort by Relevance" /></SelectTrigger>
+                <SelectTrigger className="w-full md:w-[200px] bg-white shadow-sm border"><SelectValue placeholder={t('search.sort.relevance')} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="relevance">Sort by Relevance</SelectItem>
-                  <SelectItem value="confidence">Sort by Confidence</SelectItem>
-                  <SelectItem value="newest">Sort by Newest</SelectItem>
+                  <SelectItem value="relevance">{t('search.sort.relevance')}</SelectItem>
+                  <SelectItem value="confidence">{t('search.sort.confidence')}</SelectItem>
+                  <SelectItem value="newest">{t('search.sort.newest')}</SelectItem>
                 </SelectContent>
             </Select>
           </div>
@@ -378,8 +380,8 @@ function SearchContent() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <Loader2 className="w-10 h-10 animate-spin text-[#1B1F3B] mb-4" />
-              <h2 className="text-xl font-semibold text-[#1B1F3B]">Searching The Web...</h2>
-              <p className="text-muted-foreground">Please wait while we gather and enrich the results.</p>
+              <h2 className="text-xl font-semibold text-[#1B1F3B]">{t('search.searching')}</h2>
+              <p className="text-muted-foreground">{t('search.searchingDescription')}</p>
             </div>
           ) : (
             <Tabs value={viewMode} className="w-full">
@@ -391,9 +393,9 @@ function SearchContent() {
 
           {!loading && filteredCompanies.length === 0 && (
             <div className="text-center py-24 bg-white rounded-xl shadow-sm">
-              <h3 className="text-xl font-semibold text-[#1B1F3B] mb-2">No Results Found</h3>
-              <p className="text-muted-foreground mb-4">Try adjusting your filters or search terms for a better match.</p>
-              <Button variant="outline" onClick={handleClearFilters}>Clear All Filters</Button>
+              <h3 className="text-xl font-semibold text-[#1B1F3B] mb-2">{t('search.noResults')}</h3>
+              <p className="text-muted-foreground mb-4">{t('search.tryAdjusting')}</p>
+              <Button variant="outline" onClick={handleClearFilters}>{t('search.clearAllFilters')}</Button>
             </div>
           )}
         </main>

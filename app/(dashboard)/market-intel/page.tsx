@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslation } from "@/lib/i18n/useTranslation"
 import { AppShell } from "@/components/core/layout/AppShell"
 import { Heading } from "@/components/core/typography/Heading"
 import { Text } from "@/components/core/typography/Text"
@@ -10,13 +11,15 @@ import { LeadScoreCard } from "@/components/market/LeadScoreCard"
 import { ArrowTrendingUpIcon, UserGroupIcon, LightBulbIcon, ChartBarIcon } from "@heroicons/react/24/solid"
 
 export default function MarketIntelPage() {
+  const { t } = useTranslation()
+  
   return (
     <div className="space-y-8">
       {/* Modern Header */}
       <div className="border-b pb-6">
-        <Heading level={1} className="text-gray-900">Market Intelligence Dashboard</Heading>
+        <Heading level={1} className="text-gray-900">{t('marketIntel.title')}</Heading>
         <Text className="text-gray-500 mt-2">
-          Strategic insights on competitors, market trends, and growth opportunities
+          {t('marketIntel.description')}
         </Text>
       </div>
 
@@ -26,14 +29,14 @@ export default function MarketIntelPage() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-500">
               <ChartBarIcon className="w-4 h-4 text-[#1B1F3B]" />
-              Market Size
+              {t('marketIntel.stats.marketSize')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#1B1F3B]">$2.4B</div>
             <Text size="sm" className="flex items-center mt-1 text-emerald-600">
               <ArrowTrendingUpIcon className="w-4 h-4 mr-1" />
-              +15% YoY growth
+              +15% {t('marketIntel.growth')}
             </Text>
           </CardContent>
         </Card>
@@ -42,13 +45,13 @@ export default function MarketIntelPage() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-500">
               <UserGroupIcon className="w-4 h-4 text-[#1B1F3B]" />
-              Competitors Tracked
+              {t('marketIntel.stats.competitorsTracked')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#1B1F3B]">47</div>
             <Text size="sm" className="text-gray-500 mt-1">
-              Active monitoring
+              {t('marketIntel.stats.currentlyRunning')}
             </Text>
           </CardContent>
         </Card>
@@ -57,14 +60,14 @@ export default function MarketIntelPage() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-500">
               <LightBulbIcon className="w-4 h-4 text-[#1B1F3B]" />
-              Lead Score Avg
+              {t('marketIntel.stats.leadScoreAvg')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#1B1F3B]">78</div>
             <Text size="sm" className="flex items-center mt-1 text-emerald-600">
               <ArrowTrendingUpIcon className="w-4 h-4 mr-1" />
-              +12 points
+              +12 {t('common.points')}
             </Text>
           </CardContent>
         </Card>
@@ -73,29 +76,29 @@ export default function MarketIntelPage() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-500">
               <LightBulbIcon className="w-4 h-4 text-[#1B1F3B]" />
-              Opportunities
+              {t('marketIntel.stats.opportunities')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#1B1F3B]">156</div>
             <Text size="sm" className="text-[#1B1F3B] font-medium mt-1">
-              High potential
+              {t('marketIntel.stats.highPotential')}
             </Text>
           </CardContent>
         </Card>
       </div>
 
       {/* Insights Banner */}
-      <div className="bg-gradient-to-r from-[#1B1F3B] to-[#2D325E] rounded-xl p-5 text-white transition-all duration-300 hover:shadow-lg hover:from-[#2A3050] hover:to-[#3C4568]">
+      <div className="bg-gradient-to-r from-[#1B1F3B] to-[#2D325E] rounded-xl p-5 text-white transition-all duration-300 hover:from-[#2A3050] hover:to-[#3C4568]">
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="font-medium">Market Opportunity Alert</h3>
+            <h3 className="font-medium">{t('marketIntel.marketOpportunityAlert')}</h3>
             <p className="text-sm opacity-80 mt-1">
-              Fintech sector showing 23% growth potential - 42 high-value targets identified
+              {t('marketIntel.fintechSector')}
             </p>
           </div>
           <button className="text-sm font-medium px-4 py-2 bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition">
-            Explore Opportunities
+            {t('marketIntel.exploreOpportunities')}
           </button>
         </div>
       </div>
@@ -105,9 +108,9 @@ export default function MarketIntelPage() {
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-0 shadow-sm transition-all duration-300 hover:shadow-lg hover:border hover:border-[#2A3050] hover:-translate-y-0.5">
             <CardHeader>
-              <CardTitle className="text-lg">Competitor Landscape</CardTitle>
+              <CardTitle className="text-lg">{t('marketIntel.competitorLandscape')}</CardTitle>
               <Text className="text-gray-500 text-sm">
-                Market position analysis across key dimensions
+                {t('marketIntel.marketPosition')}
               </Text>
             </CardHeader>
             <CardContent>
@@ -117,9 +120,9 @@ export default function MarketIntelPage() {
           
           <Card className="border-0 shadow-sm transition-all duration-300 hover:shadow-lg hover:border hover:border-[#2A3050] hover:-translate-y-0.5">
             <CardHeader>
-              <CardTitle className="text-lg">Relationship Mapping</CardTitle>
+              <CardTitle className="text-lg">{t('marketIntel.relationshipMapping')}</CardTitle>
               <Text className="text-gray-500 text-sm">
-                Connections between industry players and key stakeholders
+                {t('marketIntel.industryConnections')}
               </Text>
             </CardHeader>
             <CardContent className="min-h-[400px]">
@@ -131,9 +134,9 @@ export default function MarketIntelPage() {
         <div className="space-y-6">
           <Card className="border-0 shadow-sm transition-all duration-300 hover:shadow-lg hover:border hover:border-[#2A3050] hover:-translate-y-0.5">
             <CardHeader>
-              <CardTitle className="text-lg">Lead Scoring</CardTitle>
+              <CardTitle className="text-lg">{t('marketIntel.leadScoring')}</CardTitle>
               <Text className="text-gray-500 text-sm">
-                Prioritized prospects by engagement potential
+                {t('marketIntel.prioritizedProspects')}
               </Text>
             </CardHeader>
             <CardContent>
@@ -143,9 +146,9 @@ export default function MarketIntelPage() {
           
           <Card className="border-0 shadow-sm transition-all duration-300 hover:shadow-lg hover:border hover:border-[#2A3050] hover:-translate-y-0.5">
             <CardHeader>
-              <CardTitle className="text-lg">Market Trends</CardTitle>
+              <CardTitle className="text-lg">{t('marketIntel.marketTrends')}</CardTitle>
               <Text className="text-gray-500 text-sm">
-                Emerging opportunities by sector
+                {t('marketIntel.emergingOpportunities')}
               </Text>
             </CardHeader>
             <CardContent>

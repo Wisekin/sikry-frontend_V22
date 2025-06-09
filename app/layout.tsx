@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
         <body className={cn(inter.className, "min-h-screen bg-background font-sans antialiased")}>
 <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="brand" enableSystem>
           {children}
         </ThemeProvider>
 </AuthProvider>
