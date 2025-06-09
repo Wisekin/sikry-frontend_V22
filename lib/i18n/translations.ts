@@ -24,6 +24,11 @@ export const translations = {
       leadResponse: "Lead Response",
       analytics: "Analytics",
       overview: "Overview",
+      statisticsOverview: "Overview",
+      statisticsCollectionTrends: "Collection Trends",
+      statisticsGeographicDistribution: "Geographic Distribution",
+      statisticsSectorDistribution: "Sector Distribution",
+      statisticsSourceComparison: "Source Comparison",
       secondary: {
         addCompany: "Add Company",
         importCompanies: "Import Companies",
@@ -611,6 +616,11 @@ export const translations = {
       leadResponse: "Réponse aux leads",
       analytics: "Analytique",
       overview: "Vue d'ensemble",
+      statisticsOverview: "Aperçu",
+      statisticsCollectionTrends: "Tendances de collecte",
+      statisticsGeographicDistribution: "Distribution géographique",
+      statisticsSectorDistribution: "Distribution par secteur",
+      statisticsSourceComparison: "Comparaison des sources",
       secondary: {
         addCompany: "Ajouter une entreprise",
         importCompanies: "Importer des entreprises",

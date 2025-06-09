@@ -57,11 +57,11 @@ export function SidebarNav() {
     icon: BarChart3,
     basePath: "/statistics",
     items: [
-      { titleKey: "statistics.overview", href: "/statistics", },
-      { titleKey: "statistics.collectionTrends", href: "/statistics/collection-trends" },
-      { titleKey: "statistics.geographicDistribution", href: "/statistics/geographic-distribution" },
-      { titleKey: "statistics.sectorDistribution", href: "/statistics/sector-distribution" },
-      { titleKey: "statistics.sourceComparison", href: "/statistics/source-comparison" },
+      { titleKey: "nav.statisticsOverview", href: "/statistics", },
+      { titleKey: "nav.statisticsCollectionTrends", href: "/statistics/collection-trends" },
+      { titleKey: "nav.statisticsGeographicDistribution", href: "/statistics/geographic-distribution" },
+      { titleKey: "nav.statisticsSectorDistribution", href: "/statistics/sector-distribution" },
+      { titleKey: "nav.statisticsSourceComparison", href: "/statistics/source-comparison" },
     ],
   };
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import EnterprisePageHeader from '@/components/core/layout/EnterprisePageHeader';
 import QualityMetricCard from '@/components/ui/quality-metric-card';
-import { Database, CheckShield, BarChartBig, Filter as FilterIcon, ListChecks, TrendingUp } from 'lucide-react'; // CheckShield for quality, Added TrendingUp
+import { Database, ShieldCheck, BarChart2, Filter as FilterIcon, ListChecks, TrendingUp } from 'lucide-react'; // CheckShield for quality, Added TrendingUp
 
 interface DataSourceComparisonMetric {
   id: string;
@@ -38,8 +38,8 @@ const SourceComparisonPage = () => {
       <div className="p-6 md:p-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <QualityMetricCard title="Total Data Sources" value={stats.totalSources.toLocaleString()} icon={<Database className="text-blue-600" />} />
-          <QualityMetricCard title="Highest Volume Source" value={stats.highestVolumeSource} icon={<BarChartBig className="text-emerald-600" />} />
-          <QualityMetricCard title="Best Quality Source" value={stats.bestQualitySource} icon={<CheckShield className="text-purple-600" />} />
+          <QualityMetricCard title="Highest Volume Source" value={stats.highestVolumeSource} icon={<BarChart2 className="text-emerald-600" />} />
+          <QualityMetricCard title="Best Quality Source" value={stats.bestQualitySource} icon={<ShieldCheck className="text-purple-600" />} />
         </div>
 
         {/* Filters Section */}
