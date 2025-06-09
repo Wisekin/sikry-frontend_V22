@@ -2,6 +2,7 @@ import type React from "react"
 import { TranslationProvider } from "@/providers/TranslationProvider"
 import { SidebarNav } from "@/components/core/navigation/SidebarNav"
 import { TopNav } from "@/components/core/navigation/TopNav"
+import { SecondaryMenuBarWrapper } from "@/components/core/navigation/SecondaryMenuBarWrapper"
 import { ThemeProvider } from "@/providers/ThemeProvider"
 import { AuthProvider } from "@/providers/AuthProvider"
 import { SupabaseProvider } from "@/providers/SupabaseProvider"
@@ -28,6 +29,7 @@ export default function DashboardLayout({
                 <div className="h-16 flex-shrink-0 bg-background border-b">
                   <TopNav />
                 </div>
+                <SecondaryMenuBarWrapper />
                 <main className="flex-1 overflow-y-auto bg-background pt-8">
                   <ThemeProvider attribute="class" defaultTheme="brand" enableSystem>
                     <div className="flex-grow ml-5 mr-5">
@@ -43,3 +45,4 @@ export default function DashboardLayout({
     </SupabaseProvider>
   )
 }
+
