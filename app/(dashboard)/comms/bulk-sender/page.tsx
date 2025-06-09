@@ -1,14 +1,17 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Upload, FileText, Users, Mail, Send, Calendar, Gauge, Eye, MousePointer, ShieldCheck, ChevronDown, Plus, Save, Clock } from "lucide-react"
+import {
+    Upload, FileText, Users, Mail, Send, Calendar, Gauge, Eye, MousePointer, ShieldCheck, ChevronDown, Plus,
+    Save, Clock, Bold, Italic, Underline, Link2, List, Tags, Info, MessageCircle // Added MessageCircle for SMS tab icon
+} from "lucide-react";
 import { useState } from "react"
 
 export default function BulkSenderPage() {
@@ -92,13 +95,10 @@ export default function BulkSenderPage() {
             LinkedIn Outreach
           </TabsTrigger>
           <TabsTrigger 
-            value="phone" 
+            value="sms"  // Changed from "phone" to "sms"
             className="px-0 py-4 data-[state=active]:border-b-2 data-[state=active]:border-[#1B1F3B] data-[state=active]:text-[#1B1F3B] rounded-none flex items-center"
           >
-            <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 6.943 20 10.999z"/>
-              <path d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443a1.001 1.001 0 00-1.391.043l-2.393 2.461c-.576-.11-1.734-.471-2.926-1.66-1.192-1.193-1.553-2.354-1.66-2.926l2.459-2.394a1 1 0 00.043-1.391L6.859 3.513a1 1 0 00-1.391-.087l-2.17 1.861a1 1 0 00-.29.649c-.015.25-.301 6.172 4.291 10.766C11.305 20.707 16.323 21 17.705 21c.202 0 .326-.006.359-.008a.992.992 0 00.648-.291l1.86-2.171a.997.997 0 00-.085-1.391l-4.064-3.696z"/>
-            </svg>
+            <MessageCircle className="h-4 w-4 mr-2" /> {/* Changed icon to lucide */}
             SMS Campaign
           </TabsTrigger>
         </TabsList>
@@ -123,11 +123,13 @@ export default function BulkSenderPage() {
                     />
                   </div>
                   
+                  <hr className="my-4 border-gray-200" />
+
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <Label htmlFor="template" className="text-[#1B1F3B] font-medium">Template</Label>
-                      <Button variant="ghost" className="text-[#1B1F3B] flex items-center">
-                        <Plus className="h-4 w-4 mr-1" /> New Template
+                      <Button variant="ghost" className="text-[#1B1F3B] flex items-center text-xs hover:bg-gray-100">
+                        <Plus size={14} className="h-4 w-4 mr-1" /> New Template
                       </Button>
                     </div>
                     <Select>
@@ -145,17 +147,33 @@ export default function BulkSenderPage() {
                     </Select>
                   </div>
                   
-                  <div className="space-y-3">
-                    <Label htmlFor="message" className="text-[#1B1F3B] font-medium">Message Content</Label>
+                  <hr className="my-4 border-gray-200" />
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center mb-1">
+                        <Label htmlFor="message" className="text-[#1B1F3B] font-medium">Message Content</Label>
+                        <Button variant="ghost" size="sm" className="text-xs text-[#1B1F3B] hover:bg-gray-100">
+                            <Save size={14} className="mr-1.5" /> Save as Template
+                        </Button>
+                    </div>
+                    <div className="bg-slate-100 px-3 py-1.5 border border-gray-300 border-b-0 rounded-t-md flex items-center space-x-3">
+                        <button title="Bold" className="p-1 hover:bg-slate-200 rounded"><Bold size={16} className="text-gray-600" /></button>
+                        <button title="Italic" className="p-1 hover:bg-slate-200 rounded"><Italic size={16} className="text-gray-600" /></button>
+                        <button title="Underline" className="p-1 hover:bg-slate-200 rounded"><Underline size={16} className="text-gray-600" /></button>
+                        <div className="h-4 border-l border-gray-300"></div> {/* Divider */}
+                        <button title="Insert Personalization Tag" className="p-1 hover:bg-slate-200 rounded"><Tags size={16} className="text-gray-600" /></button>
+                        <button title="Insert Link" className="p-1 hover:bg-slate-200 rounded"><Link2 size={16} className="text-gray-600" /></button>
+                        <button title="Bulleted List" className="p-1 hover:bg-slate-200 rounded"><List size={16} className="text-gray-600" /></button>
+                    </div>
                     <Textarea 
                       id="message" 
                       placeholder="Compose your message here..." 
-                      className="min-h-[250px] border-[#2A3050]/20 focus:border-[#1B1F3B] focus:ring-[#1B1F3B]"
+                      className="min-h-[200px] border-[#2A3050]/20 focus:border-[#1B1F3B] focus:ring-[#1B1F3B] rounded-b-md rounded-t-none border-t-0"
                       defaultValue={`Hello {first_name},\n\nWe noticed your interest in enterprise solutions and thought you might appreciate...`}
                     />
-                    <div className="text-sm text-[#3C4568] flex items-center">
-                      <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                      Personalization tags detected: first_name, company
+                    <div className="text-xs text-gray-600 pt-1 flex items-center font-medium">
+                      <Info size={14} className="mr-1.5 text-blue-500" />
+                      Personalization tags detected: <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">{'{first_name}'}</code>, <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">{'{company}'}</code>. Ensure CSV has these columns.
                     </div>
                   </div>
                   
@@ -362,40 +380,109 @@ export default function BulkSenderPage() {
           </div>
         </TabsContent>
         
-        <TabsContent value="linkedin">
-          <Card className="border border-[#2A3050]/10 p-8 text-center">
-            <div className="mx-auto bg-[#2A3050]/10 p-4 rounded-full w-16 h-16 flex items-center justify-center">
-              <svg className="h-10 w-10 text-[#1B1F3B]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-[#1B1F3B] mt-6">LinkedIn Outreach</h2>
-            <p className="text-[#3C4568] mt-2 max-w-md mx-auto">
-              Scale your LinkedIn outreach with automated connection requests and personalized messages. 
-              Coming in Q3 2024.
-            </p>
-            <Button className="mt-6 bg-[#1B1F3B] hover:bg-[#2A3050]">
-              Notify ME WHEN AVAILABLE
-            </Button>
+        <TabsContent value="linkedin" className="pt-8">
+          <Card className="border border-[#2A3050]/10 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl text-[#1B1F3B]">LinkedIn Outreach Message</CardTitle>
+              <CardDescription className="text-[#3C4568]">Craft your connection request and follow-up message for LinkedIn.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="linkedin-connection-request" className="text-[#1B1F3B] font-medium">Connection Request Message (Optional)</Label>
+                <Textarea
+                  id="linkedin-connection-request"
+                  placeholder="e.g., Hi {{firstName}}, I came across your profile and was impressed by your work at {{companyName}}..."
+                  className="min-h-[100px] border-[#2A3050]/20 focus:border-[#1B1F3B] focus:ring-[#1B1F3B]"
+                />
+                <div className="text-xs text-gray-500 text-right">0 / 300 characters</div>
+                <p className="text-xs text-gray-500">Keep it short and personalized. Max 300 characters for connection requests.</p>
+              </div>
+
+              <hr className="my-4 border-gray-200" />
+
+              <div className="space-y-2">
+                <Label htmlFor="linkedin-main-message" className="text-[#1B1F3B] font-medium">Main LinkedIn Message</Label>
+                <div className="bg-slate-100 px-3 py-1.5 border border-gray-300 border-b-0 rounded-t-md flex items-center space-x-3">
+                    <button title="Bold" className="p-1 hover:bg-slate-200 rounded"><Bold size={16} className="text-gray-600" /></button>
+                    <button title="Italic" className="p-1 hover:bg-slate-200 rounded"><Italic size={16} className="text-gray-600" /></button>
+                    <div className="h-4 border-l border-gray-300"></div>
+                    <button title="Insert Personalization Tag" className="p-1 hover:bg-slate-200 rounded"><Tags size={16} className="text-gray-600" /></button>
+                </div>
+                <Textarea
+                  id="linkedin-main-message"
+                  placeholder="e.g., Thanks for connecting, {{firstName}}! I'd love to discuss how our solutions could help {{companyName}} with..."
+                  className="min-h-[200px] border-[#2A3050]/20 focus:border-[#1B1F3B] focus:ring-[#1B1F3B] rounded-t-none border-t-0"
+                />
+                <div className="text-xs text-gray-500 text-right">0 / 2000 characters</div>
+              </div>
+
+              <div className="space-y-1 pt-2">
+                <p className="text-xs text-gray-600 font-medium">Available LinkedIn tags:</p>
+                <p className="text-xs text-gray-500">
+                  <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">{`{{firstName}}`}</code>,
+                  <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700 ml-1">{`{{lastName}}`}</code>,
+                  <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700 ml-1">{`{{companyName}}`}</code>,
+                  <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700 ml-1">{`{{jobTitle}}`}</code>
+                </p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mt-4">
+                <h4 className="text-sm font-medium text-center text-gray-500 mb-2">LinkedIn Message Preview Area</h4>
+                <p className="text-center text-sm text-gray-400 italic">Preview will appear here.</p>
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="phone">
-          <Card className="border border-[#2A3050]/10 p-8 text-center">
-            <div className="mx-auto bg-[#2A3050]/10 p-4 rounded-full w-16 h-16 flex items-center justify-center">
-              <svg className="h-10 w-10 text-[#1B1F3B]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 6.943 20 10.999z"/>
-                <path d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443a1.001 1.001 0 00-1.391.043l-2.393 2.461c-.576-.11-1.734-.471-2.926-1.66-1.192-1.193-1.553-2.354-1.66-2.926l2.459-2.394a1 1 0 00.043-1.391L6.859 3.513a1 1 0 00-1.391-.087l-2.17 1.861a1 1 0 00-.29.649c-.015.25-.301 6.172 4.291 10.766C11.305 20.707 16.323 21 17.705 21c.202 0 .326-.006.359-.008a.992.992 0 00.648-.291l1.86-2.171a.997.997 0 00-.085-1.391l-4.064-3.696z"/>
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-[#1B1F3B] mt-6">SMS Campaigns</h2>
-            <p className="text-[#3C4568] mt-2 max-w-md mx-auto">
-              Launch high-impact SMS campaigns with delivery optimization and compliance safeguards. 
-              Coming in Q4 2024.
-            </p>
-            <Button className="mt-6 bg-[#1B1F3B] hover:bg-[#2A3050]">
-              Notify ME WHEN AVAILABLE
-            </Button>
+        <TabsContent value="sms" className="pt-8"> {/* Changed from "phone" to "sms" */}
+          <Card className="border border-[#2A3050]/10 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl text-[#1B1F3B]">SMS Campaign Content</CardTitle>
+              <CardDescription className="text-[#3C4568]">Compose your SMS message. Keep it concise and engaging.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="sms-message" className="text-[#1B1F3B] font-medium">SMS Message</Label>
+                <div className="bg-slate-100 px-3 py-1.5 border border-gray-300 border-b-0 rounded-t-md flex items-center space-x-3">
+                    <button title="Insert Personalization Tag" className="p-1 hover:bg-slate-200 rounded"><Tags size={16} className="text-gray-600" /></button>
+                </div>
+                <Textarea
+                  id="sms-message"
+                  placeholder="Hi {{firstName}}, quick update from SIKRY..."
+                  className="min-h-[120px] border-[#2A3050]/20 focus:border-[#1B1F3B] focus:ring-[#1B1F3B] rounded-t-none border-t-0"
+                />
+                <div className="text-sm text-gray-600 flex justify-between items-center pt-1">
+                  <span>Characters: <span className="font-medium text-[#1B1F3B]">0 / 160</span></span>
+                  <span className="text-xs text-gray-500">(1 SMS segment)</span>
+                </div>
+                 {/* <p className="text-xs text-gray-500">Max 4 segments (612 chars)</p> */}
+              </div>
+
+              <div className="space-y-1 pt-2">
+                <p className="text-xs text-gray-600 font-medium">Available SMS tags:</p>
+                <p className="text-xs text-gray-500">
+                  <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">{`{{firstName}}`}</code>,
+                  <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700 ml-1">{`{{link}}`}</code>,
+                  <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700 ml-1">{`{{promoCode}}`}</code>
+                </p>
+              </div>
+
+              <p className="text-xs text-gray-500 pt-2 border-t border-gray-200">Tip: Include opt-out info like 'Reply STOP to end' if legally required.</p>
+
+              <div>
+                <h4 className="text-sm font-medium text-center text-gray-500 mb-2">SMS Preview</h4>
+                <div className="w-full max-w-[280px] mx-auto bg-slate-700 rounded-[20px] p-1.5 shadow-xl">
+                  <div className="bg-slate-50 h-[400px] rounded-[12px] p-3 overflow-y-auto text-sm flex flex-col space-y-2">
+                    <div className="bg-blue-500 text-white p-2.5 rounded-lg max-w-[80%] ml-auto self-end shadow">
+                      Hi {'{firstName}'}, quick update from SIKRY regarding your recent inquiry. More details at {'{link}'}. Use code {'{promoCode}'} for a discount!
+                    </div>
+                     <div className="bg-gray-200 text-gray-800 p-2.5 rounded-lg max-w-[80%] mr-auto self-start shadow">
+                      STOP
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>

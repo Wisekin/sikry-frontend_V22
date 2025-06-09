@@ -66,57 +66,22 @@ export async function GET(request: Request) {
       return NextResponse.json(cachedResult)
     }
 
-    // --- Modular Search Integration ---
-    const { parseQuery } = await import('@/lib/search/queryParser');
-    const { companiesHouseAdapter } = await import('@/lib/search/adapters/companiesHouse');
-
-    // Parse the query using the modular parser
-    const parsedQuery = await parseQuery(query);
-
-    // Call Supabase (internal DB)
-    const supabaseResult = await performSearch(query, scope, teamMember.organization_id);
-
-    // Call Companies House adapter (mock for now)
-    const companiesHouseResults = await companiesHouseAdapter.search(parsedQuery);
-
-    // Merge results (simple concat, dedupe by name+location)
-    const allResults = [
-      ...(supabaseResult.data || []),
-      ...companiesHouseResults
-    ];
-    const seen = new Set();
-    const mergedResults = allResults.filter(item => {
-      const key = `${item.name?.toLowerCase() || ''}|${item.location?.toLowerCase() || ''}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-    const response = {
-      success: true,
-      data: mergedResults,
-      metadata: {
-        query,
-        parsedQuery,
-        sources: ['supabase', 'companies_house'],
-        timestamp: new Date().toISOString(),
-        originalSupabaseCount: supabaseResult.data?.length || 0,
-        companiesHouseCount: companiesHouseResults.length,
-        mergedCount: mergedResults.length
-      }
-    };
+    // Perform the search if not in cache
+    const searchStartTime = Date.now()
+    const response = await performSearch(query, scope, teamMember.organization_id)
+    const searchTime = Date.now() - searchStartTime
 
     // Store search metrics
     await supabase.from('search_history').insert({
       organization_id: teamMember.organization_id,
       user_id: user,
       search_query: query,
-      search_filters: parsedQuery || {},
+      search_filters: {}, // Add any filters used
       search_scope: scope,
-      search_type: 'modular',
-      results_count: mergedResults.length,
-      execution_time_ms: Date.now() - searchStartTime
-    });
+      search_type: 'standard',
+      results_count: response.data?.length || 0,
+      execution_time_ms: searchTime
+    })
 
     // Cache the successful response
     await cacheManager.set({
@@ -127,13 +92,12 @@ export async function GET(request: Request) {
       accessCount: 0,
       metadata: {
         query,
-        parsedQuery,
-        executionTime: Date.now() - searchStartTime,
-        resultsCount: mergedResults.length
+        executionTime: searchTime,
+        resultsCount: response.data?.length || 0
       }
-    });
+    })
 
-    return NextResponse.json(response);
+    return NextResponse.json(response)
 
   } catch (error) {
     console.error('Search API error:', error)

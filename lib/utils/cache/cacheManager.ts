@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/client"
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { ORGANIZATION_TIERS } from '@/lib/constants/organization'
+import { ORGANIZATION_TIERS } from './rateLimiter'
 
 export interface CacheStats {
     hits: number;

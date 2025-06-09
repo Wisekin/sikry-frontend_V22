@@ -42,7 +42,7 @@ export function TopNav() {
   }
 
   return (
-    <header className="sticky top-0 left-0 right-0 h-16 bg-[var(--topnav-bg)] text-[var(--topnav-foreground)] z-50 px-3 flex items-center justify-between shadow-md">
+    <header className="sticky top-0 left-0 right-0 h-14 bg-[var(--topnav-bg)] text-[var(--topnav-foreground)] z-50 px-3 flex items-center justify-between shadow-md">
       <div className="flex items-center lg:hidden">
         <Button 
           variant="ghost" 
