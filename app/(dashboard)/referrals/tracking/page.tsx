@@ -74,7 +74,9 @@ const ReferralTrackingPage = () => {
             <input type="date" className="p-2 rounded border border-gray-300 bg-gray-50 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
            <div className="mt-4 flex justify-end">
-            <button className="p-2 px-4 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition-colors">Apply Filters</button>
+            <button className="bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg flex items-center text-sm justify-center">
+              <FilterIcon size={16} className="mr-2" /> Apply Filters
+            </button>
           </div>
         </div>
 
