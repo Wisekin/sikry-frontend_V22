@@ -5,20 +5,37 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Download, Upload, Filter, Search, Calendar, Play, Settings, UserPlus, ShieldCheck, LayoutGrid, List } from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useTranslation } from "@/lib/i18n/useTranslation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function SecondaryMenuBar() {
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { t } = useTranslation()
+
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams)
+    params.set('tab', value)
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  const handleViewChange = (view: string) => {
+    const params = new URLSearchParams(searchParams)
+    params.set('view', view)
+    router.push(`${pathname}?${params.toString()}`)
+  }
 
   const getContextualContent = () => {
     if (pathname.includes("/admin/team")) {
       return (
         <div className="flex items-center gap-4">
-          <Tabs defaultValue="overview" className="w-auto">
+          <Tabs 
+            defaultValue={searchParams.get('tab') || "overview"} 
+            className="w-auto"
+            onValueChange={handleTabChange}
+          >
             <TabsList className="grid w-auto grid-cols-4 bg-gray-100 p-1 rounded-lg">
               <TabsTrigger value="overview" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Overview</TabsTrigger>
               <TabsTrigger value="members" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Members</TabsTrigger>
@@ -31,18 +48,18 @@ export function SecondaryMenuBar() {
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'grid' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('grid')}
             >
               <LayoutGrid className="w-4 h-4" />
-              <span>Grid</span>
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'list' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('list')}
             >
               <List className="w-4 h-4" />
-              <span>List</span>
             </Button>
           </div>
         </div>
@@ -52,7 +69,11 @@ export function SecondaryMenuBar() {
     if (pathname.includes("/admin/security")) {
       return (
         <div className="flex items-center gap-4">
-          <Tabs defaultValue="overview" className="w-auto">
+          <Tabs 
+            defaultValue={searchParams.get('tab') || "overview"} 
+            className="w-auto"
+            onValueChange={handleTabChange}
+          >
             <TabsList className="grid w-auto grid-cols-4 bg-gray-100 p-1 rounded-lg">
               <TabsTrigger value="overview" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Overview</TabsTrigger>
               <TabsTrigger value="logs" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Security Logs</TabsTrigger>
@@ -65,18 +86,18 @@ export function SecondaryMenuBar() {
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'grid' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('grid')}
             >
               <LayoutGrid className="w-4 h-4" />
-              <span>Grid</span>
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'list' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('list')}
             >
               <List className="w-4 h-4" />
-              <span>List</span>
             </Button>
           </div>
         </div>
@@ -176,6 +197,156 @@ export function SecondaryMenuBar() {
             <Filter className="h-4 w-4 mr-2" />
             {t("search.filters")}
           </Button>
+        </div>
+      )
+    }
+
+    if (pathname.includes("/admin/billing")) {
+      return (
+        <div className="flex items-center gap-4">
+          <Tabs 
+            defaultValue={searchParams.get('tab') || "overview"} 
+            className="w-auto"
+            onValueChange={handleTabChange}
+          >
+            <TabsList className="grid w-auto grid-cols-4 bg-gray-100 p-1 rounded-lg">
+              <TabsTrigger value="overview" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Overview</TabsTrigger>
+              <TabsTrigger value="invoices" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Invoices</TabsTrigger>
+              <TabsTrigger value="usage" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Usage</TabsTrigger>
+              <TabsTrigger value="plans" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Plans</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'grid' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('grid')}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'list' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('list')}
+            >
+              <List className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    if (pathname.includes("/admin/users")) {
+      return (
+        <div className="flex items-center gap-4">
+          <Tabs 
+            defaultValue={searchParams.get('tab') || "overview"} 
+            className="w-auto"
+            onValueChange={handleTabChange}
+          >
+            <TabsList className="grid w-auto grid-cols-3 bg-gray-100 p-1 rounded-lg">
+              <TabsTrigger value="overview" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Overview</TabsTrigger>
+              <TabsTrigger value="users" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Users</TabsTrigger>
+              <TabsTrigger value="invites" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Invites</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'grid' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('grid')}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'list' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('list')}
+            >
+              <List className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    if (pathname.includes("/admin/compliance")) {
+      return (
+        <div className="flex items-center gap-4">
+          <Tabs 
+            defaultValue={searchParams.get('tab') || "overview"} 
+            className="w-auto"
+            onValueChange={handleTabChange}
+          >
+            <TabsList className="grid w-auto grid-cols-4 bg-gray-100 p-1 rounded-lg">
+              <TabsTrigger value="overview" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Overview</TabsTrigger>
+              <TabsTrigger value="logs" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Compliance Logs</TabsTrigger>
+              <TabsTrigger value="policies" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Policies</TabsTrigger>
+              <TabsTrigger value="reports" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Reports</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'grid' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('grid')}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'list' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('list')}
+            >
+              <List className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    if (pathname.includes("/admin/monitoring")) {
+      return (
+        <div className="flex items-center gap-4">
+          <Tabs 
+            defaultValue={searchParams.get('tab') || "overview"} 
+            className="w-auto"
+            onValueChange={handleTabChange}
+          >
+            <TabsList className="grid w-auto grid-cols-3 bg-gray-100 p-1 rounded-lg">
+              <TabsTrigger value="overview" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Overview</TabsTrigger>
+              <TabsTrigger value="alerts" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Alerts</TabsTrigger>
+              <TabsTrigger value="metrics" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Metrics</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'grid' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('grid')}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-2 ${searchParams.get('view') === 'list' ? 'bg-[#3C4568] text-white' : ''}`}
+              onClick={() => handleViewChange('list')}
+            >
+              <List className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       )
     }
