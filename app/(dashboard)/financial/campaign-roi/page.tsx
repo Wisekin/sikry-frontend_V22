@@ -1,7 +1,7 @@
 import React from 'react';
 import EnterprisePageHeader from '@/components/core/layout/EnterprisePageHeader';
 import QualityMetricCard from '@/components/ui/quality-metric-card';
-import { Target, TrendingUp, DollarSign, Percent } from 'lucide-react';
+import { Target, TrendingUp, Percent, DollarSign } from 'lucide-react';
 
 interface CampaignRoiData {
   id: string;
@@ -16,7 +16,6 @@ interface CampaignRoiData {
 }
 
 const CampaignRoiPage = () => {
-  // Mock data for campaign ROI - will be replaced by API call
   const mockCampaigns: CampaignRoiData[] = [
     { id: 'camp_001', name: 'Q4 Holiday Push 2023', totalSpend: 15000, totalRevenue: 45000, netProfit: 30000, roiPercentage: 200, startDate: '2023-11-01', endDate: '2023-12-31', status: 'completed' },
     { id: 'camp_002', name: 'Spring Product Launch 2023', totalSpend: 25000, totalRevenue: 60000, netProfit: 35000, roiPercentage: 140, startDate: '2023-03-15', endDate: '2023-05-15', status: 'completed' },
@@ -25,8 +24,10 @@ const CampaignRoiPage = () => {
     { id: 'camp_005', name: 'Influencer Outreach Q1 2024', totalSpend: 8000, totalRevenue: 0, netProfit: -8000, roiPercentage: -100, startDate: '2024-02-01', status: 'planned' },
   ];
 
-  const overallRoi = mockCampaigns.length > 0
-    ? (mockCampaigns.reduce((sum, camp) => sum + camp.netProfit, 0) / mockCampaigns.reduce((sum, camp) => sum + camp.totalSpend, 0)) * 100
+  const totalSpendAllCampaigns = mockCampaigns.reduce((sum, camp) => sum + camp.totalSpend, 0);
+  const totalRevenueAllCampaigns = mockCampaigns.reduce((sum, camp) => sum + camp.totalRevenue, 0);
+  const overallRoi = totalSpendAllCampaigns > 0
+    ? ((totalRevenueAllCampaigns - totalSpendAllCampaigns) / totalSpendAllCampaigns) * 100
     : 0;
 
   const topPerformingCampaign = mockCampaigns.length > 0
@@ -34,15 +35,17 @@ const CampaignRoiPage = () => {
     : null;
 
   return (
-    <div>
+    <div className="bg-gray-50/50 min-h-screen">
       <EnterprisePageHeader title="Campaign ROI Analysis" subtitle="Evaluate the performance of your marketing campaigns." />
 
-      <div className="p-6">
+      <div className="p-6 md:p-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <QualityMetricCard
             title="Overall Campaign ROI"
             value={`${overallRoi.toFixed(2)}%`}
             icon={<Percent size={24} />}
+            change="+2.5% vs last period" // Mock change
+            changeColor={overallRoi >= 0 ? "text-green-600" : "text-red-600"}
           />
           {topPerformingCampaign && (
             <QualityMetricCard
@@ -59,56 +62,64 @@ const CampaignRoiPage = () => {
           />
         </div>
 
-        {/* Placeholder for Filters */}
-        <div className="mb-6 bg-[#2A3050] p-4 rounded-lg shadow-md text-[#FFFFFF]">
-          <h3 className="text-lg font-semibold">Filters</h3>
-          <div className="flex space-x-4 mt-2">
-            <input type="date" className="p-2 rounded bg-[#1B1F3B] text-white" placeholder="Start Date" />
-            <input type="date" className="p-2 rounded bg-[#1B1F3B] text-white" placeholder="End Date" />
-            <select className="p-2 rounded bg-[#1B1F3B] text-white">
+        <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-lg font-semibold text-[#1B1F3B] mb-3">Filters</h3>
+          <div className="flex flex-wrap items-center gap-4">
+            <input type="date" className="p-2 rounded border border-gray-300 bg-gray-100 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Start Date" />
+            <input type="date" className="p-2 rounded border border-gray-300 bg-gray-100 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="End Date" />
+            <select className="p-2 rounded border border-gray-300 bg-gray-100 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="">All Statuses</option>
               <option value="active">Active</option>
               <option value="completed">Completed</option>
               <option value="planned">Planned</option>
             </select>
+             <button className="p-2 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition-colors">Apply Filters</button>
           </div>
         </div>
 
-        <div className="bg-[#2A3050] p-6 rounded-lg shadow-md text-[#FFFFFF]">
-          <h2 className="text-xl font-semibold mb-4">Campaign Performance Details</h2>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold mb-4 text-[#1B1F3B]">Campaign Performance Details</h2>
           {mockCampaigns.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full">
-                <thead className="bg-[#1B1F3B]">
+                <thead className="bg-gray-100">
                   <tr>
-                    <th className="px-4 py-2 text-left">Campaign Name</th>
-                    <th className="px-4 py-2 text-right">Spend</th>
-                    <th className="px-4 py-2 text-right">Revenue</th>
-                    <th className="px-4 py-2 text-right">Net Profit</th>
-                    <th className="px-4 py-2 text-right">ROI (%)</th>
-                    <th className="px-4 py-2 text-left">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Campaign Name</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Spend</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Revenue</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Net Profit</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">ROI (%)</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-200">
                   {mockCampaigns.map((campaign) => (
-                    <tr key={campaign.id} className="border-b border-[#3C4568] hover:bg-[#3C4568]/50">
-                      <td className="px-4 py-2">{campaign.name}</td>
-                      <td className="px-4 py-2 text-right">${campaign.totalSpend.toLocaleString()}</td>
-                      <td className="px-4 py-2 text-right">${campaign.totalRevenue.toLocaleString()}</td>
-                      <td className="px-4 py-2 text-right" style={{ color: campaign.netProfit < 0 ? '#EF4444' : '#22C55E' }}>
+                    <tr key={campaign.id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-800">{campaign.name}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 text-right">${campaign.totalSpend.toLocaleString()}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 text-right">${campaign.totalRevenue.toLocaleString()}</td>
+                      <td className={`px-4 py-3 whitespace-nowrap text-sm font-semibold text-right ${campaign.netProfit < 0 ? 'text-red-600' : 'text-green-600'}`}>
                         ${campaign.netProfit.toLocaleString()}
                       </td>
-                      <td className="px-4 py-2 text-right" style={{ color: campaign.roiPercentage < 0 ? '#EF4444' : '#22C55E' }}>
+                      <td className={`px-4 py-3 whitespace-nowrap text-sm font-semibold text-right ${campaign.roiPercentage < 0 ? 'text-red-600' : 'text-green-600'}`}>
                         {campaign.roiPercentage.toFixed(2)}%
                       </td>
-                      <td className="px-4 py-2 capitalize">{campaign.status}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          campaign.status === 'completed' ? 'bg-green-100 text-green-800' :
+                          campaign.status === 'active' ? 'bg-blue-100 text-blue-800' :
+                          'bg-yellow-100 text-yellow-800' // planned
+                        }`}>
+                          {campaign.status}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p>No campaign data found.</p>
+            <p className="text-gray-500">No campaign data found.</p>
           )}
         </div>
       </div>

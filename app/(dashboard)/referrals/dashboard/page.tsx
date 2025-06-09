@@ -1,7 +1,8 @@
+"use client";
 import React from 'react';
 import EnterprisePageHeader from '@/components/core/layout/EnterprisePageHeader';
 import QualityMetricCard from '@/components/ui/quality-metric-card';
-import { Link as LinkIcon, Users, CheckSquare, Clock, Gift, Copy, Share2 } from 'lucide-react'; // Icons for referrals dashboard
+import { Link as LinkIcon, Users, Clock, Gift, Copy, Share2 } from 'lucide-react';
 
 interface UserReferralStats {
   invitesSentOrClicks: number;
@@ -12,14 +13,13 @@ interface UserReferralStats {
 
 interface ReferredFriend {
   id: string;
-  nameOrEmail: string; // Masked email or name
+  nameOrEmail: string;
   dateReferred: string;
   status: 'Joined' | 'Pending Action' | 'Reward Earned' | 'Inactive';
   rewardAmountUsd?: number;
 }
 
 const ReferralDashboardPage = () => {
-  // Mock data - will be replaced by API calls for the logged-in user
   const userReferralLink = "https://yourapp.com/signup?ref=USER123XYZ";
   const userStats: UserReferralStats = {
     invitesSentOrClicks: 75,
@@ -37,77 +37,78 @@ const ReferralDashboardPage = () => {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(userReferralLink).then(() => {
-      alert('Referral link copied to clipboard!'); // Replace with a proper toast notification
+      alert('Referral link copied to clipboard!');
     }).catch(err => {
       console.error('Failed to copy: ', err);
     });
   };
 
-  const getStatusColor = (status: ReferredFriend['status']) => {
-    if (status === 'Reward Earned') return 'bg-green-500/30 text-green-300';
-    if (status === 'Pending Action') return 'bg-yellow-500/30 text-yellow-300';
-    if (status === 'Joined') return 'bg-blue-500/30 text-blue-300';
-    return 'bg-gray-500/30 text-gray-300'; // Inactive
+  const getStatusBadgeStyle = (status: ReferredFriend['status']) => {
+    switch (status) {
+      case 'Reward Earned': return 'bg-green-100 text-green-700';
+      case 'Pending Action': return 'bg-amber-100 text-amber-700';
+      case 'Joined': return 'bg-blue-100 text-blue-700';
+      case 'Inactive': return 'bg-gray-100 text-gray-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
   };
 
-
   return (
-    <div>
+    <div className="bg-gray-50/50 min-h-screen">
       <EnterprisePageHeader title="My Referral Dashboard" subtitle="Share your link, track your referrals, and see your rewards." />
 
-      <div className="p-6">
-        {/* Referral Link Section */}
-        <div className="bg-[#2A3050] p-6 rounded-lg shadow-md text-[#FFFFFF] mb-8">
-          <h2 className="text-xl font-semibold mb-3">Your Unique Referral Link</h2>
+      <div className="p-6 md:p-10">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+          <h2 className="text-xl font-semibold text-[#1B1F3B] mb-3">Your Unique Referral Link</h2>
           <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-3">
             <input
               type="text"
               readOnly
               value={userReferralLink}
-              className="w-full sm:flex-grow p-3 bg-[#1B1F3B] border border-[#3C4568] rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3C4568]"
+              className="w-full sm:flex-grow p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <button
               onClick={copyToClipboard}
-              className="w-full sm:w-auto bg-[#3C4568] hover:bg-[#4A5578] text-white py-3 px-5 rounded-lg flex items-center justify-center text-sm"
+              className="w-full sm:w-auto bg-[#1B1F3B] hover:bg-[#2A3050] text-white py-3 px-4 rounded-lg flex items-center justify-center text-sm transition-colors"
             >
-              <Copy size={18} className="mr-2" /> Copy Link
+              <Copy size={16} className="mr-2" /> Copy Link
             </button>
-            <button className="w-full sm:w-auto bg-transparent border border-[#3C4568] hover:bg-[#3C4568] text-white py-3 px-5 rounded-lg flex items-center justify-center text-sm">
-              <Share2 size={18} className="mr-2" /> Share
+            <button className="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 py-3 px-4 rounded-lg flex items-center justify-center text-sm transition-colors">
+              <Share2 size={16} className="mr-2" /> Share
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <QualityMetricCard title="Invites/Clicks" value={userStats.invitesSentOrClicks.toLocaleString()} icon={<LinkIcon size={24} />} />
-          <QualityMetricCard title="Successful Referrals" value={userStats.successfulReferrals.toLocaleString()} icon={<Users size={24} />} />
-          <QualityMetricCard title="Pending Referrals" value={userStats.pendingReferrals.toLocaleString()} icon={<Clock size={24} />} />
-          <QualityMetricCard title="Total Rewards Earned (USD)" value={`$${userStats.earnedRewardsUsd.toLocaleString()}`} icon={<Gift size={24} />} />
+          <QualityMetricCard title="Invites/Clicks" value={userStats.invitesSentOrClicks.toLocaleString()} icon={<LinkIcon size={24} className="text-blue-500"/>} />
+          <QualityMetricCard title="Successful Referrals" value={userStats.successfulReferrals.toLocaleString()} icon={<Users size={24} className="text-green-500"/>} change={`+${userStats.successfulReferrals - 5} this month`} changeColor="text-green-600" />
+          <QualityMetricCard title="Pending Referrals" value={userStats.pendingReferrals.toLocaleString()} icon={<Clock size={24} className="text-amber-500"/>} />
+          <QualityMetricCard title="Total Rewards Earned (USD)" value={`$${userStats.earnedRewardsUsd.toLocaleString()}`} icon={<Gift size={24} className="text-indigo-500"/>} />
         </div>
 
-        <div className="bg-[#2A3050] p-6 rounded-lg shadow-md text-[#FFFFFF]">
-          <h2 className="text-xl font-semibold mb-4">Your Referred Friends</h2>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold text-[#1B1F3B] mb-4">Your Referred Friends</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-[#1B1F3B]">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-3 py-2 text-left">Name/Email</th>
-                  <th className="px-3 py-2 text-left">Date Referred</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-right">Reward Earned</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Name/Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Date Referred</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Reward Earned</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {referredFriends.map((friend) => (
-                  <tr key={friend.id} className="border-b border-[#3C4568] hover:bg-[#3C4568]/50">
-                    <td className="px-3 py-2">{friend.nameOrEmail}</td>
-                    <td className="px-3 py-2">{friend.dateReferred}</td>
-                    <td className="px-3 py-2">
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(friend.status)}`}>
+                  <tr key={friend.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-800">{friend.nameOrEmail}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-700">{friend.dateReferred}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeStyle(friend.status)}`}>
                         {friend.status}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-700 text-right">
                       {friend.rewardAmountUsd && friend.rewardAmountUsd > 0 ? `$${friend.rewardAmountUsd.toLocaleString()}` : '-'}
                     </td>
                   </tr>
@@ -115,7 +116,7 @@ const ReferralDashboardPage = () => {
               </tbody>
             </table>
           </div>
-          {referredFriends.length === 0 && <p className="text-center py-4">You haven't referred anyone yet. Share your link to get started!</p>}
+          {referredFriends.length === 0 && <p className="text-center py-4 text-gray-500">You haven't referred anyone yet. Share your link to get started!</p>}
         </div>
       </div>
     </div>

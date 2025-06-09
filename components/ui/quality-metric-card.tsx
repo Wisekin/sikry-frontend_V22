@@ -4,10 +4,9 @@ interface QualityMetricCardProps {
   title: string;
   value: string | number;
   unit?: string;
-  icon?: React.ReactNode; // Allow passing an icon component
-  bgColor?: string;
-  hoverBgColor?: string;
-  textColor?: string;
+  icon?: React.ReactNode;
+  change?: string;
+  changeColor?: string;
 }
 
 const QualityMetricCard: React.FC<QualityMetricCardProps> = ({
@@ -15,27 +14,32 @@ const QualityMetricCard: React.FC<QualityMetricCardProps> = ({
   value,
   unit,
   icon,
-  bgColor = 'bg-[#2A3050]', // Default: #2A3050
-  hoverBgColor = 'hover:bg-[#3C4568]', // Default hover: #3C4568
-  textColor = 'text-[#FFFFFF]', // Default text: #FFFFFF
+  change,
+  changeColor = 'text-gray-500', // Default change color
 }) => {
   return (
     <div
       className={`
-        ${bgColor} ${hoverBgColor} ${textColor}
-        p-6 rounded-lg shadow-md transition-colors duration-200 ease-in-out
-        flex flex-col items-start justify-between min-h-[120px]
+        bg-white border border-gray-200 shadow-sm hover:shadow-lg hover:bg-gray-50/50
+        p-5 rounded-lg transition-all duration-200 ease-in-out
+        flex flex-col justify-between min-h-[110px]
       `}
     >
-      <div className="flex items-center justify-between w-full">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        {icon && <div className="text-2xl">{icon}</div>}
+      <div className="flex items-start justify-between">
+        <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+        {icon && <div className="text-gray-400 text-2xl">{icon}</div>}
       </div>
-      <div className="mt-2">
-        <p className="text-3xl font-bold">
+
+      <div>
+        <p className="text-2xl font-bold text-[#1B1F3B] mt-1">
           {value}
-          {unit && <span className="text-lg font-normal ml-1">{unit}</span>}
+          {unit && <span className="text-sm font-normal text-gray-500 ml-1">{unit}</span>}
         </p>
+        {change && (
+          <p className={`text-xs mt-1 ${changeColor}`}>
+            {change}
+          </p>
+        )}
       </div>
     </div>
   );

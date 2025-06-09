@@ -5,20 +5,19 @@ interface UserReferralDashboardData {
   user_referral_link: string;
   stats: {
     invites_sent_or_clicks: number;
-    successful_referrals: number; // e.g., signed up and met criteria
-    pending_referrals: number;   // e.g., signed up but haven't met criteria
+    successful_referrals: number;
+    pending_referrals: number;
     earned_rewards_usd: number;
   };
   referred_users_details: Array<{
     referral_id: string;
-    name_or_email_preview: string; // e.g., "John D." or "jo***@example.com"
+    name_or_email_preview: string;
     date_referred: string; // ISO date string
     status: 'Joined' | 'Pending Reward Criteria' | 'Reward Earned' | 'Inactive';
-    reward_amount_usd_earned?: number; // Only if reward earned
+    reward_amount_usd_earned?: number;
   }>;
 }
 
-// Mock data for a specific user (in a real app, this would be fetched based on authenticated user)
 const mockUserDashboardData: UserReferralDashboardData = {
   user_referral_code: 'USER123XYZ',
   user_referral_link: 'https://yourapp.com/signup?ref=USER123XYZ',
@@ -38,17 +37,11 @@ const mockUserDashboardData: UserReferralDashboardData = {
 };
 
 export async function GET(request: Request) {
-  // Here, you would typically identify the authenticated user from the request (e.g., session, token)
-  // and fetch their specific referral data from the database.
-  // For now, we return the same mock data for any request.
   try {
-    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
-    return NextResponse.json(mockUserDashboardData);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return NextResponse.json({ data: mockUserDashboardData }); // Wrapped response
   } catch (error) {
     console.error("Error fetching user referral dashboard data:", error);
-    return NextResponse.json({ message: "Error fetching user referral dashboard data" }, { status: 500 });
+    return NextResponse.json({ error: { message: "Error fetching user referral dashboard data" } }, { status: 500 });
   }
 }
-
-// POST/PUT might not be directly relevant here unless users can update some part of their referral settings,
-// which is not in scope for this specific dashboard view.
