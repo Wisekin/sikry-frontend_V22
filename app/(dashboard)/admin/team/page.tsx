@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   UserGroupIcon,
   UserPlusIcon,
@@ -73,7 +73,13 @@ export default function TeamPage() {
         </div>
 
         {/* Main Content */}
-        <div className="grid gap-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="grid gap-6">
+          <TabsList className="mb-6 bg-gray-100 p-1 rounded-lg max-w-md">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="members">Members</TabsTrigger>
+            <TabsTrigger value="roles">Roles</TabsTrigger>
+            <TabsTrigger value="permissions">Permissions</TabsTrigger>
+          </TabsList>
           <TabsContent value="overview">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="bg-white border-none shadow-sm hover:shadow-lg transition-shadow duration-300">
@@ -179,7 +185,7 @@ export default function TeamPage() {
               </CardContent>
             </Card>
           </TabsContent>
-        </div>
+        </Tabs>
       </div>
     </div>
   )

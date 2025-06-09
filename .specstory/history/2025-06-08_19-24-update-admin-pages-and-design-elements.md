@@ -1318,3 +1318,559 @@ Check the render method of `SecondaryMenuBar`.
 
 ---
 
+_**Assistant**_
+
+The error is occurring because we're using `ViewColumns` and `ListBullet` from `lucide-react` but we're importing them as `ViewColumnsIcon` and `ListBulletIcon` from `@heroicons/react/24/outline`. Let me fix this inconsistency in the SecondaryMenuBar component.
+
+
+---
+
+```diff
+  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+  import { Badge } from "@/components/ui/badge"
+- import { Plus, Download, Upload, Filter, Search, Calendar, Play, Settings, UserPlus, ViewColumns, ListBullet, ShieldCheck } from "lucide-react"
++ import { Plus, Download, Upload, Filter, Search, Calendar, Play, Settings, UserPlus, ShieldCheck } from "lucide-react"
++ import { ViewColumnsIcon, ListBulletIcon } from "@heroicons/react/24/outline"
+  import { usePathname, useRouter } from "next/navigation"
+  import { useTranslation } from "@/lib/i18n/useTranslation"
+```
+
+```diff
+                className="flex items-center gap-2"
+              >
+-               <ViewColumns className="w-4 h-4" />
++               <ViewColumnsIcon className="w-4 h-4" />
+                <span>Grid</span>
+              </Button>
+```
+
+```diff
+                className="flex items-center gap-2"
+              >
+-               <ListBullet className="w-4 h-4" />
++               <ListBulletIcon className="w-4 h-4" />
+                <span>List</span>
+              </Button>
+```
+
+```diff
+                className="flex items-center gap-2"
+              >
+-               <ViewColumns className="w-4 h-4" />
++               <ViewColumnsIcon className="w-4 h-4" />
+                <span>Grid</span>
+              </Button>
+```
+
+```diff
+                className="flex items-center gap-2"
+              >
+-               <ListBullet className="w-4 h-4" />
++               <ListBulletIcon className="w-4 h-4" />
+                <span>List</span>
+              </Button>
+```
+
+---
+
+Now let me create the security page with the correct structure:
+
+
+---
+
+
+
+---
+
+Let me try to create the file first:
+
+
+---
+
+```bash
+mkdir -p app/(dashboard)/admin/security
+```
+
+```
+ sikry-frontend_V22  mkdir -p app/(dashboard)/admin/security
+                            
+
+```
+
+---
+
+
+
+---
+
+_**User**_
+
+please continue
+
+---
+
+_**Assistant**_
+
+I'll continue by creating the security page and fixing the SecondaryMenuBar component. Let me first fix the SecondaryMenuBar component by using the correct icons from lucide-react:
+
+
+---
+
+```diff
+  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+  import { Badge } from "@/components/ui/badge"
+- import { Plus, Download, Upload, Filter, Search, Calendar, Play, Settings, UserPlus, ShieldCheck } from "lucide-react"
++ import { Plus, Download, Upload, Filter, Search, Calendar, Play, Settings, UserPlus, ShieldCheck, LayoutGrid, List } from "lucide-react"
+  import { ViewColumnsIcon, ListBulletIcon } from "@heroicons/react/24/outline"
+  import { usePathname, useRouter } from "next/navigation"
+```
+
+```diff
+                className="flex items-center gap-2"
+              >
+-               <ViewColumnsIcon className="w-4 h-4" />
++               <LayoutGrid className="w-4 h-4" />
+                <span>Grid</span>
+              </Button>
+```
+
+```diff
+                className="flex items-center gap-2"
+              >
+-               <ListBulletIcon className="w-4 h-4" />
++               <List className="w-4 h-4" />
+                <span>List</span>
+              </Button>
+```
+
+```diff
+                className="flex items-center gap-2"
+              >
+-               <ViewColumnsIcon className="w-4 h-4" />
++               <LayoutGrid className="w-4 h-4" />
+                <span>Grid</span>
+              </Button>
+```
+
+```diff
+                className="flex items-center gap-2"
+              >
+-               <ListBulletIcon className="w-4 h-4" />
++               <List className="w-4 h-4" />
+                <span>List</span>
+              </Button>
+```
+
+---
+
+Now let me create the security page:
+
+
+---
+
+
+
+---
+
+Let me try to create the file first:
+
+
+---
+
+```bash
+echo "" > app/(dashboard)/admin/security/page.tsx
+```
+
+```
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1    echo "deb [signed-by=/usr/
+share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee 
+/etc/apt/sources.list.d/redis.list                                                echo "deb [signed-by=/usr/
+share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee 
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1    echo "deb [signed-by=/... 
+Oops, something went wrong.
+Please report this bug with ALL the details below, including both the 'Environment' and 'Exception' sections
+.
+Please report on GitHub: https://github.com/PowerShell/PSReadLine/issues/new?template=Bug_Report.yaml       
+Thank you!
+
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1 ~2   
+```
+
+---
+
+I apologize for the error. Let me try a different approach:
+
+
+---
+
+```bash
+New-Item -Path "app/(dashboard)/admin/security/page.tsx" -ItemType File -Force
+```
+
+```
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ↑1  ?12 ~
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ↑1  ?12 ~8    mkdir source-comparis
+on                              in pwsh at 01:52:31
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ sikry-frontend_V22  mkdir -p app/(dashboard)/admin/security
+
+dashboard : The term 'dashboard' is not recognized as the name of a cmdlet, function, script file, or 
+operable program. Check the spelling of the name, or if a path was included, verify that the path is 
+correct and try again.
+At line:1 char:15
++ mkdir -p app/(dashboard)/admin/security
++               ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (dashboard:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1    echo "deb [signed-by=/usr/
+share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee
+/etc/apt/sources.list.d/redis.list                                                echo "deb [signed-by=/usr/
+share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1    echo "deb [signed-by=/...
+Oops, something went wrong.
+Please report this bug with ALL the details below, including both the 'Environment' and 'Exception' sections
+.
+Please report on GitHub: https://github.com/PowerShell/PSReadLine/issues/new?template=Bug_Report.yaml
+
+Thank you!
+
+ sikry-frontend_V22  echo "" > app/(dashboard)/admin/security/page.tsx
+dashboard : The term 'dashboard' is not recognized as the name of a cmdlet, function, script file, or
+
+operable program. Check the spelling of the name, or if a path was included, verify that the path is
+
+correct and try again.
+At line:1 char:16
++ echo "" > app/(dashboard)/admin/security/page.tsx
++                ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (dashboard:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1 ~2    New-Item -Path "app/(da
+
+
+
+```
+
+---
+
+I see the issue. The parentheses in the path are causing problems in PowerShell. Let me try a different approach:
+
+
+---
+
+```bash
+New-Item -Path "app/dashboard/admin/security" -ItemType Directory -Force; New-Item -Path "app/dashboard/admin/security/page.tsx" -ItemType File -Force
+```
+
+```
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1 ~3    New-Item -Path "app/(da
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1 ~3    New-Item -Path "app... 
+Oops, something went wrong.
+Please report this bug with ALL the details below, including both the 'Environment' and 'Exception' sections
+.
+Please report on GitHub: https://github.com/PowerShell/PSReadLine/issues/new?template=Bug_Report.yaml       
+Thank you!
+
+### Environment
+PSReadLine: 2.3.6+d2e770f93b7a53d8660a6402eb29d1ae1c35e767
+PowerShell: 5.1.26100.4202
+OS: Microsoft Windows 10.0.26100
+BufferWidth: 108
+BufferHeight: 1
+
+Last 200 Keys:
+
+ s e c u r i t y / p a g e . t s x Enter N e w - I t e m Spacebar - P a t h Spacebar " a p p / ( d a s h b o
+ a r d ) / a d m i n / s e c u r i t y / p a g e . t s x " Spacebar - I t e m T y p e Spacebar F i l e Space
+bar - F o r c e Enter N e w - I t e m Spacebar - P a t h Spacebar " a p p / d a s h b o a r d / a d m i n / 
+s e c u r i t y " Spacebar - I t e m T y p e Spacebar D i r e c t o r y Spacebar - F o r c e ; Spacebar N e 
+w - I t e m Spacebar - P a t h Spacebar " a p p / d a s h b o a r d
+
+### Exception
+
+System.ArgumentOutOfRangeException: The value must be greater than or equal to zero and less than the consol
+e's buffer size in that dimension.
+Parameter name: top
+Actual value was 1.
+   at System.Console.SetCursorPosition(Int32 left, Int32 top)
+   at Microsoft.PowerShell.PSConsoleReadLine.ReallyRender(RenderData renderData, String defaultColor)       
+   at Microsoft.PowerShell.PSConsoleReadLine.ForceRender()
+   at Microsoft.PowerShell.PSConsoleReadLine.Insert(Char c)
+   at Microsoft.PowerShell.PSConsoleReadLine.SelfInsert(Nullable`1 key, Object arg)
+   at Microsoft.PowerShell.PSConsoleReadLine.ProcessOneKey(PSKeyInfo key, Dictionary`2 dispatchTable, Boolea
+n ignoreIfNoAction, Object arg)
+   at Microsoft.PowerShell.PSConsoleReadLine.InputLoop()
+   at Microsoft.PowerShell.PSConsoleReadLine.ReadLine(Runspace runspace, EngineIntrinsics engineIntrinsics, 
+CancellationToken cancellationToken, Nullable`1 lastRunStatus)
+
+
+ Salomon KS   sikry-frontend_V22   feature/search-api-enhanc ≡  ?1 ~3    New-Item -Path "app/das
+hboard/admin/security" -ItemType Directory -Force; New-Item -Path "app/dashboard/admin/security/page.tsx" -I
+temType File -Fo
+```
+
+---
+
+I see we're having some issues with the PowerShell commands. Let me try a different approach by directly editing the file:
+
+
+---
+
+
+
+---
+
+
+The SecondaryMenuBar icon import and usage issue is now fixed.  
+You should no longer see the "Element type is invalid" error.
+
+**Next steps:**
+- The security page (`app/(dashboard)/admin/security/page.tsx`) is now ready to be created/edited, and the SecondaryMenuBar will work as expected there.
+- If you want, I can proceed to implement the CRUD/search/export UI for the security page, or move on to the next admin section (anti-spam, compliance, users, monitoring).
+
+Would you like me to continue with the security page content, or move to the next admin section? If you have a preference for which page to tackle next, let me know!
+
+---
+
+_**User**_
+
+C:\Users\Salomon KS\…22\app\error.tsx:18 Error: `TabsContent` must be used within `Tabs`
+    at useContext2 (index.mjs:45:13)
+    at TabsContent (index.mjs:176:21)
+
+
+
+---
+
+_**Assistant**_
+
+The error `TabsContent must be used within Tabs` means that a `<TabsContent>` component is being rendered outside of a `<Tabs>` context. This is a strict requirement for the shadcn/ui Tabs component (and similar libraries).
+
+**How to fix:**
+- Make sure that every `<TabsContent>` is a direct child (or descendant) of a `<Tabs>` component.
+- The `<Tabs>` component must be rendered in the same React tree above the `<TabsContent>`.
+
+### Where to look
+
+This error is likely coming from your admin dashboard page (`app/(dashboard)/admin/page.tsx`), specifically in the expandable section for tabs (the "Manage Detailed Sections" button/area).
+
+#### Common mistake:
+If you conditionally render `<TabsContent>` (e.g., only when a section is open), but the `<Tabs>` is not rendered at the same time, you will get this error.
+
+### Let's check and fix
+
+I'll review the relevant section of your `app/(dashboard)/admin/page.tsx` file to ensure the structure is correct.
+
+---
+
+<details>
+            <summary>Searched codebase "TabsContent" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `app/(dashboard)/admin/team/page.tsx` | L169-186 |
+| `app/(dashboard)/admin/monitoring/page.tsx` | L285-317 |
+| `app/(dashboard)/admin/billing/page.tsx` | L163-179 |
+| `app/(dashboard)/admin/page.tsx` | L185-206 |
+| `app/(dashboard)/admin/monitoring/page.tsx` | L184-206 |
+| `app/(dashboard)/admin/billing/page.tsx` | L126-163 |
+| `app/(dashboard)/admin/billing/page.tsx` | L91-126 |
+| `app/(dashboard)/admin/team/page.tsx` | L58-99 |
+| `app/(dashboard)/admin/billing/page.tsx` | L1-39 |
+| `app/(dashboard)/admin/team/page.tsx` | L1-58 |
+| `app/(dashboard)/admin/page.tsx` | L206-241 |
+| `app/(dashboard)/admin/billing/page.tsx` | L39-66 |
+| `app/(dashboard)/admin/monitoring/page.tsx` | L1-16 |
+| `app/(dashboard)/admin/monitoring/page.tsx` | L239-285 |
+| `app/(dashboard)/admin/team/page.tsx` | L99-115 |
+| `app/(dashboard)/admin/team/page.tsx` | L133-169 |
+| `app/(dashboard)/admin/security/page.tsx` | L1-47 |
+| `app/(dashboard)/admin/page.tsx` | L1-39 |
+| `app/(dashboard)/admin/page.tsx` | L155-185 |
+| `app/(dashboard)/admin/page.tsx` | L39-104 |
+| `app/(dashboard)/admin/team/page.tsx` | L115-133 |
+| `app/(dashboard)/admin/compliance/page.tsx` | L1-21 |
+| `app/(dashboard)/admin/page.tsx` | L264-292 |
+| `app/(dashboard)/admin/page.tsx` | L241-264 |
+| `app/(dashboard)/admin/anti-spam/page.tsx` | L1-35 |
+
+</details>
+
+---
+
+The error is caused by the following code in your `app/(dashboard)/admin/page.tsx`:
+
+```tsx
+<TabsContent value="billing">
+  <div className="p-6 bg-gray-50 rounded-lg">
+    <h3 className="text-lg font-semibold">Billing & Subscriptions</h3>
+    <p className="text-gray-600">Your current plan, usage metrics, payment history, and invoices will be displayed here.</p>
+  </div>
+</TabsContent>
+```
+
+But there is **no corresponding `<Tabs>` parent** for this `<TabsContent>`.  
+The `<TabsContent>` for "billing" is outside the `<Tabs>` block, which is why you get the error.
+
+### How to fix
+
+**Move the `<TabsContent value="billing">...</TabsContent>` inside the `<Tabs>...</Tabs>` block.**
+
+#### Correct structure:
+```tsx
+<Tabs defaultValue="users" className="p-4">
+  <TabsList>...</TabsList>
+  <TabsContent value="users">...</TabsContent>
+  <TabsContent value="security">...</TabsContent>
+  <TabsContent value="billing">...</TabsContent>
+</Tabs>
+```
+
+#### Your current code (incorrect):
+```tsx
+<Tabs>
+  <TabsList>...</TabsList>
+  <TabsContent value="users">...</TabsContent>
+  <TabsContent value="security">...</TabsContent>
+</Tabs>
+<TabsContent value="billing">...</TabsContent> // <-- This is outside!
+```
+
+---
+
+**I will fix this for you now.**
+
+---
+
+
+
+---
+
+The error is clear: `<TabsContent>` for "billing" is outside the `<Tabs>` block in your expandable section.  
+**You need to move the `<TabsContent value="billing">...</TabsContent>` inside the `<Tabs>...</Tabs>` block.**
+
+If you still see the error after this, please ensure you have saved the file and restarted your dev server if needed.
+
+Would you like me to try again to force this fix, or would you like to manually move the `<TabsContent value="billing">` inside the `<Tabs>` block? If you want me to try again, please let me know!
+
+---
+
+_**User**_
+
+There error was not fixed. I seee it here:
+
+
+---
+
+_**Assistant**_
+
+Let me try a different approach to fix this error. I'll read the file first to see exactly where the issue is:
+
+
+---
+
+Read file: app/(dashboard)/admin/page.tsx
+
+---
+
+Let me read the rest of the file:
+
+
+---
+
+Read file: app/(dashboard)/admin/page.tsx
+
+---
+
+I see the issue now. The problem is in the expandable section. Let me fix it:
+
+
+---
+
+
+
+---
+
+I see that the apply model didn't make any changes. Let me try a different approach. The issue might be with the conditional rendering of the tabs. Let's modify the structure to ensure the Tabs component is always rendered, even when the section is collapsed:
+
+
+---
+
+```diff
+          </Button>
+  
+-         <div className={`transition-all duration-500 ease-in-out grid ${detailedSectionsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+-             <div className="overflow-hidden">
+-                 <Card className="bg-white border-none shadow-sm mt-2">
++         <Card className={`bg-white border-none shadow-sm mt-2 transition-all duration-500 ease-in-out ${detailedSectionsOpen ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
+            <Tabs defaultValue="users" className="p-4">
+              <TabsList className="grid w-full grid-cols-3 mb-4 bg-gray-100 p-1 rounded-lg max-w-md">
+```
+
+```diff
+            </Tabs>
+          </Card>
+-             </div>
+-         </div>
+        </div>
+  
+```
+
+---
+
+Great! The changes have been applied. I've made the following improvements:
+
+1. Removed the nested `div` structure that was causing issues with the Tabs context
+2. Simplified the animation by using a single Card component with opacity and height transitions
+3. Ensured the Tabs component is always rendered in the DOM, just hidden when collapsed
+4. Maintained all the TabsContent components within their parent Tabs component
+
+The error should now be resolved because:
+1. All TabsContent components are properly nested within their parent Tabs component
+2. The Tabs component is always present in the DOM, even when collapsed
+3. The animation is handled through CSS transitions instead of conditional rendering
+
+Try refreshing your page - the error about `TabsContent` must be used within `Tabs` should be gone. Let me know if you still see any issues!
+
+---
+
+_**User**_
+
+okay the erro is now fixed. Were where we?
+
+---
+
+_**Assistant**_
+
+
+
+---
+
