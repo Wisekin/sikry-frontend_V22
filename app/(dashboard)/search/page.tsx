@@ -215,13 +215,45 @@ function SearchContent() {
   });
 
   useEffect(() => {
-    setLoading(true);
-    // Simulate fetching data
-    setTimeout(() => {
-      setCompanies(mockCompanies);
-      setLoading(false);
-    }, 1000);
-  }, [searchParams]);
+    const fetchCompanies = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams();
+        params.set('q', query);
+        params.set('scope', 'companies');
+        // TODO: set 'user' param from auth/session context if available
+        // params.set('user', userId);
+        const res = await fetch(`/api/search?${params.toString()}`);
+        if (!res.ok) throw new Error('Failed to fetch results');
+        const data = await res.json();
+        // Map backend results to Company interface for display
+        setCompanies((data.data || []).map((item: any, idx: number) => ({
+          id: item.id || `api-${idx}`,
+          name: item.name || '',
+          domain: item.domain || item.url || '',
+          logo: item.logo || '',
+          location: item.location || '',
+          industry: item.industry || '',
+          employees: item.size || '',
+          description: item.description || '',
+          confidenceScore: item.confidence || 75,
+          extractedData: {
+            emails: item.emails || [],
+            phones: item.phones || [],
+            technologies: item.technologies || [],
+          },
+          lastScraped: item.lastScraped || '',
+        })));
+      } catch (err: any) {
+        setError(err.message || 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCompanies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, query]);
 
   const filteredCompanies = companies.filter(company => {
     if (filters.industry !== "All Industries" && company.industry !== filters.industry) return false;
