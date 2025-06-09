@@ -21,7 +21,6 @@ export default function CompliancePage() {
   ]
 
   return (
-    <AppShell>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -248,6 +247,5 @@ export default function CompliancePage() {
           </CardContent>
         </Card>
       </div>
-    </AppShell>
   )
 }

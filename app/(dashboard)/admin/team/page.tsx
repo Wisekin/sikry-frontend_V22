@@ -1,176 +1,186 @@
 "use client"
 
-import { AppShell } from "@/components/core/layout/AppShell"
-import { Heading } from "@/components/core/typography/Heading"
-import { Text } from "@/components/core/typography/Text"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DataTable } from "@/components/data/tables/DataTable"
-import { UserPlus, Settings, Mail } from "lucide-react"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
+import {
+  UserGroupIcon,
+  UserPlusIcon,
+  UserMinusIcon,
+  UserCircleIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline"
+import { SecondaryMenuBar } from "@/components/core/navigation/SecondaryMenuBar"
 
-export default function TeamManagementPage() {
+export default function TeamPage() {
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const teamMembers = [
     {
       id: "1",
-      name: "John Doe",
-      email: "john@company.com",
-      role: "Admin",
+      name: "Sarah Johnson",
+      role: "Administrator",
+      email: "sarah.j@company.com",
       status: "Active",
       lastActive: "2 hours ago",
-      avatar: "/avatars/john.jpg",
+      avatar: "SJ"
     },
     {
       id: "2",
-      name: "Jane Smith",
-      email: "jane@company.com",
-      role: "User",
+      name: "Mark Wilson",
+      role: "Team Lead",
+      email: "mark.w@company.com",
       status: "Active",
-      lastActive: "1 day ago",
-      avatar: "/avatars/jane.jpg",
+      lastActive: "5 minutes ago",
+      avatar: "MW"
     },
-    {
-      id: "3",
-      name: "Mike Johnson",
-      email: "mike@company.com",
-      role: "User",
-      status: "Inactive",
-      lastActive: "1 week ago",
-      avatar: "/avatars/mike.jpg",
-    },
-  ]
+    // Add more team members as needed
+  ];
 
-  const columns = [
-    {
-      accessorKey: "name",
-      header: "User",
-      cell: ({ row }: any) => (
-        <div className="flex items-center gap-3">
-          <Avatar className="w-8 h-8">
-            <AvatarImage src={row.original.avatar || "/placeholder.svg"} />
-            <AvatarFallback>
-              {row.original.name
-                .split(" ")
-                .map((n: string) => n[0])
-                .join("")}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="font-medium">{row.original.name}</div>
-            <div className="text-sm text-secondary">{row.original.email}</div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "role",
-      header: "Role",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.role === "Admin" ? "default" : "secondary"}>{row.original.role}</Badge>
-      ),
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.status === "Active" ? "default" : "secondary"}>{row.original.status}</Badge>
-      ),
-    },
-    {
-      accessorKey: "lastActive",
-      header: "Last Active",
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }: any) => (
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Settings className="w-3 h-3" />
-          </Button>
-          <Button variant="outline" size="sm">
-            <Mail className="w-3 h-3" />
-          </Button>
-        </div>
-      ),
-    },
-  ]
+  const handleDelete = (id: string) => {
+    // Implement delete functionality
+    console.log('Delete member:', id);
+  };
+
+  const handleEdit = (id: string) => {
+    // Implement edit functionality
+    console.log('Edit member:', id);
+  };
+
+  const filteredMembers = teamMembers.filter(member =>
+    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    member.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <AppShell>
-      <div className="space-y-6">
+    <div className="min-h-screen space-y-8 bg-white text-[#1B1F3B]">
+      <SecondaryMenuBar />
+
+      <div className="p-6 md:p-10">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <Heading level={1}>Team Management</Heading>
-            <Text className="text-secondary">Manage users, roles, and permissions</Text>
+            <h1 className="text-3xl md:text-4xl font-bold text-[#1B1F3B]">Team Management</h1>
+            <p className="text-gray-500 mt-1">
+              Manage your team members, roles, and permissions.
+            </p>
           </div>
-          <Button>
-            <UserPlus className="w-4 h-4 mr-2" />
-            Invite User
-          </Button>
         </div>
 
-        {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-4">
-          <Card className="shadow-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-caption text-secondary">Total Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-h2 font-semibold">12</div>
-              <Text size="sm" className="text-emerald-600">
-                +2 this month
-              </Text>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-caption text-secondary">Active Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-h2 font-semibold">10</div>
-              <Text size="sm" className="text-secondary">
-                83% active
-              </Text>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-caption text-secondary">Admins</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-h2 font-semibold">3</div>
-              <Text size="sm" className="text-secondary">
-                25% of team
-              </Text>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-caption text-secondary">Pending Invites</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-h2 font-semibold">2</div>
-              <Text size="sm" className="text-yellow-600">
-                Awaiting response
-              </Text>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Main Content */}
+        <div className="grid gap-6">
+          <TabsContent value="overview">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="bg-white border-none shadow-sm hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Total Members</CardTitle>
+                  <UserGroupIcon className="w-5 h-5 text-gray-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-[#1B1F3B]">24</div>
+                  <p className="text-xs text-green-600 flex items-center gap-1">+3 this month</p>
+                </CardContent>
+              </Card>
 
-        {/* Team Table */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle>Team Members</CardTitle>
-            <CardDescription>Manage your team members and their permissions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DataTable columns={columns} data={teamMembers} />
-          </CardContent>
-        </Card>
+              <Card className="bg-white border-none shadow-sm hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Active Now</CardTitle>
+                  <UserCircleIcon className="w-5 h-5 text-gray-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-[#1B1F3B]">12</div>
+                  <p className="text-xs text-gray-500">50% of team online</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white border-none shadow-sm hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Pending Invites</CardTitle>
+                  <UserPlusIcon className="w-5 h-5 text-gray-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-[#1B1F3B]">3</div>
+                  <p className="text-xs text-amber-600">Requires action</p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="members">
+            <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+              {filteredMembers.map((member) => (
+                <Card key={member.id} className="bg-white border-none shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#2A3050]">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full bg-[#3C4568] text-white flex items-center justify-center font-semibold">
+                        {member.avatar}
+                      </div>
+                      <div className="flex-grow">
+                        <h3 className="font-semibold text-[#1B1F3B]">{member.name}</h3>
+                        <p className="text-sm text-gray-500">{member.role}</p>
+                        <p className="text-sm text-gray-400">{member.email}</p>
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded-full text-xs ${member.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                            {member.status}
+                          </span>
+                          <span className="text-xs text-gray-400">{member.lastActive}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-500 hover:text-[#2A3050]"
+                          onClick={() => handleEdit(member.id)}
+                        >
+                          <PencilSquareIcon className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-500 hover:text-red-600"
+                          onClick={() => handleDelete(member.id)}
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="roles">
+            <Card className="bg-white border-none shadow-sm">
+              <CardHeader>
+                <CardTitle>Role Management</CardTitle>
+                <CardDescription>Configure team roles and their associated permissions.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Role management interface will be implemented here.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="permissions">
+            <Card className="bg-white border-none shadow-sm">
+              <CardHeader>
+                <CardTitle>Permission Settings</CardTitle>
+                <CardDescription>Manage detailed permission settings for different roles.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Permission management interface will be implemented here.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </div>
       </div>
-    </AppShell>
+    </div>
   )
 }
