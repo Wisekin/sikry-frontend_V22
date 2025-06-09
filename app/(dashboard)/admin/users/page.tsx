@@ -1,178 +1,256 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { AppShell } from "@/components/core/layout/AppShell"
+import { Heading } from "@/components/core/typography/Heading"
+import { Text } from "@/components/core/typography/Text"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { UserGroupIcon, UserPlusIcon, UserCircleIcon } from "@heroicons/react/24/outline"
-import { UserPlus, Users, Mail } from "lucide-react"
-import { useSearchParams } from "next/navigation"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  UserPlusIcon,
+  MagnifyingGlassIcon,
+  FunnelIcon,
+  PencilIcon,
+  TrashIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline"
+import { useTranslation } from "@/lib/i18n/useTranslation"
 
 export default function UsersPage() {
-  const searchParams = useSearchParams()
-  const activeTab = searchParams.get('tab') || 'overview'
-  const viewMode = searchParams.get('view') || 'grid'
-
-  const [searchQuery, setSearchQuery] = useState("")
+  const { t } = useTranslation()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [roleFilter, setRoleFilter] = useState("all")
 
   const users = [
     {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      role: "Admin",
-      status: "Active",
-      lastActive: "2024-02-20 14:30:00"
+      id: "1",
+      name: "SIKRY Admin",
+      email: "sikry@sikso.com",
+      role: "admin",
+      status: "active",
+      lastActive: "2 minutes ago",
+      avatar: null,
     },
     {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      role: "User",
-      status: "Active",
-      lastActive: "2024-02-20 13:15:00"
+      id: "2",
+      name: "Sarah Johnson",
+      email: "sarah@sikso.com",
+      role: "manager",
+      status: "active",
+      lastActive: "1 hour ago",
+      avatar: null,
     },
     {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob.johnson@example.com",
-      role: "User",
-      status: "Inactive",
-      lastActive: "2024-02-19 09:45:00"
-    }
+      id: "3",
+      name: "Mike Chen",
+      email: "mike@sikso.com",
+      role: "member",
+      status: "inactive",
+      lastActive: "2 days ago",
+      avatar: null,
+    },
+    {
+      id: "4",
+      name: "Emma Wilson",
+      email: "emma@sikso.com",
+      role: "member",
+      status: "active",
+      lastActive: "30 minutes ago",
+      avatar: null,
+    },
   ]
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return (
-          <>
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="bg-white border-none shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Total Users</CardTitle>
-                  <Users className="w-5 h-5 text-emerald-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-emerald-600">24</div>
-                  <p className="text-xs text-gray-500">Active members</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-white border-none shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Pending Invites</CardTitle>
-                  <Mail className="w-5 h-5 text-amber-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-amber-600">3</div>
-                  <p className="text-xs text-gray-500">Awaiting response</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-white border-none shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">New Users</CardTitle>
-                  <UserPlus className="w-5 h-5 text-emerald-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-emerald-600">5</div>
-                  <p className="text-xs text-gray-500">This month</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Main Content */}
-            <Card className="bg-white border-none shadow-sm">
-              <CardHeader>
-                <CardTitle>Users Overview</CardTitle>
-                <CardDescription>Manage your team members and their roles</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Add users content here */}
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        )
-      case 'users':
-        return (
-          <Card className="bg-white border-none shadow-sm">
-            <CardHeader>
-              <CardTitle>Users</CardTitle>
-              <CardDescription>View and manage all users</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}`}>
-                {filteredUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <div className="flex flex-col">
-                        <div className="font-medium">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
-                      </div>
-                      <Badge variant={user.status === "Active" ? "default" : "secondary"}>
-                        {user.status}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )
-      case 'invites':
-        return (
-          <Card className="bg-white border-none shadow-sm">
-            <CardHeader>
-              <CardTitle>Pending Invites</CardTitle>
-              <CardDescription>Manage user invitations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}`}>
-                {/* Add invites list/grid content here */}
-              </div>
-            </CardContent>
-          </Card>
-        )
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "bg-red-50 text-red-700 border-red-200"
+      case "manager":
+        return "bg-blue-50 text-blue-700 border-blue-200"
+      case "member":
+        return "bg-gray-50 text-gray-700 border-gray-200"
       default:
-        return null
+        return "bg-gray-50 text-gray-700 border-gray-200"
     }
   }
 
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case "active":
+        return "bg-emerald-50 text-emerald-700 border-emerald-200"
+      case "inactive":
+        return "bg-gray-50 text-gray-700 border-gray-200"
+      case "pending":
+        return "bg-yellow-50 text-yellow-700 border-yellow-200"
+      default:
+        return "bg-gray-50 text-gray-700 border-gray-200"
+    }
+  }
+
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesRole = roleFilter === "all" || user.role === roleFilter
+    return matchesSearch && matchesRole
+  })
+
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="p-6 space-y-6">
+    <AppShell>
+      <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#1B1F3B]">Users</h1>
-            <p className="text-gray-500 mt-1">
-              Manage your team members and their roles.
-            </p>
+            <Heading level={1}>{t("admin.users.title")}</Heading>
+            <Text className="text-muted-foreground">{t("admin.users.description")}</Text>
           </div>
-          <Button size="lg" className="bg-[#1B1F3B] text-white hover:bg-[#2A3050] flex items-center gap-2">
-            <UserPlus className="w-5 h-5" />
-            <span>Invite User</span>
+          <Button className="bg-primary hover:bg-primary/90">
+            <UserPlusIcon className="w-4 h-4 mr-2" />
+            {t("admin.users.inviteUser")}
           </Button>
         </div>
 
-        {renderContent()}
+        {/* Stats Cards */}
+        <div className="grid md:grid-cols-4 gap-4">
+          <Card className="shadow-sm border border-border/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("admin.users.totalUsers")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">4</div>
+              <Text size="sm" className="text-muted-foreground">
+                +1 this month
+              </Text>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border border-border/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {t("admin.users.activeUsers")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-emerald-600">3</div>
+              <Text size="sm" className="text-emerald-600">
+                75% active rate
+              </Text>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border border-border/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("admin.users.admins")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">1</div>
+              <Text size="sm" className="text-muted-foreground">
+                System admin
+              </Text>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border border-border/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {t("admin.users.pendingInvites")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <Text size="sm" className="text-muted-foreground">
+                No pending
+              </Text>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters and Search */}
+        <Card className="shadow-sm border border-border/40">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <UserIcon className="w-4 h-4 mr-2" />
+              {t("admin.users.userManagement")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4 mb-6">
+              <div className="relative flex-1">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t("admin.users.searchPlaceholder")}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-48">
+                  <FunnelIcon className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder={t("admin.users.filterByRole")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("admin.users.allRoles")}</SelectItem>
+                  <SelectItem value="admin">{t("admin.users.admin")}</SelectItem>
+                  <SelectItem value="manager">{t("admin.users.manager")}</SelectItem>
+                  <SelectItem value="member">{t("admin.users.member")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Users Table */}
+            <div className="space-y-4">
+              {filteredUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={user.avatar || ""} />
+                      <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
+                        {user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium">{user.name}</div>
+                      <Text size="sm" className="text-muted-foreground">
+                        {user.email}
+                      </Text>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <Badge variant="outline" className={getRoleBadgeColor(user.role)}>
+                      {t(`admin.users.${user.role}`)}
+                    </Badge>
+                    <Badge variant="outline" className={getStatusBadgeColor(user.status)}>
+                      {t(`admin.users.${user.status}`)}
+                    </Badge>
+                    <Text size="sm" className="text-muted-foreground w-24">
+                      {user.lastActive}
+                    </Text>
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm">
+                        <PencilIcon className="w-3 h-3" />
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                        <TrashIcon className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </AppShell>
   )
 }
