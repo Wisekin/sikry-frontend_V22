@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 // Define the structure of a financial record based on Building-Plan.md
 interface FinancialRecord {
   id: string;
-  organization_id?: string; // Optional, assuming it might be contextually inferred or added later
+  organization_id?: string;
   source_type: 'campaign' | 'contact' | 'manual_entry' | 'other';
   source_id?: string;
   amount: number;
@@ -14,7 +14,7 @@ interface FinancialRecord {
 }
 
 // Mock data for the API
-const mockFinancialRecords: FinancialRecord[] = [
+let mockFinancialRecords: FinancialRecord[] = [ // Changed to let for in-memory modification
   {
     id: 'rec_001',
     source_type: 'manual_entry',
@@ -65,38 +65,58 @@ const mockFinancialRecords: FinancialRecord[] = [
 ];
 
 export async function GET(request: Request) {
-  // In a real application, you would fetch this data from a database
-  // and handle query parameters for filtering, pagination, etc.
+  const { searchParams } = new URL(request.url);
+  const typeFilter = searchParams.get('type');
+
   try {
-    // Simulate a delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return NextResponse.json(mockFinancialRecords);
+    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+
+    let filteredRecords = mockFinancialRecords;
+    if (typeFilter && (typeFilter === 'income' || typeFilter === 'expense')) {
+      filteredRecords = mockFinancialRecords.filter(record => record.type === typeFilter);
+    }
+
+    return NextResponse.json({ data: filteredRecords });
   } catch (error) {
     console.error("Error fetching financial records:", error);
-    return NextResponse.json({ message: "Error fetching financial records" }, { status: 500 });
+    return NextResponse.json({ error: { message: "Error fetching financial records" } }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
-  // In a real application, you would validate the input and save it to a database
   try {
-    const newRecord = await request.json() as Omit<FinancialRecord, 'id' | 'timestamp'>;
-    // Simulate adding a record
+    const newRecordData = await request.json() as Omit<FinancialRecord, 'id' | 'timestamp'>;
+
+    // Basic type checking
+    if (typeof newRecordData.amount !== 'number' || newRecordData.amount <= 0) {
+      return NextResponse.json({ error: { message: "Invalid amount: Must be a positive number." } }, { status: 400 });
+    }
+    if (newRecordData.type !== 'income' && newRecordData.type !== 'expense') {
+      return NextResponse.json({ error: { message: "Invalid type: Must be 'income' or 'expense'." } }, { status: 400 });
+    }
+    if (!newRecordData.description || typeof newRecordData.description !== 'string' || newRecordData.description.trim() === '') {
+        return NextResponse.json({ error: { message: "Description is required." } }, { status: 400 });
+    }
+    if (!newRecordData.currency || typeof newRecordData.currency !== 'string' || newRecordData.currency.trim().length !== 3) {
+        return NextResponse.json({ error: { message: "Valid 3-letter currency code is required." } }, { status: 400 });
+    }
+     if (!newRecordData.source_type || !['campaign', 'contact', 'manual_entry', 'other'].includes(newRecordData.source_type)) {
+        return NextResponse.json({ error: { message: "Invalid source_type." } }, { status: 400 });
+    }
+
+
     const createdRecord: FinancialRecord = {
-      ...newRecord,
-      id: `rec_${String(Date.now()).slice(-5)}`, // Generate a simple unique ID
+      ...newRecordData,
+      id: `rec_${String(Date.now()).slice(-5)}_${Math.random().toString(36).substring(2, 7)}`, // More unique ID
       timestamp: new Date().toISOString(),
     };
-    mockFinancialRecords.push(createdRecord); // Add to our mock data store
-    return NextResponse.json(createdRecord, { status: 201 });
+    mockFinancialRecords.push(createdRecord);
+    return NextResponse.json({ data: createdRecord }, { status: 201 });
   } catch (error) {
     console.error("Error creating financial record:", error);
-    if (error instanceof SyntaxError) {
-      return NextResponse.json({ message: "Invalid JSON payload" }, { status: 400 });
+    if (error instanceof SyntaxError) { // Specifically for JSON parsing errors
+      return NextResponse.json({ error: { message: "Invalid JSON payload" } }, { status: 400 });
     }
-    return NextResponse.json({ message: "Error creating financial record" }, { status: 500 });
+    return NextResponse.json({ error: { message: "Error creating financial record" } }, { status: 500 });
   }
 }
-
-// You might also want PUT for updates and DELETE for removing records.
-// For now, GET and POST should suffice for initial setup.

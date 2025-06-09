@@ -1,7 +1,7 @@
 import React from 'react';
 import EnterprisePageHeader from '@/components/core/layout/EnterprisePageHeader';
 import QualityMetricCard from '@/components/ui/quality-metric-card';
-import { ListChecks, CheckCircle2, AlertOctagon, PlusCircle, Filter } from 'lucide-react'; // Icons for tasks
+import { ListChecks, CheckCircle2, AlertOctagon, PlusCircle, Filter, Edit2 } from 'lucide-react'; // Added Edit2 for table actions
 
 interface ReEngagementTask {
   id: string;
@@ -14,7 +14,6 @@ interface ReEngagementTask {
 }
 
 const ReEngagementTasksPage = () => {
-  // Mock data - will be replaced by API calls
   const tasks: ReEngagementTask[] = [
     { id: 'task_001', description: 'Draft personalized email for Cold Lead Segment A', leadName: 'Segment A', assignedTo: 'Marketing Team', dueDate: '2023-11-10', status: 'Completed', priority: 'High' },
     { id: 'task_002', description: 'Follow-up call with Jane Doe (Warm Lead)', leadName: 'Jane Doe', assignedTo: 'Sales Rep Alice', dueDate: '2023-11-12', status: 'Open', priority: 'High' },
@@ -24,41 +23,47 @@ const ReEngagementTasksPage = () => {
   ];
 
   const openTasks = tasks.filter(t => t.status === 'Open' || t.status === 'In Progress').length;
-  const completedToday = tasks.filter(t => t.status === 'Completed' && t.dueDate === new Date().toISOString().split('T')[0]).length; // Simple check for today
+  const completedToday = tasks.filter(t => t.status === 'Completed' && t.dueDate === new Date().toISOString().split('T')[0]).length;
   const overdueTasks = tasks.filter(t => t.status === 'Overdue').length;
 
-  const getStatusColor = (status: ReEngagementTask['status']) => {
-    if (status === 'Completed') return 'bg-green-500/30 text-green-300';
-    if (status === 'Overdue') return 'bg-red-500/30 text-red-300';
-    if (status === 'In Progress') return 'bg-blue-500/30 text-blue-300';
-    return 'bg-gray-500/30 text-gray-300'; // Open
+  const getStatusBadgeStyle = (status: ReEngagementTask['status']) => {
+    switch (status) {
+      case 'Completed': return 'bg-green-100 text-green-700';
+      case 'Overdue': return 'bg-red-100 text-red-700';
+      case 'In Progress': return 'bg-blue-100 text-blue-700';
+      case 'Open': return 'bg-gray-100 text-gray-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
   };
 
-  const getPriorityColor = (priority: ReEngagementTask['priority']) => {
-    if (priority === 'High') return 'text-red-400';
-    if (priority === 'Medium') return 'text-yellow-400';
-    return 'text-green-400'; // Low
+  const getPriorityTextStyle = (priority: ReEngagementTask['priority']) => {
+    switch (priority) {
+      case 'High': return 'text-red-600 font-semibold';
+      case 'Medium': return 'text-amber-600 font-semibold';
+      case 'Low': return 'text-green-600 font-semibold';
+      default: return 'text-gray-700';
+    }
   };
 
   return (
-    <div>
+    <div className="bg-gray-50/50 min-h-screen">
       <EnterprisePageHeader title="Re-engagement Tasks" subtitle="Manage and track your re-engagement activities." />
 
-      <div className="p-6">
+      <div className="p-6 md:p-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <QualityMetricCard title="Open Tasks" value={openTasks} icon={<ListChecks size={24} />} />
-          <QualityMetricCard title="Completed Today" value={completedToday} icon={<CheckCircle2 size={24} />} />
-          <QualityMetricCard title="Overdue Tasks" value={overdueTasks} icon={<AlertOctagon size={24} />} />
+          <QualityMetricCard title="Open Tasks" value={openTasks} icon={<ListChecks size={24} className="text-blue-500" />} change="+3 today" changeColor="text-green-600" />
+          <QualityMetricCard title="Completed Today" value={completedToday} icon={<CheckCircle2 size={24} className="text-green-500" />} />
+          <QualityMetricCard title="Overdue Tasks" value={overdueTasks} icon={<AlertOctagon size={24} className="text-red-500" />} change={`${overdueTasks} urgent`} changeColor="text-red-600"/>
         </div>
 
-        <div className="bg-[#2A3050] p-6 rounded-lg shadow-md text-[#FFFFFF]">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Task List</h2>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+            <h2 className="text-xl font-semibold text-[#1B1F3B] mb-3 sm:mb-0">Task List</h2>
             <div className="flex items-center space-x-3">
-                <button className="bg-[#3C4568] hover:bg-[#4A5578] text-white py-2 px-3 rounded-lg flex items-center text-sm">
+                <button className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 py-2 px-4 rounded-lg flex items-center text-sm transition-colors">
                     <Filter size={16} className="mr-2" /> Filter
                 </button>
-                <button className="bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg flex items-center text-sm">
+                <button className="bg-[#1B1F3B] hover:bg-[#2A3050] text-white py-2 px-4 rounded-lg flex items-center text-sm transition-colors">
                     <PlusCircle size={16} className="mr-2" /> Create New Task
                 </button>
             </div>
@@ -66,42 +71,42 @@ const ReEngagementTasksPage = () => {
 
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-[#1B1F3B]">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-3 py-2 text-left">Description</th>
-                  <th className="px-3 py-2 text-left">Lead/Segment</th>
-                  <th className="px-3 py-2 text-left">Assigned To</th>
-                  <th className="px-3 py-2 text-left">Due Date</th>
-                  <th className="px-3 py-2 text-left">Priority</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-left">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Description</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Lead/Segment</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Assigned To</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Due Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Priority</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {tasks.map((task) => (
-                  <tr key={task.id} className="border-b border-[#3C4568] hover:bg-[#3C4568]/50">
-                    <td className="px-3 py-2">{task.description}</td>
-                    <td className="px-3 py-2">{task.leadName || 'N/A'}</td>
-                    <td className="px-3 py-2">{task.assignedTo || 'Unassigned'}</td>
-                    <td className="px-3 py-2">{task.dueDate}</td>
-                    <td className="px-3 py-2">
-                        <span className={`${getPriorityColor(task.priority)} font-semibold`}>{task.priority}</span>
+                  <tr key={task.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-800">{task.description}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-700">{task.leadName || 'N/A'}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-700">{task.assignedTo || 'Unassigned'}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-700">{task.dueDate}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                        <span className={getPriorityTextStyle(task.priority)}>{task.priority}</span>
                     </td>
-                    <td className="px-3 py-2">
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(task.status)}`}>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeStyle(task.status)}`}>
                         {task.status}
                       </span>
                     </td>
-                    <td className="px-3 py-2">
-                      <button className="text-blue-400 hover:text-blue-300 text-xs mr-2">Edit</button>
-                      <button className="text-green-400 hover:text-green-300 text-xs">Done</button>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <button className="text-blue-600 hover:text-blue-800 mr-3 transition-colors"><Edit2 size={16} /></button>
+                      <button className="text-green-600 hover:text-green-800 transition-colors"><CheckCircle2 size={16} /></button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {tasks.length === 0 && <p className="text-center py-4">No tasks found.</p>}
+          {tasks.length === 0 && <p className="text-center py-4 text-gray-500">No tasks found.</p>}
         </div>
       </div>
     </div>

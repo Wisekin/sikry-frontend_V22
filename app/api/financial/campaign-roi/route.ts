@@ -18,8 +18,8 @@ const mockCampaignRoiData: CampaignRoiData[] = [
     campaign_name: 'Q4 Holiday Push 2023',
     total_spend: 15000,
     total_revenue: 45000,
-    net_profit: 30000, // revenue - spend
-    roi_percentage: 200, // (net_profit / total_spend) * 100
+    net_profit: 30000,
+    roi_percentage: 200,
     start_date: '2023-11-01T00:00:00Z',
     end_date: '2023-12-31T23:59:59Z',
     status: 'completed'
@@ -39,7 +39,7 @@ const mockCampaignRoiData: CampaignRoiData[] = [
     campaign_id: 'camp_003',
     campaign_name: 'Summer SaaS Promo',
     total_spend: 10000,
-    total_revenue: 12500, // Adjusted for slight profit
+    total_revenue: 12500,
     net_profit: 2500,
     roi_percentage: 25,
     start_date: '2023-06-01T00:00:00Z',
@@ -50,7 +50,7 @@ const mockCampaignRoiData: CampaignRoiData[] = [
     campaign_id: 'camp_004',
     campaign_name: 'New Year Engagement 2024',
     total_spend: 12000,
-    total_revenue: 5000, // Resulting in a loss
+    total_revenue: 5000,
     net_profit: -7000,
     roi_percentage: -58.33,
     start_date: '2024-01-01T00:00:00Z',
@@ -60,27 +60,40 @@ const mockCampaignRoiData: CampaignRoiData[] = [
     campaign_id: 'camp_005',
     campaign_name: 'Influencer Outreach Q1 2024',
     total_spend: 8000,
-    total_revenue: 0, // No revenue yet
+    total_revenue: 0,
     net_profit: -8000,
     roi_percentage: -100,
     start_date: '2024-02-01T00:00:00Z',
     status: 'planned'
+  },
+  {
+    campaign_id: 'camp_006',
+    campaign_name: 'Archived Test Campaign',
+    total_spend: 1000,
+    total_revenue: 500,
+    net_profit: -500,
+    roi_percentage: -50,
+    start_date: '2022-01-01T00:00:00Z',
+    end_date: '2022-01-31T23:59:59Z',
+    status: 'archived'
   }
 ];
 
 export async function GET(request: Request) {
-  // In a real application, this data would be calculated by joining campaign data
-  // with financial records (expenses for spend, income for revenue).
-  // Filters for date range, status, etc., would be applied here.
+  const { searchParams } = new URL(request.url);
+  const statusFilter = searchParams.get('status');
+
   try {
-    // Simulate a delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return NextResponse.json(mockCampaignRoiData);
+    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+
+    let filteredCampaigns = mockCampaignRoiData;
+    if (statusFilter && ['active', 'completed', 'planned', 'archived'].includes(statusFilter)) {
+      filteredCampaigns = mockCampaignRoiData.filter(campaign => campaign.status === statusFilter);
+    }
+
+    return NextResponse.json({ data: filteredCampaigns });
   } catch (error) {
     console.error("Error fetching campaign ROI data:", error);
-    return NextResponse.json({ message: "Error fetching campaign ROI data" }, { status: 500 });
+    return NextResponse.json({ error: { message: "Error fetching campaign ROI data" } }, { status: 500 });
   }
 }
-
-// POST, PUT, DELETE for campaign ROI data might not be directly applicable here
-// as this data is usually derived. However, one might manage campaign metadata itself elsewhere.

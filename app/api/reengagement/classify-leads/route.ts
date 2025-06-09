@@ -12,8 +12,7 @@ interface ClassificationRule {
   name: string;
   description: string;
   classification_target: 'Hot' | 'Warm' | 'Cold';
-  criteria_summary: string; // A human-readable summary of the rule logic
-  // In a real system, this would also include structured criteria for processing
+  criteria_summary: string;
 }
 
 // Mock data store
@@ -32,39 +31,48 @@ let mockClassificationRules: ClassificationRule[] = [
 ];
 
 export async function GET(request: Request) {
-  // In a real application, stats would be queried from the database based on lead data and rules.
-  // Rules would also be fetched from a database.
   try {
-    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+    await new Promise(resolve => setTimeout(resolve, 300));
     return NextResponse.json({
-      stats: mockClassificationStats,
-      rules: mockClassificationRules,
+      data: { // Wrapped response
+        stats: mockClassificationStats,
+        rules: mockClassificationRules,
+      }
     });
   } catch (error) {
     console.error("Error fetching lead classification data:", error);
-    return NextResponse.json({ message: "Error fetching lead classification data" }, { status: 500 });
+    return NextResponse.json({ error: { message: "Error fetching lead classification data" } }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
-  // This endpoint could be used to add a new classification rule.
-  // For now, it's a placeholder.
   try {
-    const newRule = await request.json() as Omit<ClassificationRule, 'id'>;
+    const newRuleData = await request.json() as Omit<ClassificationRule, 'id'>;
+
+    // Basic validation
+    if (!newRuleData.name || typeof newRuleData.name !== 'string' || newRuleData.name.trim() === '') {
+        return NextResponse.json({ error: { message: "Rule name is required." } }, { status: 400 });
+    }
+    if (!newRuleData.classification_target || !['Hot', 'Warm', 'Cold'].includes(newRuleData.classification_target)) {
+        return NextResponse.json({ error: { message: "Invalid or missing classification_target. Must be 'Hot', 'Warm', or 'Cold'." } }, { status: 400 });
+    }
+    if (!newRuleData.criteria_summary || typeof newRuleData.criteria_summary !== 'string' || newRuleData.criteria_summary.trim() === '') {
+        return NextResponse.json({ error: { message: "Criteria summary is required." } }, { status: 400 });
+    }
+    // Description is optional, so no validation for it here.
+
     const createdRule: ClassificationRule = {
-      ...newRule,
-      id: `rule_${String(Date.now()).slice(-5)}`,
+      ...newRuleData,
+      id: `rule_${String(Date.now()).slice(-5)}_${Math.random().toString(36).substring(2, 7)}`,
     };
     mockClassificationRules.push(createdRule);
-    // In a real app, you might want to re-calculate stats after adding a rule, or trigger a background job.
-    return NextResponse.json(createdRule, { status: 201 });
+
+    return NextResponse.json({ data: createdRule }, { status: 201 });
   } catch (error) {
     console.error("Error creating classification rule:", error);
-    return NextResponse.json({ message: "Error creating classification rule" }, { status: 500 });
+    if (error instanceof SyntaxError) {
+      return NextResponse.json({ error: { message: "Invalid JSON payload" } }, { status: 400 });
+    }
+    return NextResponse.json({ error: { message: "Error creating classification rule" } }, { status: 500 });
   }
 }
-
-// Further development could include:
-// - PUT /api/reengagement/classify-leads/rules/{rule_id} to update a rule
-// - DELETE /api/reengagement/classify-leads/rules/{rule_id} to delete a rule
-// - POST /api/reengagement/classify-leads/run to trigger a re-classification job for all leads

@@ -1,85 +1,46 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
-  try {
-    const supabase = createClient()
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get("status")
-    const type = searchParams.get("type")
-
-    let query = supabase
-      .from("funnels")
-      .select(`
-        *,
-        funnel_steps(*),
-        funnel_analytics(*)
-      `)
-      .order("created_at", { ascending: false })
-
-    if (status) {
-      query = query.eq("status", status)
-    }
-
-    if (type) {
-      query = query.eq("funnel_type", type)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ funnels: data })
-  } catch (error) {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
-  }
+interface OverallFunnelStats {
+  total_funnels_count: number;
+  total_leads_in_all_funnels: number; // Sum of leads from all active funnels
+  average_conversion_rate_all_funnels: number; // Weighted average or simple average
+  top_performing_funnel_by_conversion?: {
+    funnel_id: string;
+    funnel_name: string;
+    conversion_rate_percent: number;
+  };
+  top_performing_funnel_by_revenue?: { // Assuming funnels can be tied to revenue
+    funnel_id: string;
+    funnel_name: string;
+    revenue_generated_usd: number;
+  };
 }
 
-export async function POST(request: NextRequest) {
+// Mock data for overall funnel statistics
+// In a real app, this would be calculated dynamically from all funnels data
+const mockOverallFunnelStats: OverallFunnelStats = {
+  total_funnels_count: 2, // Based on mockFunnelsList in progress/route.ts or builder/route.ts
+  total_leads_in_all_funnels: 750, // Sum of 250 + 500 from mock progress data
+  average_conversion_rate_all_funnels: 25.0, // (20+30)/2 = 25% (simple average)
+  top_performing_funnel_by_conversion: {
+    funnel_id: 'fnl_webinar_002',
+    funnel_name: 'Webinar Signup Funnel',
+    conversion_rate_percent: 30.0,
+  },
+  top_performing_funnel_by_revenue: { // Example, assuming revenue can be tracked per funnel
+    funnel_id: 'fnl_onboarding_001',
+    funnel_name: 'SaaS Trial Onboarding Funnel',
+    revenue_generated_usd: 12500, // Mocked revenue
+  },
+};
+
+export async function GET(request: Request) {
+  // In a real application, these stats would be aggregated from the funnels data (builder definitions, progress data, etc.)
   try {
-    const supabase = createClient()
-    const body = await request.json()
-
-    const { data: funnel, error: funnelError } = await supabase
-      .from("funnels")
-      .insert({
-        name: body.name,
-        description: body.description,
-        funnel_type: body.funnel_type || "lead_nurture",
-        trigger_conditions: body.trigger_conditions || {},
-        exit_conditions: body.exit_conditions || {},
-        steps: body.steps || [],
-      })
-      .select()
-      .single()
-
-    if (funnelError) {
-      return NextResponse.json({ error: funnelError.message }, { status: 500 })
-    }
-
-    // Create funnel steps if provided
-    if (body.steps && body.steps.length > 0) {
-      const stepsData = body.steps.map((step: any, index: number) => ({
-        funnel_id: funnel.id,
-        step_order: index + 1,
-        step_name: step.name,
-        step_type: step.type,
-        step_config: step.config || {},
-        success_criteria: step.success_criteria || {},
-        failure_criteria: step.failure_criteria || {},
-      }))
-
-      const { error: stepsError } = await supabase.from("funnel_steps").insert(stepsData)
-
-      if (stepsError) {
-        console.error("Error creating funnel steps:", stepsError)
-      }
-    }
-
-    return NextResponse.json({ funnel })
+    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+    return NextResponse.json({ data: mockOverallFunnelStats });
   } catch (error) {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Error fetching overall funnel stats:", error);
+    return NextResponse.json({ error: { message: "Error fetching overall funnel stats" } }, { status: 500 });
   }
 }

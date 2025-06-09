@@ -1,13 +1,13 @@
 import React from 'react';
 import EnterprisePageHeader from '@/components/core/layout/EnterprisePageHeader';
 import QualityMetricCard from '@/components/ui/quality-metric-card';
-import { Gift, DollarSign, HelpCircle, ListChecks, Users } from 'lucide-react'; // Icons for rewards page
+import { Gift, DollarSign, HelpCircle, ListChecks, Users } from 'lucide-react';
 
 interface RewardTier {
   id: string;
   name: string;
   description: string;
-  rewardForReferrer: string; // e.g., "$50 USD" or "10% off next bill"
+  rewardForReferrer: string;
   rewardForReferee: string;
   conditions: string[];
 }
@@ -27,7 +27,6 @@ interface RewardsProgramDetails {
 }
 
 const ReferralRewardsPage = () => {
-  // Mock data - will be replaced by API call
   const rewardsProgram: RewardsProgramDetails = {
     programName: "Our Awesome Referral Program",
     howItWorksSummary: "Invite your friends to join us! When they sign up and make their first qualifying action (like a purchase or subscription), you both get rewarded. It's a win-win!",
@@ -73,57 +72,52 @@ const ReferralRewardsPage = () => {
   };
 
   return (
-    <div>
+    <div className="bg-gray-50/50 min-h-screen">
       <EnterprisePageHeader title={rewardsProgram.programName} subtitle="Learn about the rewards you can earn by referring friends." />
 
-      <div className="p-6 text-[#FFFFFF]">
+      <div className="p-6 md:p-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <QualityMetricCard
             title="Referrer Reward (Standard)"
             value={rewardsProgram.rewardTiers[0]?.rewardForReferrer || 'N/A'}
-            icon={<Gift size={24} />}
-            bgColor="bg-[#2A3050]" hoverBgColor="hover:bg-[#3C4568]"
+            icon={<Gift size={24} className="text-indigo-500" />}
           />
           <QualityMetricCard
             title="Referee Reward (Standard)"
             value={rewardsProgram.rewardTiers[0]?.rewardForReferee || 'N/A'}
-            icon={<DollarSign size={24} />}
-            bgColor="bg-[#2A3050]" hoverBgColor="hover:bg-[#3C4568]"
+            icon={<DollarSign size={24} className="text-green-500" />}
           />
            <QualityMetricCard
             title="Friends To Invite"
             value="Unlimited"
-            icon={<Users size={24} />}
-            bgColor="bg-[#2A3050]" hoverBgColor="hover:bg-[#3C4568]"
+            icon={<Users size={24} className="text-blue-500" />}
           />
         </div>
 
-        {/* How it Works */}
-        <div className="bg-[#2A3050] p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-xl font-semibold mb-3 text-white">How It Works</h2>
-          <p className="text-gray-300">{rewardsProgram.howItWorksSummary}</p>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+          <h2 className="text-xl font-semibold mb-3 text-[#1B1F3B]">How It Works</h2>
+          <p className="text-gray-700 leading-relaxed">{rewardsProgram.howItWorksSummary}</p>
         </div>
 
-        {/* Reward Tiers */}
-        <div className="bg-[#2A3050] p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-xl font-semibold mb-4 text-white">Reward Details</h2>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+          <h2 className="text-xl font-semibold mb-4 text-[#1B1F3B]">Reward Details</h2>
           {rewardsProgram.rewardTiers.map(tier => (
-            <div key={tier.id} className="mb-6 pb-4 border-b border-[#3C4568] last:border-b-0 last:pb-0">
-              <h3 className="text-lg font-semibold text-[#ADD8E6] mb-2">{tier.name}</h3> {/* Light blue for tier name */}
-              <p className="text-sm text-gray-300 mb-2">{tier.description}</p>
+            <div key={tier.id} className="mb-6 pb-4 border-b border-gray-200 last:border-b-0 last:pb-0">
+              <h3 className="text-lg font-semibold text-blue-600 mb-2">{tier.name}</h3>
+              <p className="text-sm text-gray-600 mb-2">{tier.description}</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                    <p className="text-gray-400">You Get:</p>
-                    <p className="font-semibold text-white">{tier.rewardForReferrer}</p>
+                <div className="bg-gray-50 p-3 rounded-md">
+                    <p className="text-gray-500 mb-1">You Get:</p>
+                    <p className="font-semibold text-gray-800">{tier.rewardForReferrer}</p>
                 </div>
-                <div>
-                    <p className="text-gray-400">Your Friend Gets:</p>
-                    <p className="font-semibold text-white">{tier.rewardForReferee}</p>
+                <div className="bg-gray-50 p-3 rounded-md">
+                    <p className="text-gray-500 mb-1">Your Friend Gets:</p>
+                    <p className="font-semibold text-gray-800">{tier.rewardForReferee}</p>
                 </div>
               </div>
-              <div className="mt-3">
-                <h4 className="text-sm font-semibold text-gray-200 mb-1">Conditions:</h4>
-                <ul className="list-disc list-inside text-xs text-gray-400 space-y-1">
+              <div className="mt-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-1">Conditions:</h4>
+                <ul className="list-disc list-inside text-sm text-gray-600 space-y-1 pl-4">
                   {tier.conditions.map((condition, index) => <li key={index}>{condition}</li>)}
                 </ul>
               </div>
@@ -131,28 +125,26 @@ const ReferralRewardsPage = () => {
           ))}
         </div>
 
-        {/* Eligibility & Claim Process */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="bg-[#2A3050] p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-3 text-white flex items-center"><ListChecks size={20} className="mr-2"/>Eligibility Criteria</h2>
-                <ul className="list-disc list-inside text-sm text-gray-300 space-y-1">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 className="text-xl font-semibold mb-3 text-[#1B1F3B] flex items-center"><ListChecks size={20} className="mr-2 text-gray-400"/>Eligibility Criteria</h2>
+                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 pl-4 leading-relaxed">
                     {rewardsProgram.eligibilityNotes.map((note, index) => <li key={index}>{note}</li>)}
                 </ul>
             </div>
-            <div className="bg-[#2A3050] p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-3 text-white">Claiming Your Rewards</h2>
-                <p className="text-sm text-gray-300">{rewardsProgram.claimProcessInfo}</p>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 className="text-xl font-semibold mb-3 text-[#1B1F3B]">Claiming Your Rewards</h2>
+                <p className="text-sm text-gray-700 leading-relaxed">{rewardsProgram.claimProcessInfo}</p>
             </div>
         </div>
 
-        {/* FAQ */}
-        <div className="bg-[#2A3050] p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-white flex items-center"><HelpCircle size={20} className="mr-2"/>Frequently Asked Questions</h2>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold mb-4 text-[#1B1F3B] flex items-center"><HelpCircle size={20} className="mr-2 text-gray-400"/>Frequently Asked Questions</h2>
           <div className="space-y-4">
             {rewardsProgram.faq.map((item, index) => (
-              <div key={index}>
-                <h3 className="font-semibold text-gray-100">{item.question}</h3>
-                <p className="text-sm text-gray-400">{item.answer}</p>
+              <div key={index} className="border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
+                <h3 className="font-semibold text-gray-800">{item.question}</h3>
+                <p className="text-sm text-gray-600 mt-1 leading-relaxed">{item.answer}</p>
               </div>
             ))}
           </div>

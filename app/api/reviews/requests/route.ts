@@ -1,180 +1,115 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
+import { NextResponse } from 'next/server';
+
+interface ReviewRequestRecord {
+  request_id: string;
+  date_sent: string;
+  recipient_email: string;
+  recipient_name?: string;
+  status: 'Sent' | 'Opened' | 'Clicked' | 'Reviewed' | 'Failed' | 'Bounced';
+  review_platform_target: string;
+  campaign_id?: string;
+  review_link_clicked_at?: string;
+  review_submitted_at?: string;
+  created_at: string;
+  updated_at: string;
+  notes?: string;
+}
+
+let mockReviewRequests: ReviewRequestRecord[] = [
+  { request_id: 'req_001', date_sent: '2023-11-05T10:00:00Z', recipient_email: 'alice.j@example.com', recipient_name: 'Alice Johnson', status: 'Reviewed', review_platform_target: 'Google', campaign_id: 'q4_push', review_submitted_at: '2023-11-06T14:00:00Z', created_at: '2023-11-05T10:00:00Z', updated_at: '2023-11-06T14:00:00Z' },
+  { request_id: 'req_002', date_sent: '2023-11-05T11:00:00Z', recipient_email: 'bob.w@example.com', recipient_name: 'Bob Williams', status: 'Opened', review_platform_target: 'Trustpilot', created_at: '2023-11-05T11:00:00Z', updated_at: '2023-11-05T15:00:00Z' },
+  { request_id: 'req_003', date_sent: '2023-11-04T09:30:00Z', recipient_email: 'carol.d@example.com', recipient_name: 'Carol Davis', status: 'Sent', review_platform_target: 'Google', created_at: '2023-11-04T09:30:00Z', updated_at: '2023-11-04T09:30:00Z' },
+  { request_id: 'req_004', date_sent: '2023-11-04T14:00:00Z', recipient_email: 'david.m@example.com', recipient_name: 'David Miller', status: 'Clicked', review_platform_target: 'Capterra', campaign_id: 'saas_promo', review_link_clicked_at: '2023-11-04T18:00:00Z', created_at: '2023-11-04T14:00:00Z', updated_at: '2023-11-04T18:00:00Z' },
+  { request_id: 'req_005', date_sent: '2023-11-03T16:00:00Z', recipient_email: 'eve.w@example.com', recipient_name: 'Eve Wilson', status: 'Failed', review_platform_target: 'Google', created_at: '2023-11-03T16:00:00Z', updated_at: '2023-11-03T16:05:00Z', notes: "Invalid email address" },
+];
+
+const validRequestStatuses: ReviewRequestRecord['status'][] = ['Sent', 'Opened', 'Clicked', 'Reviewed', 'Failed', 'Bounced'];
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const statusFilter = searchParams.get('status') as ReviewRequestRecord['status'] | null;
+  const platformFilter = searchParams.get('review_platform_target');
+
   try {
-    const { searchParams } = new URL(request.url)
-    const page = Number.parseInt(searchParams.get("page") || "1", 10)
-    const limit = Number.parseInt(searchParams.get("limit") || "10", 10)
-    const status = searchParams.get("status")
-    const platform = searchParams.get("platform")
-    const contact_id = searchParams.get("contact_id")
+    await new Promise(resolve => setTimeout(resolve, 300));
+    let filteredRequests = mockReviewRequests;
 
-    const supabase = await createClient()
-
-    // Get current user's organization
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-
-    if (userError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (statusFilter && validRequestStatuses.includes(statusFilter)) {
+      filteredRequests = filteredRequests.filter(req => req.status === statusFilter);
+    }
+    if (platformFilter) {
+      filteredRequests = filteredRequests.filter(req => req.review_platform_target.toLowerCase() === platformFilter.toLowerCase());
     }
 
-    const { data: teamMember, error: teamError } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
-
-    if (teamError || !teamMember) {
-      return NextResponse.json({ error: "User not part of any organization" }, { status: 403 })
-    }
-
-    // Build query with filters
-    let query = supabase
-      .from("review_requests")
-      .select(
-        `
-        *,
-        contact:contact_id(id, name, email),
-        campaign:campaign_id(id, name, status)
-      `,
-        { count: "exact" },
-      )
-      .eq("organization_id", teamMember.organization_id)
-
-    if (status) {
-      query = query.eq("status", status)
-    }
-
-    if (platform) {
-      query = query.eq("platform", platform)
-    }
-
-    if (contact_id) {
-      query = query.eq("contact_id", contact_id)
-    }
-
-    // Apply pagination
-    const from = (page - 1) * limit
-    const to = from + limit - 1
-    query = query.range(from, to).order("created_at", { ascending: false })
-
-    const { data, error, count } = await query
-
-    if (error) {
-      throw error
-    }
-
-    return NextResponse.json({
-      data: data || [],
-      success: true,
-      meta: {
-        total: count || 0,
-        page,
-        limit,
-        hasMore: count ? from + data.length < count : false,
-      },
-    })
+    return NextResponse.json({ data: filteredRequests });
   } catch (error) {
-    console.error("Review requests API error:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch review requests",
-        errors: [{ code: "fetch_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
-    )
+    console.error("Error fetching review requests:", error);
+    return NextResponse.json({ error: { message: "Error fetching review requests" } }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const supabase = await createClient()
+    const body = await request.json() as Omit<ReviewRequestRecord, 'request_id' | 'date_sent' | 'created_at' | 'updated_at' | 'status'>;
 
-    // Get current user's organization
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-
-    if (userError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!body.recipient_email || !/\S+@\S+\.\S+/.test(body.recipient_email)) { // Simple email validation
+        return NextResponse.json({ error: { message: "Valid recipient_email is required." } }, { status: 400 });
+    }
+    if (!body.review_platform_target || typeof body.review_platform_target !== 'string' || body.review_platform_target.trim() === '') {
+        return NextResponse.json({ error: { message: "review_platform_target is required." } }, { status: 400 });
     }
 
-    const { data: teamMember, error: teamError } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
-
-    if (teamError || !teamMember) {
-      return NextResponse.json({ error: "User not part of any organization" }, { status: 403 })
-    }
-
-    // Validate required fields
-    if (!body.contact_id || !body.review_url) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Missing required fields",
-          errors: [{ code: "validation_error", message: "Contact ID and review URL are required" }],
-        },
-        { status: 400 },
-      )
-    }
-
-    // Create review request
-    const reviewRequestData = {
-      organization_id: teamMember.organization_id,
-      contact_id: body.contact_id,
-      campaign_id: body.campaign_id || null,
-      platform: body.platform || "google",
-      review_url: body.review_url,
-      business_name: body.business_name || null,
-      request_type: body.request_type || "manual",
-      trigger_event: body.trigger_event || null,
-      message_template_id: body.message_template_id || null,
-      sent_via: body.sent_via || "email",
-      expires_at: body.expires_at || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      metadata: body.metadata || {},
-      notes: body.notes || null,
-    }
-
-    const { data, error } = await supabase
-      .from("review_requests")
-      .insert(reviewRequestData)
-      .select(
-        `
-        *,
-        contact:contact_id(id, name, email),
-        campaign:campaign_id(id, name, status)
-      `,
-      )
-      .single()
-
-    if (error) {
-      throw error
-    }
-
-    return NextResponse.json({
-      data,
-      success: true,
-      message: "Review request created successfully",
-    })
+    const newRequest: ReviewRequestRecord = {
+      ...body,
+      request_id: `req_${String(Date.now()).slice(-6)}_${Math.random().toString(36).substring(2, 7)}`,
+      date_sent: new Date().toISOString(),
+      status: 'Sent',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    mockReviewRequests.unshift(newRequest);
+    return NextResponse.json({ data: newRequest }, { status: 201 });
   } catch (error) {
-    console.error("Review requests API error:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to create review request",
-        errors: [{ code: "create_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
-    )
+    console.error("Error creating review request:", error);
+    if (error instanceof SyntaxError) {
+      return NextResponse.json({ error: { message: "Invalid JSON payload" } }, { status: 400 });
+    }
+    return NextResponse.json({ error: { message: "Error creating review request" } }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const requestId = searchParams.get('requestId');
+    if (!requestId) {
+      return NextResponse.json({ error: { message: "Request ID (requestId) is required" } }, { status: 400 });
+    }
+    const { status, ...otherUpdates } = await request.json() as Partial<ReviewRequestRecord>;
+
+    if (status && !validRequestStatuses.includes(status)) {
+      return NextResponse.json({ error: { message: `Invalid status. Must be one of: ${validRequestStatuses.join(', ')}` } }, { status: 400 });
+    }
+
+    const requestIndex = mockReviewRequests.findIndex(r => r.request_id === requestId);
+    if (requestIndex === -1) {
+      return NextResponse.json({ error: { message: "Review request not found" } }, { status: 404 });
+    }
+
+    const updatedRequest = {
+        ...mockReviewRequests[requestIndex],
+        ... (status && { status }), // only update status if provided
+        ...otherUpdates, // apply other potential updates
+        updated_at: new Date().toISOString()
+    };
+    mockReviewRequests[requestIndex] = updatedRequest;
+
+    return NextResponse.json({ data: updatedRequest });
+  } catch (error) {
+    console.error("Error updating review request:", error);
+    if (error instanceof SyntaxError) {
+      return NextResponse.json({ error: { message: "Invalid JSON payload" } }, { status: 400 });
+    }
+    return NextResponse.json({ error: { message: "Error updating review request" } }, { status: 500 });
   }
 }

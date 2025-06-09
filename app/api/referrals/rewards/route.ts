@@ -4,12 +4,9 @@ interface ApiRewardTier {
   tier_id: string;
   name: string;
   description: string;
-  reward_for_referrer_display: string; // e.g., "$50 USD Credit"
-  reward_for_referee_display: string; // e.g., "$25 USD Discount"
-  // Actual values might be stored separately for calculation if needed
-  // reward_for_referrer_value_usd?: number;
-  // reward_for_referee_value_usd?: number;
-  conditions: string[]; // Array of condition descriptions
+  reward_for_referrer_display: string;
+  reward_for_referee_display: string;
+  conditions: string[];
 }
 
 interface ApiFAQItem {
@@ -72,13 +69,11 @@ const mockRewardsProgramData: RewardsProgramDetailsApiResponse = {
 };
 
 export async function GET(request: Request) {
-  // This endpoint returns static-like information about the rewards program.
-  // In a more complex system, parts of this might be configurable by an admin via another interface.
   try {
-    await new Promise(resolve => setTimeout(resolve, 200)); // Simulate delay
-    return NextResponse.json(mockRewardsProgramData);
+    await new Promise(resolve => setTimeout(resolve, 200));
+    return NextResponse.json({ data: mockRewardsProgramData }); // Wrapped response
   } catch (error) {
     console.error("Error fetching rewards program details:", error);
-    return NextResponse.json({ message: "Error fetching rewards program details" }, { status: 500 });
+    return NextResponse.json({ error: { message: "Error fetching rewards program details" } }, { status: 500 });
   }
 }
