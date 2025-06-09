@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openai"
+import OpenAI from "openai"
 
 export interface ParsedQuery {
   industry?: string
@@ -29,23 +29,34 @@ export async function parseQuery(query: string): Promise<ParsedQuery> {
  * OpenAI-powered parser (modular, can be swapped for other providers)
  */
 async function parseWithOpenAI(query: string, apiKey: string): Promise<ParsedQuery | null> {
-  const configuration = new Configuration({ apiKey })
-  const openai = new OpenAIApi(configuration)
-  const prompt = `Extract the following entities from the user query if present: industry, location, company size (number or range of employees), and keywords. Return as JSON.\n\nQuery: "${query}"\n\nExample output:\n{\n  "industry": "marketing",\n  "location": "Paris",\n  "size": "less than 20 employees",\n  "keywords": ["marketing", "Paris", "less than 20 employees"]\n}`
-  const completion = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
-    messages: [
-      { role: "system", content: "You are an assistant that extracts structured search parameters from user queries." },
-      { role: "user", content: prompt }
-    ],
-    max_tokens: 150,
-    temperature: 0.2,
+  const openai = new OpenAI({
+    apiKey: apiKey,
   })
-  const text = completion.data.choices[0].message?.content || ""
+
   try {
-    const parsed = JSON.parse(text)
-    return { ...parsed, raw: query }
-  } catch {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that parses search queries into structured data. Extract industry, location, company size, and keywords from the query.",
+        },
+        {
+          role: "user",
+          content: query,
+        },
+      ],
+      temperature: 0.3,
+      response_format: { type: "json_object" }
+    })
+
+    const content = response.choices[0]?.message?.content
+    if (!content) return null
+
+    // Parse the response (assuming it's in JSON format)
+    return { ...JSON.parse(content), raw: query } as ParsedQuery
+  } catch (error) {
+    console.error("OpenAI API error:", error)
     return null
   }
 }
