@@ -22,9 +22,9 @@ export const translations = {
       gapAnalysis: "Gap Analysis",
       vsl: "VSL Pages",
       leadResponse: "Lead Response",
-      analytics: "Analytics",
-      overview: "Overview",
-      statisticsOverview: "Overview",
+      analytics: "Analytics", // Main nav item for Analytics module
+      overview: "Overview", // Generic overview, often used as sub-nav
+      statisticsOverview: "Overview", // Statistics specific overview
       statisticsCollectionTrends: "Collection Trends",
       statisticsGeographicDistribution: "Geographic Distribution",
       statisticsSectorDistribution: "Sector Distribution",
@@ -41,6 +41,7 @@ export const translations = {
         scheduleJob: "Schedule Job"
       }
     },
+    // ... (other existing modules like comms, companies, search, dashboard are preserved) ...
     comms: {
       campaigns: "Campaigns",
       templates: "Templates",
@@ -155,28 +156,7 @@ export const translations = {
       performance: "Performance"
     },
     financial: {
-      ...{ // Existing financial keys from the file
-        dashboard: "Financial Dashboard",
-        dashboardDescription: "Overview of your financial data",
-        addRecord: "Add Record",
-        records: "Records",
-        summary: "Summary",
-        campaignRoi: "Campaign ROI",
-        campaignROI: "Campaign ROI", // Note: campaignRoi and campaignROI might be redundant, choose one
-        campaign: "Campaign",
-        revenue: "Revenue",
-        cost: "Cost",
-        costs: "Costs",
-        expense: "Expense",
-        refund: "Refund",
-        currency: "Currency",
-        type: "Type",
-        source: "Source",
-        amount: "Amount",
-        category: "Category",
-        netProfit: "Net Profit",
-        roi: "ROI"
-      }, // New/Updated keys
+      ...(translations.en.financial || {}),
       recordsPageTitle: "Financial Records",
       recordsPageSubtitle: "View and manage your financial transactions.",
       totalRevenue: "Total Revenue",
@@ -196,14 +176,10 @@ export const translations = {
       totalCampaignsTracked: "Total Campaigns Tracked",
       campaignPerformanceDetails: "Campaign Performance Details",
       spend: "Spend",
-      netProfitLong: "Net Profit", // Using a distinct key
+      netProfitLong: "Net Profit",
     },
     reengagement: {
-      ...{ // Existing reengagement keys from the file
-        tasks: "Tasks",
-        classification: "Classification",
-        automation: "Automation"
-      }, // New/Updated keys
+      ...(translations.en.reengagement || {}),
       overviewPageTitle: "Lead Re-engagement",
       overviewPageSubtitle: "Revitalize dormant leads and boost conversions.",
       coldLeadsIdentified: "Cold Leads Identified",
@@ -234,26 +210,22 @@ export const translations = {
       overdueTasks: "Overdue Tasks",
       taskList: "Task List",
       createNewTask: "Create New Task",
-      priority: "Priority",
+      // priority: "Priority", // Already in common
       automationPageTitle: "Re-engagement Automation",
       automationPageSubtitle: "Set up and manage automated workflows to re-engage leads.",
       activeAutomationRules: "Active Automation Rules",
       leadsProcessedTodayAuto: "Leads Processed Today (Auto)",
       automatedReEngagements: "Automated Re-engagements",
       automationRuleList: "Automation Rule List",
-      trigger: "Trigger",
+      // trigger: "Trigger", // Already in common
     },
     referrals: {
-      ...{ // Existing referrals keys from the file
-        dashboard: "Dashboard", // This might be a nav title, page titles might be more specific
-        tracking: "Tracking",   // Same as above
-        rewards: "Rewards"      // Same as above
-      }, // New/Updated keys
+      ...(translations.en.referrals || {}),
       overviewPageTitle: "Referral Program Overview",
       overviewPageSubtitle: "Monitor and manage your company's referral program.",
       totalReferrers: "Total Referrers",
       successfulReferrals: "Successful Referrals",
-      conversionRate: "Conversion Rate",
+      // conversionRate: "Conversion Rate", // Already in common
       totalRewardsPaid: "Total Rewards Paid (USD)",
       navMyReferralDashboard: "My Referral Dashboard",
       navMyReferralDashboardDesc: "View your personal referral link, track your invites, and see your earned rewards.",
@@ -262,7 +234,7 @@ export const translations = {
       navViewRewardsProgram: "View Rewards Program",
       navViewRewardsProgramDesc: "Understand the referral reward structure, eligibility criteria, and how to claim rewards.",
       referralsOverTime: "Referrals Over Time",
-      dashboardPageTitle: "My Referral Dashboard", // Specific page title
+      dashboardPageTitle: "My Referral Dashboard",
       dashboardPageSubtitle: "Share your link, track your referrals, and see your rewards.",
       yourReferralLink: "Your Unique Referral Link",
       copyLink: "Copy Link",
@@ -274,17 +246,17 @@ export const translations = {
       nameOrEmail: "Name/Email",
       dateReferred: "Date Referred",
       rewardEarned: "Reward Earned",
-      trackingPageTitle: "Referral Tracking", // Specific page title
+      trackingPageTitle: "Referral Tracking",
       trackingPageSubtitle: "Monitor all referral activities and their statuses.",
       totalReferralsInitiated: "Total Referrals Initiated",
       pendingFullConversion: "Pending Full Conversion",
       totalRewardsDisbursed: "Total Rewards Disbursed (USD)",
       filterReferrals: "Filter Referrals",
       allReferralRecords: "All Referral Records",
-      referrer: "Referrer",
+      // referrer: "Referrer", // Already in common
       refereeEmail: "Referee Email",
       refereeName: "Referee Name",
-      rewardsPageTitle: "Referral Rewards Program", // Specific page title, might use API programName
+      rewardsPageTitle: "Referral Rewards Program",
       rewardsPageSubtitle: "Learn about the rewards you can earn by referring friends.",
       referrerRewardStandard: "Referrer Reward (Standard)",
       refereeRewardStandard: "Referee Reward (Standard)",
@@ -296,34 +268,30 @@ export const translations = {
       faq: "Frequently Asked Questions",
     },
     reviews: {
-      ...{ // Existing reviews keys from the file
-        requests: "Requests",     // Nav title
-        booster: "Booster",       // Nav title
-        monitoring: "Monitoring"  // Nav title
-      }, // New/Updated keys
+      ...(translations.en.reviews || {}),
       overviewPageTitle: "Reviews Management",
       overviewPageSubtitle: "Monitor, request, and boost your customer reviews.",
       totalReviews: "Total Reviews",
       averageRating: "Average Rating",
       newReviewsThisMonth: "New Reviews This Month",
       reviewRequestsSent: "Review Requests Sent",
-      navReviewRequests: "Review Requests", // Repeating for nav card title
+      navReviewRequests: "Review Requests",
       navReviewRequestsDesc: "Manage and send out review requests to your customers.",
-      navReviewBooster: "Review Booster", // Repeating for nav card title
+      navReviewBooster: "Review Booster",
       navReviewBoosterDesc: "Utilize tools and campaigns to boost positive review generation.",
-      navReviewMonitoring: "Review Monitoring", // Repeating for nav card title
+      navReviewMonitoring: "Review Monitoring",
       navReviewMonitoringDesc: "Track new reviews from various platforms and respond to feedback.",
       avgRatingOverTime: "Average Rating Over Time",
-      requestsPageTitle: "Review Requests", // Specific page title
+      requestsPageTitle: "Review Requests",
       requestsPageSubtitle: "Manage and track review invitations sent to customers.",
       requestsSentToday: "Requests Sent Today",
       estOpenRate: "Est. Open Rate",
       reviewsFromRequests: "Reviews from Requests",
       filterRequests: "Filter Requests",
       sendNewRequest: "Send New Request",
-      platform: "Platform",
-      campaign: "Campaign",
-      boosterPageTitle: "Review Booster", // Specific page title
+      // platform: "Platform", // Already in common
+      // campaign: "Campaign", // Already in comms / financial
+      boosterPageTitle: "Review Booster",
       boosterPageSubtitle: "Implement strategies and campaigns to proactively increase positive reviews.",
       activeBoosterCampaigns: "Active Booster Campaigns",
       reviewsFromBooster: "Reviews from Booster",
@@ -332,7 +300,7 @@ export const translations = {
       activeRecentCampaigns: "Active & Recent Campaigns",
       strategy: "Strategy",
       reviewsGenerated: "Reviews Generated",
-      monitoringPageTitle: "Review Monitoring", // Specific page title
+      monitoringPageTitle: "Review Monitoring",
       monitoringPageSubtitle: "Track and respond to customer reviews from various platforms.",
       newReviewsToday: "New Reviews Today",
       pendingReply: "Pending Reply",
@@ -346,35 +314,31 @@ export const translations = {
       yourReply: "Your Reply:",
     },
     funnels: {
-      ...{ // Existing funnels keys from the file
-        builder: "Builder",     // Nav title
-        progress: "Progress",   // Nav title
-        automation: "Automation"// Nav title
-      }, // New/Updated keys
+      ...(translations.en.funnels || {}),
       overviewPageTitle: "Funnels Overview",
       overviewPageSubtitle: "Design, monitor, and optimize your sales and marketing funnels.",
       activeFunnels: "Active Funnels",
       totalLeadsInFunnels: "Total Leads in Funnels",
       overallFunnelConvRate: "Overall Funnel Conv. Rate",
       revenueFromFunnels: "Revenue from Funnels",
-      navFunnelBuilder: "Funnel Builder", // Repeating for nav card title
+      navFunnelBuilder: "Funnel Builder",
       navFunnelBuilderDesc: "Visually design and configure your multi-step funnels.",
-      navFunnelProgress: "Funnel Progress", // Repeating for nav card title
+      navFunnelProgress: "Funnel Progress",
       navFunnelProgressDesc: "Track lead progression and conversion rates through each funnel stage.",
-      navFunnelAutomation: "Funnel Automation", // Repeating for nav card title
+      navFunnelAutomation: "Funnel Automation",
       navFunnelAutomationDesc: "Set up automated actions and triggers within your funnels.",
       topPerformingFunnels: "Top Performing Funnels (by Conversion Rate)",
-      builderPageTitle: "Funnel Builder", // Specific page title
+      builderPageTitle: "Funnel Builder",
       builderPageSubtitle: "Visually design your automated marketing and sales funnels.",
       funnelElements: "Funnel Elements",
       funnelCanvasHint: "Drag elements from the left panel to build your funnel.",
       loadFunnel: "Load",
       saveFunnel: "Save Funnel",
       newFunnelButton: "New Funnel",
-      properties: "Properties",
+      // properties: "Properties", // Already in common
       stepName: "Step Name",
       removeStep: "Remove Step",
-      progressPageTitle: "Funnel Progress & Analytics", // Specific page title
+      progressPageTitle: "Funnel Progress & Analytics",
       progressPageSubtitle: "Track lead movement and conversion rates through your funnels.",
       selectFunnel: "Select Funnel:",
       totalLeadsInFunnel: "Total Leads in Funnel",
@@ -389,7 +353,7 @@ export const translations = {
       currentStage: "Current Stage",
       entryDate: "Entry Date",
       timeInStage: "Time in Stage",
-      automationPageTitle: "Funnel Automation", // Specific page title
+      automationPageTitle: "Funnel Automation",
       automationPageSubtitle: "Configure automated actions and triggers for your sales funnels.",
       configureAutomationFor: "Configure Automation For:",
       activeRulesInFunnel: "Active Rules in Funnel",
@@ -399,6 +363,62 @@ export const translations = {
       triggerDescription: "Trigger Description",
       actionsSummary: "Actions Summary",
       timesTriggered: "Times Triggered",
+    },
+    statisticsPages: { // New section for statistics sub-pages
+      collectionTrends: {
+        pageTitle: "Data Collection Trends",
+        pageSubtitle: "Analyze trends in data acquisition over time.",
+        newRecordsThisPeriod: "New Records This Period",
+        growthRate: "Growth Rate",
+        peakCollection: "Peak Collection",
+        peakCollectionDetail: "on {peakDate}",
+        volumeOverTime: "Collection Volume Over Time",
+        daily: "Daily",
+        weekly: "Weekly",
+        monthly: "Monthly",
+        vsLastPeriod: "vs last period",
+        noTrendData: "No trend data available for the selected period."
+      },
+      geographicDistribution: {
+        pageTitle: "Geographic Data Distribution",
+        pageSubtitle: "Visualize how your data is distributed across different regions.",
+        totalRegionsCovered: "Total Regions Covered",
+        topRegion: "Top Region",
+        regionsWithGrowth: "Regions with Growth",
+        distributionMap: "Distribution Map",
+        allDataTypes: "All Data Types",
+        // companies: "Companies", // From common.companies
+        // users: "Users", // From admin.users
+        topRegionsByVolume: "Top Regions by Data Volume"
+      },
+      sectorDistribution: {
+        pageTitle: "Sector Data Distribution",
+        pageSubtitle: "Analyze how your data is distributed across industry sectors.",
+        totalSectorsTracked: "Total Sectors Tracked",
+        fastestGrowingSector: "Fastest Growing Sector",
+        distributionBySector: "Distribution by Sector",
+        contacts: "Contacts",
+        sectorBreakdown: "Sector Breakdown"
+      },
+      sourceComparison: {
+        pageTitle: "Data Source Comparison",
+        pageSubtitle: "Evaluate and compare the performance of your different data sources.",
+        totalDataSources: "Total Data Sources",
+        highestVolumeSource: "Highest Volume Source",
+        bestQualitySource: "Best Quality Source",
+        compareBy: "Compare by:",
+        allMetrics: "All Metrics",
+        dataVolume: "Data Volume",
+        qualityScore: "Quality Score",
+        coveragePercentage: "Coverage Percentage",
+        sourcePerformanceMetrics: "Source Performance Metrics",
+        detailedSourceMetrics: "Detailed Source Metrics",
+        sourceName: "Source Name",
+        updateFrequency: "Update Frequency"
+      },
+      commonFilters: {
+         apply: "Apply"
+      }
     },
     gapAnalysis: {
       form: "Analysis Form",
@@ -415,10 +435,90 @@ export const translations = {
       queue: "Queue",
       analytics: "Analytics"
     },
-    analytics: {
-      performance: "Performance",
-      conversion: "Conversion",
-      revenue: "Revenue"
+    // analytics: { // This is for nav, page specific analytics keys below
+    //   performance: "Performance",
+    //   conversion: "Conversion",
+    //   revenue: "Revenue"
+    // },
+    analyticsPages: { // New section for analytics sub-pages
+      overview: {
+        pageTitle: "Analytics Overview",
+        pageSubtitle: "Explore key metrics and insights across your application.",
+        overallKeyMetric: "Overall Key Metric",
+        totalTrackedEvents: "Total Tracked Events",
+        performanceNavLinkTitle: "Performance Analytics",
+        performanceNavLinkDesc: "Dive into traffic, engagement, and user behavior metrics.",
+        conversionNavLinkTitle: "Conversion Analytics",
+        conversionNavLinkDesc: "Track funnel performance and identify drop-off points.",
+        revenueNavLinkTitle: "Revenue Analytics",
+        revenueNavLinkDesc: "Analyze sales trends, LTV, and revenue by source."
+      },
+      performance: {
+        pageTitle: "Performance Analytics",
+        pageSubtitle: "Track user engagement and website traffic metrics.",
+        loadingSubtitle: "Crunching the numbers...",
+        errorTitle: "Could not load performance data",
+        totalVisits: "Total Visits",
+        uniqueVisitors: "Unique Visitors",
+        avgSession: "Avg. Session",
+        avgSessionUnit: "min",
+        bounceRate: "Bounce Rate",
+        pagesPerVisit: "Pages / Visit",
+        topReferrer: "Top Referrer",
+        timePeriod: "Time Period:",
+        last7Days: "Last 7 Days",
+        last30Days: "Last 30 Days",
+        last3Months: "Last 3 Months",
+        userActivityOverTime: "User Activity Over Time",
+        topPerformingPages: "Top Performing Pages",
+        pagePath: "Page Path",
+        views: "Views"
+      },
+      conversion: {
+        pageTitle: "Conversion Analytics",
+        pageSubtitle: "Understand how users convert through key funnels.",
+        loadingSubtitle: "Analyzing conversion funnels...",
+        errorTitle: "Could not load conversion data",
+        overallConvRate: "Overall Conv. Rate",
+        totalConversions: "Total Conversions",
+        topConvertingFunnel: "Top Converting Funnel",
+        avgCostPerConversion: "Avg. Cost / Conversion",
+        funnelFilterLabel: "Funnel:",
+        allFunnelsOverall: "All Funnels (Overall)",
+        onboardingFunnelExample: "Onboarding Funnel",
+        salesFunnelQ4Example: "Sales Funnel Q4",
+        funnelBreakdownTitle: "Funnel Breakdown ({funnelName})",
+        funnelStageVisitors: "Visitors: {count}",
+        funnelStageConvFromPrev: "Conv. from prev: {rate}%",
+        funnelStageEntryPont: "Entry Point",
+        funnelStageDropOff: "Drop-off: {rate}%",
+        conversionsBySource: "Conversions by Source",
+        source: "Source",
+      },
+      revenue: {
+        pageTitle: "Revenue Analytics",
+        pageSubtitle: "Gain insights into your revenue streams and financial performance.",
+        loadingSubtitle: "Calculating revenue streams...",
+        errorTitle: "Could not load revenue data",
+        totalRevenue: "Total Revenue",
+        arpu: "ARPU",
+        mrr: "MRR",
+        ltv: "LTV",
+        breakdownByLabel: "Breakdown By:",
+        breakdownProductService: "Product/Service",
+        breakdownCustomerSegment: "Customer Segment",
+        breakdownRegion: "Region",
+        last12Months: "Last 12 Months",
+        revenueTrendsOverTime: "Revenue Trends Over Time",
+        revenueBreakdownByTitle: "Revenue Breakdown by {breakdownType}",
+        itemNameLabel: "{breakdownType} Name",
+        percentageOfTotal: "% of Total"
+      },
+      commonAnalytics: {
+        tryAgainButton: "Try Again",
+        noDataAvailable: "No data available.",
+        noDataForFilters: "No data available for the selected filters."
+      }
     },
     admin: {
       title: "Administration",
@@ -461,7 +561,7 @@ export const translations = {
       goToPage: "Go to page"
     },
     common: {
-      ...{ // Existing common keys
+      ...{
         previous: "Previous",
         next: "Next",
         loading: "Loading...",
@@ -488,8 +588,7 @@ export const translations = {
         all: "All",
         description: "Description",
         date: "Date"
-      }, // New common terms (if any identified and confirmed as common)
-      // For example, "Status" and "Priority" are used in multiple modules
+      },
       status: "Status",
       priority: "Priority",
       overview: "Overview",
@@ -508,26 +607,16 @@ export const translations = {
       campaigns: "Campaigns",
       leads: "Leads",
       customers: "Customers",
-      // users: "Users", // Already in admin
       referrer: "Referrer",
       referee: "Referee",
       recipient: "Recipient",
       platform: "Platform",
       stage: "Stage",
       trigger: "Trigger",
-      // conversion: "Conversion", // Already in analytics
       rate: "Rate",
       program: "Program",
-      // dashboard: "Dashboard", // Already in nav
-      // tracking: "Tracking", // Already in vsl
-      // rewards: "Rewards", // Already in referrals
-      // requests: "Requests", // Already in reviews
-      // booster: "Booster", // Already in reviews
-      // monitoring: "Monitoring", // Already in reviews
-      // builder: "Builder", // Already in funnels
-      // progress: "Progress", // Already in funnels
     },
-    status: { // Ensure this aligns with common.status or is more specific if needed
+    status: {
       active: "Active",
       inactive: "Inactive",
       pending: "Pending",
@@ -541,7 +630,6 @@ export const translations = {
       opened: "Opened",
       clicked: "Clicked",
       bounced: "Bounced",
-      // Adding new statuses from various modules
       viewed: "Viewed",
       replied: "Replied",
       pendingReply: "Pending Reply",
@@ -552,11 +640,10 @@ export const translations = {
       progressing: "Progressing",
       stalled: "Stalled",
       dropped: "Dropped",
-      unclassified: "Unclassified", // From re-engagement
-      hot: "Hot", // From re-engagement
-      warm: "Warm", // From re-engagement
-      cold: "Cold", // From re-engagement
-      // Financial specific
+      unclassified: "Unclassified",
+      hot: "Hot",
+      warm: "Warm",
+      cold: "Cold",
       income: "Income",
       expense: "Expense",
     },
@@ -595,7 +682,7 @@ export const translations = {
       }
     }
   },
-  fr: { // Applying new French translations
+  fr: {
     nav: {
       dashboard: "Tableau de bord",
       search: "Recherche",
@@ -633,6 +720,7 @@ export const translations = {
         scheduleJob: "Planifier une tâche"
       }
     },
+    // ... (other existing French modules) ...
     comms: {
       campaigns: "Campagnes",
       templates: "Modèles",
@@ -747,28 +835,7 @@ export const translations = {
       performance: "Performance"
     },
     financial: {
-      ...{ // Existing French financial keys
-        dashboard: "Tableau de bord financier",
-        dashboardDescription: "Aperçu de vos données financières",
-        addRecord: "Ajouter un enregistrement",
-        records: "Enregistrements",
-        summary: "Résumé",
-        campaignRoi: "ROI de la campagne",
-        campaignROI: "ROI de la campagne",
-        campaign: "Campagne",
-        revenue: "Revenu",
-        cost: "Coût",
-        costs: "Coûts",
-        expense: "Dépense",
-        refund: "Remboursement",
-        currency: "Devise",
-        type: "Type",
-        source: "Source",
-        amount: "Montant",
-        category: "Catégorie",
-        netProfit: "Bénéfice net",
-        roi: "ROI"
-      }, // New French translations for financial
+      ...(translations.fr.financial || {}),
       recordsPageTitle: "Enregistrements Financiers",
       recordsPageSubtitle: "Visualisez et gérez vos transactions financières.",
       totalRevenue: "Revenu Total",
@@ -791,11 +858,7 @@ export const translations = {
       netProfitLong: "Bénéfice Net",
     },
     reengagement: {
-      ...{ // Existing French reengagement keys
-        tasks: "Tâches",
-        classification: "Classification",
-        automation: "Automatisation"
-      }, // New French translations for reengagement
+      ...(translations.fr.reengagement || {}),
       overviewPageTitle: "Réengagement des Prospects",
       overviewPageSubtitle: "Revitalisez les prospects dormants et augmentez les conversions.",
       coldLeadsIdentified: "Prospects Froids Identifiés",
@@ -826,26 +889,22 @@ export const translations = {
       overdueTasks: "Tâches en Retard",
       taskList: "Liste des Tâches",
       createNewTask: "Créer Nouvelle Tâche",
-      priority: "Priorité",
+      // priority: "Priorité", // From common
       automationPageTitle: "Automatisation du Réengagement",
       automationPageSubtitle: "Configurez et gérez les workflows automatisés pour réengager les prospects.",
       activeAutomationRules: "Règles d'Automatisation Actives",
       leadsProcessedTodayAuto: "Prospects Traités Aujourd'hui (Auto)",
       automatedReEngagements: "Réengagements Automatisés",
       automationRuleList: "Liste des Règles d'Automatisation",
-      trigger: "Déclencheur",
+      // trigger: "Déclencheur", // From common
     },
     referrals: {
-      ...{ // Existing French referrals keys
-        dashboard: "Tableau de bord",
-        tracking: "Suivi",
-        rewards: "Récompenses"
-      }, // New French translations for referrals
+      ...(translations.fr.referrals || {}),
       overviewPageTitle: "Aperçu du Programme de Parrainage",
       overviewPageSubtitle: "Surveillez et gérez le programme de parrainage de votre entreprise.",
       totalReferrers: "Total Parrains",
       successfulReferrals: "Parrainages Réussis",
-      conversionRate: "Taux de Conversion",
+      // conversionRate: "Taux de Conversion", // From common
       totalRewardsPaid: "Total Récompenses Versées (USD)",
       navMyReferralDashboard: "Mon Tableau de Bord Parrainage",
       navMyReferralDashboardDesc: "Visualisez votre lien de parrainage personnel, suivez vos invitations et voyez vos récompenses gagnées.",
@@ -873,7 +932,7 @@ export const translations = {
       totalRewardsDisbursed: "Total Récompenses Distribuées (USD)",
       filterReferrals: "Filtrer les Parrainages",
       allReferralRecords: "Tous les Enregistrements de Parrainage",
-      referrer: "Parrain",
+      // referrer: "Parrain", // From common
       refereeEmail: "Email du Filleul",
       refereeName: "Nom du Filleul",
       rewardsPageTitle: "Programme de Récompenses de Parrainage",
@@ -888,11 +947,7 @@ export const translations = {
       faq: "Questions Fréquemment Posées",
     },
     reviews: {
-      ...{ // Existing French reviews keys
-        requests: "Demandes",
-        booster: "Booster",
-        monitoring: "Surveillance"
-      }, // New French translations for reviews
+      ...(translations.fr.reviews || {}),
       overviewPageTitle: "Gestion des Avis",
       overviewPageSubtitle: "Surveillez, demandez et boostez vos avis clients.",
       totalReviews: "Total Avis",
@@ -913,8 +968,8 @@ export const translations = {
       reviewsFromRequests: "Avis via Demandes",
       filterRequests: "Filtrer les Demandes",
       sendNewRequest: "Envoyer Nouvelle Demande",
-      platform: "Plateforme",
-      campaign: "Campagne",
+      // platform: "Plateforme", // From common
+      // campaign: "Campagne", // From comms/financial
       boosterPageTitle: "Booster d'Avis",
       boosterPageSubtitle: "Implémentez des stratégies et campagnes pour augmenter proactivement les avis positifs.",
       activeBoosterCampaigns: "Campagnes Booster Actives",
@@ -938,11 +993,7 @@ export const translations = {
       yourReply: "Votre Réponse :",
     },
     funnels: {
-      ...{ // Existing French funnels keys
-        builder: "Constructeur",
-        progress: "Progrès",
-        automation: "Automatisation"
-      }, // New French translations for funnels
+      ...(translations.fr.funnels || {}),
       overviewPageTitle: "Aperçu des Entonnoirs",
       overviewPageSubtitle: "Concevez, surveillez et optimisez vos entonnoirs de vente et marketing.",
       activeFunnels: "Entonnoirs Actifs",
@@ -963,7 +1014,7 @@ export const translations = {
       loadFunnel: "Charger",
       saveFunnel: "Enregistrer l'Entonnoir",
       newFunnelButton: "Nouvel Entonnoir",
-      properties: "Propriétés",
+      // properties: "Propriétés", // From common
       stepName: "Nom de l'étape",
       removeStep: "Supprimer l'Étape",
       progressPageTitle: "Progression & Analytique des Entonnoirs",
@@ -992,6 +1043,142 @@ export const translations = {
       actionsSummary: "Résumé des Actions",
       timesTriggered: "Fois Déclenché",
     },
+    statisticsPages: { // New section for statistics sub-pages - French
+      collectionTrends: {
+        pageTitle: "Tendances de la Collecte de Données",
+        pageSubtitle: "Analysez les tendances d'acquisition de données au fil du temps.",
+        newRecordsThisPeriod: "Nouveaux Enregistrements (Période)",
+        growthRate: "Taux de Croissance",
+        peakCollection: "Pic de Collecte",
+        peakCollectionDetail: "le {peakDate}",
+        volumeOverTime: "Volume de Collecte au Fil du Temps",
+        daily: "Quotidien",
+        weekly: "Hebdomadaire",
+        monthly: "Mensuel",
+        vsLastPeriod: "vs période précédente",
+        noTrendData: "Aucune donnée de tendance disponible pour la période sélectionnée."
+      },
+      geographicDistribution: {
+        pageTitle: "Distribution Géographique des Données",
+        pageSubtitle: "Visualisez la répartition de vos données à travers différentes régions.",
+        totalRegionsCovered: "Total Régions Couvertes",
+        topRegion: "Région Principale",
+        regionsWithGrowth: "Régions en Croissance",
+        distributionMap: "Carte de Distribution",
+        allDataTypes: "Tous Types de Données",
+        // companies: "Entreprises", // From common.companies
+        // users: "Utilisateurs", // From admin.users
+        topRegionsByVolume: "Top Régions par Volume de Données"
+      },
+      sectorDistribution: {
+        pageTitle: "Distribution des Données par Secteur",
+        pageSubtitle: "Analysez la répartition de vos données par secteurs d'activité.",
+        totalSectorsTracked: "Total Secteurs Suivis",
+        fastestGrowingSector: "Secteur à Croissance Rapide",
+        distributionBySector: "Distribution par Secteur",
+        contacts: "Contacts",
+        sectorBreakdown: "Répartition par Secteur"
+      },
+      sourceComparison: {
+        pageTitle: "Comparaison des Sources de Données",
+        pageSubtitle: "Évaluez et comparez la performance de vos différentes sources de données.",
+        totalDataSources: "Total Sources de Données",
+        highestVolumeSource: "Source au Volume le Plus Élevé",
+        bestQualitySource: "Source de Meilleure Qualité",
+        compareBy: "Comparer par :",
+        allMetrics: "Toutes Métriques",
+        dataVolume: "Volume de Données",
+        qualityScore: "Score de Qualité",
+        coveragePercentage: "Pourcentage de Couverture",
+        sourcePerformanceMetrics: "Métriques de Performance des Sources",
+        detailedSourceMetrics: "Métriques Détaillées des Sources",
+        sourceName: "Nom de la Source",
+        updateFrequency: "Fréquence de Mise à Jour"
+      },
+      commonFilters: {
+         apply: "Appliquer"
+      }
+    },
+    analyticsPages: { // New section for analytics sub-pages - French
+      overview: {
+        pageTitle: "Aperçu Analytique",
+        pageSubtitle: "Explorez les métriques et informations clés de votre application.",
+        overallKeyMetric: "Métrique Clé Globale",
+        totalTrackedEvents: "Total Événements Suivis",
+        performanceNavLinkTitle: "Analytique de Performance",
+        performanceNavLinkDesc: "Plongez dans les métriques de trafic, d'engagement et de comportement utilisateur.",
+        conversionNavLinkTitle: "Analytique de Conversion",
+        conversionNavLinkDesc: "Suivez la performance des entonnoirs et identifiez les points de chute.",
+        revenueNavLinkTitle: "Analytique des Revenus",
+        revenueNavLinkDesc: "Analysez les tendances des ventes, la LTV et les revenus par source."
+      },
+      performance: {
+        pageTitle: "Analytique de Performance",
+        pageSubtitle: "Suivez les métriques d'engagement utilisateur et de trafic du site.",
+        loadingSubtitle: "Calcul des chiffres...",
+        errorTitle: "Impossible de charger les données de performance",
+        totalVisits: "Visites Totales",
+        uniqueVisitors: "Visiteurs Uniques",
+        avgSession: "Session Moy.",
+        avgSessionUnit: "min",
+        bounceRate: "Taux de Rebond",
+        pagesPerVisit: "Pages / Visite",
+        topReferrer: "Meilleur Référent",
+        timePeriod: "Période :",
+        last7Days: "7 derniers jours",
+        last30Days: "30 derniers jours",
+        last3Months: "3 derniers mois",
+        userActivityOverTime: "Activité Utilisateur au Fil du Temps",
+        topPerformingPages: "Pages les Plus Performantes",
+        pagePath: "Chemin de la Page",
+        views: "Vues"
+      },
+      conversion: {
+        pageTitle: "Analytique de Conversion",
+        pageSubtitle: "Comprenez comment les utilisateurs convertissent via les entonnoirs clés.",
+        loadingSubtitle: "Analyse des entonnoirs de conversion...",
+        errorTitle: "Impossible de charger les données de conversion",
+        overallConvRate: "Taux de Conv. Global",
+        totalConversions: "Conversions Totales",
+        topConvertingFunnel: "Meilleur Entonnoir (Conv.)",
+        avgCostPerConversion: "Coût Moyen / Conversion",
+        funnelFilterLabel: "Entonnoir :",
+        allFunnelsOverall: "Tous les Entonnoirs (Global)",
+        onboardingFunnelExample: "Entonnoir d'Intégration",
+        salesFunnelQ4Example: "Entonnoir de Vente T4",
+        funnelBreakdownTitle: "Détail de l'Entonnoir ({funnelName})",
+        funnelStageVisitors: "Visiteurs : {count}",
+        funnelStageConvFromPrev: "Conv. depuis préc. : {rate}%",
+        funnelStageEntryPont: "Point d'Entrée",
+        funnelStageDropOff: "Abandon : {rate}%",
+        conversionsBySource: "Conversions par Source",
+        source: "Source",
+      },
+      revenue: {
+        pageTitle: "Analytique des Revenus",
+        pageSubtitle: "Obtenez des informations sur vos flux de revenus et performances financières.",
+        loadingSubtitle: "Calcul des flux de revenus...",
+        errorTitle: "Impossible de charger les données de revenus",
+        totalRevenue: "Revenu Total",
+        arpu: "ARPU", // Revenu Moyen Par Utilisateur
+        mrr: "MRR", // Revenu Mensuel Récurrent
+        ltv: "LTV", // Valeur à Vie
+        breakdownByLabel: "Ventilation par :",
+        breakdownProductService: "Produit/Service",
+        breakdownCustomerSegment: "Segment Client",
+        breakdownRegion: "Région",
+        last12Months: "12 derniers mois",
+        revenueTrendsOverTime: "Tendances des Revenus au Fil du Temps",
+        revenueBreakdownByTitle: "Ventilation des Revenus par {breakdownType}",
+        itemNameLabel: "Nom de {breakdownType, select, product {Produit} segment {Segment} region {Région} other {l''Élément}}",
+        percentageOfTotal: "% du Total"
+      },
+      commonAnalytics: {
+        tryAgainButton: "Réessayer",
+        noDataAvailable: "Aucune donnée disponible.",
+        noDataForFilters: "Aucune donnée disponible pour les filtres sélectionnés."
+      }
+    },
     gapAnalysis: {
       form: "Formulaire d'analyse",
       letters: "Lettres de vente",
@@ -1007,11 +1194,11 @@ export const translations = {
       queue: "File d'attente",
       analytics: "Analytique"
     },
-    analytics: {
-      performance: "Performance",
-      conversion: "Conversion",
-      revenue: "Revenu"
-    },
+    // analytics: { // This is for nav, page specific analytics keys are in analyticsPages
+    //   performance: "Performance",
+    //   conversion: "Conversion",
+    //   revenue: "Revenu"
+    // },
     admin: {
       title: "Administration",
       description: "Gérer les paramètres système, utilisateurs et conformité",
@@ -1053,7 +1240,7 @@ export const translations = {
       goToPage: "Aller à la page"
     },
     common: {
-      ...{ // Existing French common keys
+      ...{
         previous: "Précédent",
         next: "Suivant",
         loading: "Chargement...",
@@ -1080,7 +1267,7 @@ export const translations = {
         all: "Tout",
         description: "Description",
         date: "Date"
-      }, // New French common terms
+      },
       status: "Statut",
       priority: "Priorité",
       overview: "Aperçu",
@@ -1099,26 +1286,16 @@ export const translations = {
       campaigns: "Campagnes",
       leads: "Prospects",
       customers: "Clients",
-      // users: "Utilisateurs", // Already in admin
       referrer: "Parrain",
       referee: "Filleul",
       recipient: "Destinataire",
       platform: "Plateforme",
       stage: "Étape",
       trigger: "Déclencheur",
-      // conversion: "Conversion", // Already in analytics
       rate: "Taux",
       program: "Programme",
-      // dashboard: "Tableau de bord", // Already in nav
-      // tracking: "Suivi", // Already in vsl
-      // rewards: "Récompenses", // Already in referrals
-      // requests: "Demandes", // Already in reviews
-      // booster: "Booster", // Already in reviews
-      // monitoring: "Surveillance", // Already in reviews
-      // builder: "Constructeur", // Already in funnels
-      // progress: "Progrès", // Already in funnels
     },
-    status: { // Ensure this aligns with common.status or is more specific if needed
+    status: {
       active: "Actif",
       inactive: "Inactif",
       pending: "En attente",
@@ -1146,8 +1323,8 @@ export const translations = {
       hot: "Chaud",
       warm: "Tiède",
       cold: "Froid",
-      income: "Revenu", // Financial specific
-      expense: "Dépense", // Financial specific
+      income: "Revenu",
+      expense: "Dépense",
     },
     error: {
       general: "Une erreur s'est produite",
