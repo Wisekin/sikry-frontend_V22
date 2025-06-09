@@ -1,14 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { AppShell } from "@/components/core/layout/AppShell"
-import { Heading } from "@/components/core/typography/Heading"
-import { Text } from "@/components/core/typography/Text"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+  Tooltip
+} from 'recharts';
 import {
   UserGroupIcon,
   CreditCardIcon,
@@ -20,327 +22,348 @@ import {
   BellAlertIcon,
   ClockIcon,
   ArrowTrendingUpIcon,
-} from "@heroicons/react/24/solid"
-import Link from "next/link"
+  ArrowTrendingDownIcon,
+  AdjustmentsHorizontalIcon,
+} from "@heroicons/react/24/outline"
+
+// --- Helper component for chart tooltips
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="p-2 bg-gray-700 text-white rounded-md shadow-lg text-xs">
+        <p className="font-bold">{`${payload[0].value}${payload[0].dataKey === 'ms' ? 'ms' : (payload[0].dataKey === 'rate' ? '%' : '')}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState("overview")
+  const [detailedSectionsOpen, setDetailedSectionsOpen] = useState(false);
 
   const adminSections = [
     {
       title: "Team Management",
-      description: "Manage users, roles, and permissions",
+      description: "Manage users, roles, and permissions.",
       icon: UserGroupIcon,
       href: "/admin/team",
-      status: "Active",
-      count: "12 users",
-      color: "bg-gradient-to-br from-blue-500 to-blue-600",
+      iconColor: "text-blue-600",
+      bgColor: "bg-blue-50",
     },
     {
       title: "Billing & Usage",
-      description: "Monitor usage and manage billing",
+      description: "Monitor usage and manage billing.",
       icon: CreditCardIcon,
       href: "/admin/billing",
-      status: "Current",
-      count: "$2,450/mo",
-      color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
+      iconColor: "text-emerald-600",
+      bgColor: "bg-emerald-50",
     },
     {
-      title: "Anti-Spam Settings",
-      description: "Configure spam protection and compliance",
+      title: "Security Settings",
+      description: "Configure 2FA, SSO, and policies.",
       icon: ShieldCheckIcon,
-      href: "/admin/anti-spam",
-      status: "Protected",
-      count: "0.02% rate",
-      color: "bg-gradient-to-br from-amber-500 to-amber-600",
+      href: "/admin/security",
+      iconColor: "text-amber-600",
+      bgColor: "bg-amber-50",
     },
     {
       title: "Compliance",
-      description: "GDPR, data retention, and privacy settings",
+      description: "GDPR, data retention, and privacy.",
       icon: DocumentTextIcon,
       href: "/admin/compliance",
-      status: "Compliant",
-      count: "All regions",
-      color: "bg-gradient-to-br from-purple-500 to-purple-600",
+      iconColor: "text-purple-600",
+      bgColor: "bg-purple-50",
     },
   ]
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Active":
-      case "Current":
-      case "Protected":
-      case "Compliant":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200"
-      case "Warning":
-        return "bg-yellow-50 text-yellow-700 border-yellow-200"
-      case "Error":
-        return "bg-red-50 text-red-700 border-red-200"
-      default:
-        return "bg-muted text-secondary"
-    }
-  }
 
   const recentActivities = [
     {
       user: "Sarah Johnson",
-      action: "Updated user permissions",
-      time: "10 minutes ago",
+      action: "updated permissions for 'Mark Wilson'.",
+      time: "10m ago",
       icon: UserGroupIcon,
     },
     {
       user: "System",
-      action: "Automatic backup completed",
-      time: "1 hour ago",
-      icon: ServerIcon,
+      action: "completed its daily security scan.",
+      time: "1h ago",
+      icon: ShieldCheckIcon,
     },
     {
       user: "Mark Wilson",
-      action: "Changed billing plan",
-      time: "3 hours ago",
+      action: "updated the company billing address.",
+      time: "3h ago",
       icon: CreditCardIcon,
     },
     {
       user: "System",
-      action: "Security alert detected",
+      action: "detected a high-risk login attempt.",
       time: "Yesterday",
       icon: BellAlertIcon,
     },
   ]
 
-  const systemMetrics = [
-    {
-      name: "API Response Time",
+  const systemMetricsData = {
+    api: {
+      name: "API Response",
       value: "156ms",
       change: "-12%",
       trend: "down",
-      color: "emerald",
+      data: [
+        { t: 't-6', ms: 180 }, { t: 't-5', ms: 175 }, { t: 't-4', ms: 190 },
+        { t: 't-3', ms: 160 }, { t: 't-2', ms: 165 }, { t: 't-1', ms: 158 },
+        { t: 't-0', ms: 156 },
+      ],
+      color: "hsl(142.1 76.2% 42.2%)" // Green
     },
-    {
-      name: "Error Rate",
-      value: "0.02%",
-      change: "-5%",
-      trend: "down",
-      color: "emerald",
-    },
-    {
+    cpu: {
       name: "CPU Usage",
       value: "42%",
       change: "+3%",
       trend: "up",
-      color: "amber",
+      data: [
+        { t: 't-6', usage: 35 }, { t: 't-5', usage: 38 }, { t: 't-4', usage: 37 },
+        { t: 't-3', usage: 40 }, { t: 't-2', usage: 45 }, { t: 't-1', usage: 43 },
+        { t: 't-0', usage: 42 },
+      ],
+      color: "hsl(38.3 95.8% 53.1%)" // Amber
     },
-    {
+    memory: {
       name: "Memory Usage",
       value: "68%",
       change: "+2%",
       trend: "up",
-      color: "amber",
+      data: [
+        { t: 't-6', usage: 60 }, { t: 't-5', usage: 62 }, { t: 't-4', usage: 61 },
+        { t: 't-3', usage: 65 }, { t: 't-2', usage: 66 }, { t: 't-1', usage: 67 },
+        { t: 't-0', usage: 68 },
+      ],
+      color: "hsl(38.3 95.8% 53.1%)" // Amber
     },
-  ]
+    errors: {
+        name: "Error Rate",
+        value: "0.02%",
+        change: "-5%",
+        trend: "down",
+        data: [
+            { t: 't-6', rate: 0.05 }, { t: 't-5', rate: 0.04 }, { t: 't-4', rate: 0.06 },
+            { t: 't-3', rate: 0.03 }, { t: 't-2', rate: 0.02 }, { t: 't-1', rate: 0.03 },
+            { t: 't-0', rate: 0.02 },
+        ],
+        color: "hsl(142.1 76.2% 42.2%)" // Green
+    }
+  };
 
   return (
-    <AppShell>
-      <div className="space-y-6">
-        {/* Header with Tabs */}
-        <div className="flex flex-col space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <Heading level={1}>Administration</Heading>
-              <Text className="text-muted-foreground">Manage system settings, users, and compliance</Text>
+    <div className="min-h-screen space-y-8 bg-gray-50/50 text-[#1B1F3B] p-6 md:p-10">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-[#1B1F3B]">Administration</h1>
+          <p className="text-gray-500 mt-1">
+            Central hub for managing your organization's settings, users, and security.
+          </p>
+        </div>
+        <Button size="lg" className="bg-[#1B1F3B] text-white hover:bg-[#2A3050] flex items-center gap-2">
+          <Cog6ToothIcon className="w-5 h-5" />
+          <span>Global Settings</span>
+        </Button>
+      </div>
+      
+      {/* --- NEW: STYLISH EXPANDABLE SECTION FOR TABS --- */}
+      <div className="space-y-2">
+        <Button
+            variant="outline"
+            className="w-full md:w-auto bg-white border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-[#1B1F3B] flex items-center gap-2"
+            onClick={() => setDetailedSectionsOpen(!detailedSectionsOpen)}
+        >
+            <AdjustmentsHorizontalIcon className="w-5 h-5"/>
+            <span>Manage Detailed Sections</span>
+            <ChevronRightIcon className={`w-5 h-5 text-gray-400 transform transition-transform duration-300 ${detailedSectionsOpen ? 'rotate-90' : ''}`} />
+        </Button>
+
+        <div className={`transition-all duration-500 ease-in-out grid ${detailedSectionsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+            <div className="overflow-hidden">
+                <Card className="bg-white border-none shadow-sm mt-2">
+                  <Tabs defaultValue="users" className="p-4">
+                    <TabsList className="grid w-full grid-cols-3 mb-4 bg-gray-100 p-1 rounded-lg max-w-md">
+                      <TabsTrigger value="users" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Users</TabsTrigger>
+                      <TabsTrigger value="security" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Security</TabsTrigger>
+                      <TabsTrigger value="billing" className="text-gray-600 data-[state=active]:bg-[#3C4568] data-[state=active]:text-white rounded-md">Billing</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="users">
+                      <div className="p-6 bg-gray-50 rounded-lg">
+                        <h3 className="text-lg font-semibold">User Management</h3>
+                        <p className="text-gray-600">The user management interface, including tables, invites, and role assignments, will be displayed here.</p>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="security">
+                      <div className="p-6 bg-gray-50 rounded-lg">
+                        <h3 className="text-lg font-semibold">Security Configuration</h3>
+                        <p className="text-gray-600">Settings for Single Sign-On (SSO), 2-Factor Authentication (2FA), and API key management will be displayed here.</p>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="billing">
+                      <div className="p-6 bg-gray-50 rounded-lg">
+                        <h3 className="text-lg font-semibold">Billing & Subscriptions</h3>
+                        <p className="text-gray-600">Your current plan, usage metrics, payment history, and invoices will be displayed here.</p>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </Card>
             </div>
-            <Button className="bg-primary hover:bg-primary/90">
-              <Cog6ToothIcon className="w-4 h-4 mr-2" />
-              System Settings
-            </Button>
-          </div>
-
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
-              <TabsTrigger value="billing">Billing</TabsTrigger>
-            </TabsList>
-          </Tabs>
         </div>
+      </div>
 
-        {/* Quick Stats */}
-        <div className="grid md:grid-cols-4 gap-4">
-          <Card className="shadow-sm border border-border/40 overflow-hidden">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-bl-full"></div>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <div className="flex items-center mt-1">
-                <ArrowTrendingUpIcon className="w-3 h-3 text-emerald-500 mr-1" />
-                <Text size="sm" className="text-emerald-600">
-                  +2 this month
-                </Text>
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card className="shadow-sm border border-border/40 overflow-hidden">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full"></div>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Usage</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$2,450</div>
-              <div className="flex items-center mt-1">
-                <Text size="sm" className="text-muted-foreground">
-                  Within budget
-                </Text>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border border-border/40 overflow-hidden">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-bl-full"></div>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Compliance Score</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-emerald-600">100%</div>
-              <div className="flex items-center mt-1">
-                <ShieldCheckIcon className="w-3 h-3 text-emerald-500 mr-1" />
-                <Text size="sm" className="text-emerald-600">
-                  Fully compliant
-                </Text>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border border-border/40 overflow-hidden">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-bl-full"></div>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">System Health</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-emerald-600">99.9%</div>
-              <div className="flex items-center mt-1">
-                <ServerIcon className="w-3 h-3 text-emerald-500 mr-1" />
-                <Text size="sm" className="text-emerald-600">
-                  Uptime
-                </Text>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Admin Sections */}
-          <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
-            {adminSections.map((section, index) => (
-              <Card
-                key={index}
-                className="shadow-sm border border-border/40 hover:shadow-md transition-shadow overflow-hidden group"
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 ${section.color} rounded-lg flex items-center justify-center`}>
-                        <section.icon className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{section.title}</CardTitle>
-                        <CardDescription>{section.description}</CardDescription>
-                      </div>
-                    </div>
-                    <ChevronRightIcon className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={getStatusColor(section.status)}>
-                        {section.status}
-                      </Badge>
-                      <Text size="sm" className="text-muted-foreground">
-                        {section.count}
-                      </Text>
-                    </div>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={section.href}>
-                        <Cog6ToothIcon className="w-3 h-3 mr-1" />
-                        Manage
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Recent Activity */}
-          <Card className="shadow-sm border border-border/40">
+      {/* Quick Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-white border-none shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Total Users</CardTitle>
+            <UserGroupIcon className="w-5 h-5 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#1B1F3B]">12</div>
+            <p className="text-xs text-green-600 flex items-center gap-1">+2 this month</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border-none shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Monthly Usage</CardTitle>
+            <CreditCardIcon className="w-5 h-5 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#1B1F3B]">$2,450</div>
+            <p className="text-xs text-gray-500">75% of budget utilized</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border-none shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Compliance Score</CardTitle>
+            <ShieldCheckIcon className="w-5 h-5 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-emerald-600">100%</div>
+            <p className="text-xs text-gray-500">Fully GDPR & CCPA compliant</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border-none shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">System Health</CardTitle>
+            <ServerIcon className="w-5 h-5 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-emerald-600">99.98%</div>
+            <p className="text-xs text-gray-500">Uptime last 30 days</p>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Main Content Grid */}
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Admin Sections */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="bg-white border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <ClockIcon className="w-4 h-4 mr-2" />
-                Recent Activity
+                <CardTitle className="text-lg">Admin Control Panel</CardTitle>
+                <CardDescription>Select a category to configure its settings.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid md:grid-cols-2 gap-4">
+              {adminSections.map((section) => (
+                <Link href={section.href} key={section.title} className="group">
+                  <div className="p-4 bg-white border border-gray-200 rounded-lg hover:border-[#3C4568] hover:shadow-md hover:bg-gray-50/50 transition-all duration-300 flex items-start gap-4">
+                    <div className={`w-10 h-10 flex-shrink-0 ${section.bgColor} rounded-lg flex items-center justify-center`}>
+                      <section.icon className={`w-6 h-6 ${section.iconColor}`} />
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-semibold text-gray-800 group-hover:text-[#1B1F3B]">{section.title}</h3>
+                      <p className="text-sm text-gray-500 group-hover:text-gray-600">{section.description}</p>
+                    </div>
+                    <ChevronRightIcon className="w-5 h-5 text-gray-300 group-hover:text-[#1B1F3B] transition-colors" />
+                  </div>
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="lg:col-span-1">
+          <Card className="bg-white border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <ClockIcon className="w-5 h-5 text-gray-500" /> Recent Activity
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {recentActivities.map((activity, index) => (
                   <div key={index} className="flex items-start gap-3">
-                    <div className="bg-muted rounded-full p-1.5">
-                      <activity.icon className="w-3.5 h-3.5 text-primary" />
+                    <div className="bg-gray-100 rounded-full p-2">
+                      <activity.icon className="w-4 h-4 text-gray-600" />
                     </div>
-                    <div>
-                      <div className="font-medium text-sm">{activity.action}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-1">
-                        <span>{activity.user}</span>
-                        <span>•</span>
-                        <span>{activity.time}</span>
-                      </div>
+                    <div className="text-sm">
+                      <p className="text-gray-700">
+                        <span className="font-semibold">{activity.user}</span> {activity.action}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">{activity.time}</p>
                     </div>
                   </div>
                 ))}
               </div>
-              <Button variant="ghost" size="sm" className="w-full mt-4 text-xs">
-                View All Activity
+              <Button variant="outline" className="w-full mt-6 border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-[#1B1F3B]">
+                View Full Audit Log
               </Button>
             </CardContent>
           </Card>
         </div>
-
-        {/* System Status */}
-        <Card className="shadow-sm border border-border/40">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <ServerIcon className="w-4 h-4 mr-2" />
-              System Status
-            </CardTitle>
-            <CardDescription>Real-time system health and performance metrics</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              {systemMetrics.map((metric, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium">{metric.name}</div>
-                    <div className="flex items-center">
-                      <span className="text-lg font-semibold mr-2">{metric.value}</span>
-                      <span className={`text-xs ${metric.trend === "down" ? "text-emerald-600" : "text-amber-600"}`}>
-                        {metric.change}
-                      </span>
-                    </div>
-                  </div>
-                  <Progress
-                    value={Number.parseInt(metric.value)}
-                    className={`h-1.5 ${metric.color === "emerald" ? "bg-emerald-100" : "bg-amber-100"}`}
-                    indicatorClassName={`${metric.color === "emerald" ? "bg-emerald-500" : "bg-amber-500"}`}
-                  />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
-    </AppShell>
+
+      {/* System Status Section with Dynamic Charts */}
+      <Card className="bg-white border-none shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center text-lg">
+            <ServerIcon className="w-5 h-5 mr-2 text-gray-500" /> System Status
+          </CardTitle>
+          <CardDescription>Real-time system health and performance metrics.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Object.entries(systemMetricsData).map(([key, metric]) => (
+            <div key={key} className="p-4 border border-gray-200 rounded-lg hover:shadow-lg hover:border-gray-300 transition-all duration-300">
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="font-medium text-gray-600">{metric.name}</span>
+                <span className={`text-xs font-semibold flex items-center ${metric.trend === 'down' ? 'text-green-600' : 'text-amber-600'}`}>
+                    {metric.trend === 'down' ? <ArrowTrendingDownIcon className="w-3 h-3 mr-0.5" /> : <ArrowTrendingUpIcon className="w-3 h-3 mr-0.5" />}
+                    {metric.change}
+                </span>
+              </div>
+              <div className="font-bold text-2xl text-[#1B1F3B] mb-2">{metric.value}</div>
+              <div className="h-20 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={metric.data} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
+                    <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(100,100,100,0.3)', strokeWidth: 1, strokeDasharray: '3 3' }} />
+                    <defs>
+                        <linearGradient id={`color-${key}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={metric.color} stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor={metric.color} stopOpacity={0}/>
+                        </linearGradient>
+                    </defs>
+                    <Area
+                      type="monotone"
+                      dataKey={key === 'api' ? 'ms' : (key === 'errors' ? 'rate' : 'usage')}
+                      stroke={metric.color}
+                      strokeWidth={2}
+                      fill={`url(#color-${key})`}
+                      dot={false}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
   )
 }
