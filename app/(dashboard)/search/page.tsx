@@ -214,7 +214,6 @@ function SearchContent() {
     hasEmail: false,
     hasPhone: false,
   });
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCompanies = async () => {
