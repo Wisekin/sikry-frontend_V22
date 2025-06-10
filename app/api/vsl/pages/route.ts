@@ -1,200 +1,130 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
+import { NextResponse } from 'next/server';
+
+interface VSLPageStat {
+  views: number;
+  conversions: number;
+}
+interface VSLPageEntry {
+  page_id: string;
+  title: string;
+  template_id: string;
+  template_name: string;
+  status: 'Draft' | 'Published' | 'Archived';
+  stats: VSLPageStat;
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
+  live_url?: string;
+}
+
+interface VSLPagesData {
+    pages: VSLPageEntry[];
+}
+
+let mockVSLPages: VSLPageEntry[] = [
+  { page_id: "vslp_001", title: "My First VSL Campaign (Product A Launch)", template_id: "vsl_tpl_001", template_name: "Classic High-Converter", status: "Published", stats: { views: 12560, conversions: 870 }, created_at: "2023-11-10T10:00:00Z", updated_at: "2023-11-11T14:00:00Z", live_url: "/vsl/p/product-a-launch" },
+  { page_id: "vslp_002", title: "Webinar Replay Offer VSL", template_id: "vsl_tpl_003", template_name: "Webinar Replay VSL", status: "Published", stats: { views: 8750, conversions: 430 }, created_at: "2023-10-25T10:00:00Z", updated_at: "2023-10-26T14:00:00Z", live_url: "/vsl/p/webinar-replay-offer" },
+  { page_id: "vslp_003", title: "New Service Explainer (Draft)", template_id: "vsl_tpl_002", template_name: "Short & Punchy Explainer", status: "Draft", stats: { views: 0, conversions: 0 }, created_at: "2023-11-15T09:00:00Z", updated_at: "2023-11-15T09:00:00Z" },
+  { page_id: "vslp_004", title: "Archived Product Teaser", template_id: "vsl_tpl_004", template_name: "Product Demo VSL", status: "Archived", stats: { views: 5500, conversions: 150 }, created_at: "2023-09-01T00:00:00Z", updated_at: "2023-09-10T00:00:00Z" },
+];
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const page = Number.parseInt(searchParams.get("page") || "1", 10)
-    const limit = Number.parseInt(searchParams.get("limit") || "10", 10)
-    const template_type = searchParams.get("template_type")
-    const is_published = searchParams.get("is_published")
-    const search = searchParams.get("search")
-
-    const supabase = await createClient()
-
-    // Get current user's organization
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-
-    if (userError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const { data: teamMember, error: teamError } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
-
-    if (teamError || !teamMember) {
-      return NextResponse.json({ error: "User not part of any organization" }, { status: 403 })
-    }
-
-    // Build query
-    let query = supabase
-      .from("vsl_pages")
-      .select("*", { count: "exact" })
-      .eq("organization_id", teamMember.organization_id)
-
-    // Apply filters
-    if (template_type) {
-      query = query.eq("template_type", template_type)
-    }
-
-    if (is_published !== null) {
-      query = query.eq("is_published", is_published === "true")
-    }
-
-    if (search) {
-      query = query.or(`name.ilike.%${search}%,title.ilike.%${search}%,headline.ilike.%${search}%`)
-    }
-
-    // Apply pagination
-    const from = (page - 1) * limit
-    const to = from + limit - 1
-    query = query.range(from, to).order("created_at", { ascending: false })
-
-    const { data, error, count } = await query
-
-    if (error) {
-      throw error
-    }
-
-    return NextResponse.json({
-      data: data || [],
-      success: true,
-      meta: {
-        total: count || 0,
-        page,
-        limit,
-        hasMore: count ? from + data.length < count : false,
-      },
-    })
+    await new Promise(resolve => setTimeout(resolve, 400));
+    // In a real app, you might filter by user ID or team
+    return NextResponse.json({ data: { pages: mockVSLPages } });
   } catch (error) {
-    console.error("VSL Pages API error:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch VSL pages",
-        errors: [{ code: "fetch_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
-    )
+    console.error("Error fetching VSL pages:", error);
+    return NextResponse.json({ error: { message: "Error fetching VSL pages" } }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const supabase = await createClient()
+    try {
+        const body = await request.json() as { title: string; template_id: string; template_name: string }; // Simplified body for creation
 
-    // Get current user's organization
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
+        if (!body.title || typeof body.title !== 'string' || body.title.trim() === '') {
+            return NextResponse.json({ error: { message: "Page title is required." } }, { status: 400 });
+        }
+        if (!body.template_id || typeof body.template_id !== 'string') {
+            return NextResponse.json({ error: { message: "template_id is required." } }, { status: 400 });
+        }
+         if (!body.template_name || typeof body.template_name !== 'string') {
+            return NextResponse.json({ error: { message: "template_name is required." } }, { status: 400 });
+        }
 
-    if (userError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+        const newPage: VSLPageEntry = {
+            page_id: `vslp_${String(Date.now()).slice(-5)}_${Math.random().toString(36).substring(2,7)}`,
+            title: body.title,
+            template_id: body.template_id,
+            template_name: body.template_name,
+            status: 'Draft',
+            stats: { views: 0, conversions: 0 },
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            live_url: `/vsl/p/${body.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '').slice(0,50)}` // Basic slugify
+        };
+        mockVSLPages.unshift(newPage); // Add to the beginning for most recent first
+        return NextResponse.json({ data: newPage }, { status: 201 });
+    } catch (error) {
+        console.error("Error creating VSL page:", error);
+        if (error instanceof SyntaxError) { // Check for JSON parsing errors
+            return NextResponse.json({ error: { message: "Invalid JSON payload" } }, { status: 400 });
+        }
+        return NextResponse.json({ error: { message: "Error creating VSL page" } }, { status: 500 });
+    }
+}
+
+export async function PUT(request: Request) { // For updating status, title, etc.
+    const { searchParams } = new URL(request.url);
+    const pageId = searchParams.get('pageId');
+    if (!pageId) {
+        return NextResponse.json({ error: { message: "pageId query parameter is required for updates." } }, { status: 400 });
     }
 
-    const { data: teamMember, error: teamError } = await supabase
-      .from("team_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .single()
+    try {
+        const body = await request.json() as Partial<Omit<VSLPageEntry, 'page_id' | 'template_id' | 'template_name' | 'created_at' | 'stats'>>;
 
-    if (teamError || !teamMember) {
-      return NextResponse.json({ error: "User not part of any organization" }, { status: 403 })
+        if (body.title && (typeof body.title !== 'string' || body.title.trim() === '')) {
+             return NextResponse.json({ error: { message: "Page title must be a non-empty string if provided." } }, { status: 400 });
+        }
+        if (body.status && !['Draft', 'Published', 'Archived'].includes(body.status)) {
+            return NextResponse.json({ error: { message: "Invalid status provided. Must be 'Draft', 'Published', or 'Archived'." } }, { status: 400 });
+        }
+
+        const pageIndex = mockVSLPages.findIndex(p => p.page_id === pageId);
+        if (pageIndex === -1) {
+            return NextResponse.json({ error: { message: "VSL Page not found." } }, { status: 404 });
+        }
+
+        mockVSLPages[pageIndex] = {
+            ...mockVSLPages[pageIndex],
+            ...body,
+            updated_at: new Date().toISOString()
+        };
+
+        return NextResponse.json({ data: mockVSLPages[pageIndex] });
+    } catch (error) {
+         console.error("Error updating VSL page:", error);
+        if (error instanceof SyntaxError) {
+            return NextResponse.json({ error: { message: "Invalid JSON payload" } }, { status: 400 });
+        }
+        return NextResponse.json({ error: { message: "Error updating VSL page" } }, { status: 500 });
+    }
+}
+
+export async function DELETE(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const pageId = searchParams.get('pageId');
+    if (!pageId) {
+        return NextResponse.json({ error: { message: "pageId query parameter is required." } }, { status: 400 });
     }
 
-    // Validate required fields
-    if (!body.name || !body.title || !body.headline) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Missing required fields",
-          errors: [{ code: "validation_error", message: "Name, title, and headline are required" }],
-        },
-        { status: 400 },
-      )
+    const initialLength = mockVSLPages.length;
+    mockVSLPages = mockVSLPages.filter(p => p.page_id !== pageId);
+
+    if (mockVSLPages.length === initialLength) {
+        return NextResponse.json({ error: { message: "VSL Page not found." } }, { status: 404 });
     }
-
-    // Generate unique slug
-    const baseSlug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-    let slug = baseSlug
-    let counter = 1
-
-    while (true) {
-      const { data: existing } = await supabase
-        .from("vsl_pages")
-        .select("id")
-        .eq("organization_id", teamMember.organization_id)
-        .eq("slug", slug)
-        .single()
-
-      if (!existing) break
-      slug = `${baseSlug}-${counter}`
-      counter++
-    }
-
-    // Create VSL page
-    const vslPageData = {
-      organization_id: teamMember.organization_id,
-      name: body.name,
-      slug,
-      title: body.title,
-      description: body.description || null,
-      video_url: body.video_url || null,
-      video_thumbnail_url: body.video_thumbnail_url || null,
-      video_duration_seconds: body.video_duration_seconds || null,
-      template_type: body.template_type || "standard",
-      primary_color: body.primary_color || "#3B82F6",
-      secondary_color: body.secondary_color || "#1E40AF",
-      background_type: body.background_type || "solid",
-      background_value: body.background_value || null,
-      headline: body.headline,
-      subheadline: body.subheadline || null,
-      bullet_points: body.bullet_points || [],
-      testimonials: body.testimonials || [],
-      cta_text: body.cta_text || "Get Started Now",
-      cta_url: body.cta_url || null,
-      cta_button_color: body.cta_button_color || "#10B981",
-      meta_pixel_id: body.meta_pixel_id || null,
-      google_analytics_id: body.google_analytics_id || null,
-      custom_tracking_code: body.custom_tracking_code || null,
-      meta_title: body.meta_title || null,
-      meta_description: body.meta_description || null,
-      og_image_url: body.og_image_url || null,
-      is_published: body.is_published || false,
-      requires_opt_in: body.requires_opt_in || false,
-      collect_phone: body.collect_phone || false,
-      collect_company: body.collect_company || false,
-      created_by: user.id,
-    }
-
-    const { data, error } = await supabase.from("vsl_pages").insert(vslPageData).select().single()
-
-    if (error) {
-      throw error
-    }
-
-    return NextResponse.json({
-      data,
-      success: true,
-      message: "VSL page created successfully",
-    })
-  } catch (error) {
-    console.error("VSL Pages API error:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to create VSL page",
-        errors: [{ code: "create_error", message: error instanceof Error ? error.message : "Unknown error" }],
-      },
-      { status: 500 },
-    )
-  }
+    return NextResponse.json({ data: { message: "VSL Page deleted successfully." } });
 }
